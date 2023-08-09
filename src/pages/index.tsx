@@ -1,14 +1,17 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react';
 import { Button, Card, Text, Title } from "@tremor/react";
 
 export default function Home() {
+
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/App/Dashboard');
+  }, []);
+
   return (
     <>
-      <Card>
-        <Title>Hola</Title>
-        <Button size="xl">Read more</Button>
-      </Card>
     </>
   )
 }
