@@ -52,11 +52,23 @@ const Navbar: React.FC = () => {
                             
                             <HStack as="nav" spacing="1">
                                 
-                                <Button as={NextLink} colorScheme='messenger' variant='ghost' href='' size={'sm'}>
-                                    Section 1
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Dashboard' size={'sm'}>
+                                    Inicio
                                 </Button>
-                                <Button as={NextLink} colorScheme='messenger' variant='ghost' href='' size={'sm'}>
-                                    Section 2
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Students' size={'sm'}>
+                                    Estudiantes
+                                </Button>
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/FamilyManagement' size={'sm'}>
+                                    Gestión Familiar
+                                </Button>
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/StudentPrograms' size={'sm'}>
+                                    Programas
+                                </Button>
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Camps' size={'sm'}>
+                                    Campamentos
+                                </Button>
+                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/FinancialManager' size={'sm'}>
+                                    Gestor Financiero
                                 </Button>
                             </HStack>
                             {/* </Hide> */}
