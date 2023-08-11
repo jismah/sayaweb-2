@@ -10,6 +10,7 @@ export default function Parents() {
     
   const [dataParents, setDataParents] = useState([]);
   const [editMode, setEditMode] = useState(false);
+  const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
   const [loading, setLoading] = useState(false);
   const [dataParent, setDataParent] = useState({
     id: "",
@@ -39,6 +40,10 @@ export default function Parents() {
     });
     const json = await res.json();
     console.log(json);
+
+    //Mapear las relaciones
+
+
     setDataParents(json.response); // ACTUALIZAR EL ESTADO
     setTotalRecords(json.total); // Establecer el total de registros
     setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
@@ -53,6 +58,22 @@ export default function Parents() {
   }
 
   // CREATE DATA
+  const handleOpenCreateModal = () => {
+    setDataParent({
+      id: "",
+      identityCard: "",
+      name: "",
+      lastName1: "",
+      lastName2: "",
+      telephone: "",
+      email: "",
+      occupation: ""
+    });
+    setEditMode(false);
+    setShowMode(false);
+    onOpen();
+  };
+
   const handleCreateData = async (e: React.FormEvent) => {
     e.preventDefault()
     if (editMode) {
@@ -76,17 +97,6 @@ export default function Parents() {
       });
       const json = await res.json();
 
-      setDataParent({
-        id: "",
-        identityCard: "",
-        name: "",
-        lastName1: "",
-        lastName2: "",
-        telephone: "",
-        email: "",
-        occupation: ""
-      })
-
       toast({
         title: 'Registro Creado!',
         description: "Se creo el registro correctamente.",
@@ -94,9 +104,13 @@ export default function Parents() {
         position: 'bottom-right',
         duration: 4000,
         isClosable: true,
-      })
+      });
+      
     }
+    
+    setShowMode(false)
     setEditMode(false)
+   
     fetchData();
   }
 
@@ -153,10 +167,13 @@ export default function Parents() {
     fetchData();
   }
 
-  // VIEW DETAIL DATA
-  // const handleShowData = async (id: string) => {
-
-  // }
+  // VIEW SHOW DATA
+  const handleShowData = async (id: string, name: string, lastName1: string, lastName2: string, identityCard: string, telephone: string, email: string, occupation: string) => {
+    setDataParent({ id, name, lastName1, lastName2, identityCard, telephone, email, occupation });
+    setShowMode(true); // Cambiar a modo "mostrar"
+    console.log(id, name, lastName1, lastName2, identityCard, telephone, email, occupation)
+    onOpen()
+  }
 
   // PAGINATION
   const pageSize = 10; // Cantidad de elementos por página
@@ -191,58 +208,61 @@ export default function Parents() {
                 <Button size='sm' variant={'ghost'}>
                     Button #2
                 </Button>
-                <Button onClick={onOpen} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
+                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                     Nuevo Padre
                 </Button>
             </ButtonGroup>
           </Flex>
 
-          <Modal onClose={onClose} size={'full'} isOpen={isOpen}>
+          <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Crear programa</ModalHeader>
+                    <ModalHeader>{editMode ? "Editar" : (showMode ? "Detalle" : "Crear") }</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Box px={3} py={3}>
                         <form onSubmit={handleCreateData}>
-                          <Stack spacing={4}>                       
+                          <Stack spacing={4}>                     
                               <FormControl isRequired>
                                   <FormLabel>Nombre</FormLabel>
-                                  <Input value={dataParent.name || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, name: e.target.value })} />
+                                  <Input value={dataParent.name || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, name: e.target.value })} />
                               </FormControl>
 
                               <FormControl isRequired>
                                   <FormLabel>Primer apellido</FormLabel>
-                                  <Input value={dataParent.lastName1 || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, lastName1: e.target.value })} />
+                                  <Input value={dataParent.lastName1 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName1: e.target.value })} />
                               </FormControl>
 
                               <FormControl>
                                   <FormLabel>Segundo apellido</FormLabel>
-                                  <Input value={dataParent.lastName2 || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, lastName2: e.target.value })} />
+                                  <Input value={dataParent.lastName2 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName2: e.target.value })} />
                               </FormControl>
 
                               <FormControl isRequired>
                                   <FormLabel>Cédula</FormLabel>
-                                  <Input value={dataParent.identityCard || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, identityCard: e.target.value })} />
+                                  <Input value={dataParent.identityCard || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, identityCard: e.target.value })} />
                               </FormControl>
 
                               <FormControl isRequired>
                                   <FormLabel>Correo eléctronico</FormLabel>
-                                  <Input value={dataParent.email || ""} type='email' onChange={(e) => setDataParent({ ...dataParent, email: e.target.value })} />
+                                  <Input value={dataParent.email || ""} type='email' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, email: e.target.value })} />
                               </FormControl>
 
                               <FormControl>
                                   <FormLabel>Ocupación</FormLabel>
-                                  <Input value={dataParent.occupation || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, occupation: e.target.value })} />
+                                  <Input value={dataParent.occupation || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, occupation: e.target.value })} />
                               </FormControl>
 
                               <FormControl>
                                   <FormLabel>Número de telefono</FormLabel>
-                                  <Input value={dataParent.telephone || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, telephone: e.target.value })} />
+                                  <Input value={dataParent.telephone || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, telephone: e.target.value })} />
                               </FormControl>
 
+
+                              /*Poner aquí las tablas para las relaciones */
+
                               <Button type='submit' colorScheme='teal' mr={3}>
-                                        Agregar
+                                        {showMode ? "Cerrar" : "Agregar"}
                                       </Button>
                               <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>
 
@@ -255,6 +275,8 @@ export default function Parents() {
                     </ModalFooter>
                 </ModalContent>
           </Modal>   
+
+          
 
 
             {loading ?
@@ -275,8 +297,8 @@ export default function Parents() {
                                           <Thead>
                                               <Tr>
                                               <Th>ID</Th>
-                                              <Th>Cedula</Th>
                                               <Th>Nombre Completo</Th>
+                                              <Th>Cedula</Th>
                                               <Th>Telefono</Th>
                                               <Th>Email</Th>
                                               <Th>Ocupación</Th>
@@ -295,7 +317,7 @@ export default function Parents() {
                                                         <Td>{occupation}</Td>
                                                           <Td>
                                                               <ButtonGroup variant='ghost' spacing='1'>
-                                                                  <IconButton onClick={() => handleDeleteData(id)}
+                                                                  <IconButton onClick={() => handleShowData(id, name, lastName1, lastName2, identityCard, telephone, email, occupation)}
                                                                   colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
                                                                   <IconButton onClick={() => handleEditData(id, name, lastName1, lastName2, identityCard, telephone, email, occupation)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
