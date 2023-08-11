@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack, Show, Hide } from "@chakra-ui/react";
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import Image from 'next/image'
@@ -49,29 +49,34 @@ const Navbar: React.FC = () => {
                                 Saya Montessori
                             </Heading>
 
-                            
+
                             <HStack as="nav" spacing="1">
-                                
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Dashboard' size={'sm'}>
-                                    Inicio
-                                </Button>
                                 <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Students' size={'sm'}>
                                     Estudiantes
                                 </Button>
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/FamilyManagement' size={'sm'}>
-                                    Gestión Familiar
-                                </Button>
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/StudentPrograms' size={'sm'}>
-                                    Programas
-                                </Button>
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Camps' size={'sm'}>
-                                    Campamentos
-                                </Button>
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/FinancialManager' size={'sm'}>
-                                    Gestor Financiero
-                                </Button>
+
+                                <Menu>
+                                    <MenuButton as={Button} color={'teal'} variant='ghost' size={'sm'} rightIcon={<ChevronDownIcon />}>
+                                        Gestión Académica y Familiar
+                                    </MenuButton>
+                                    <MenuList>
+                                        <MenuItem as={NextLink} href='/App/FamilyManagement'>Gestion Familiar</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/StudentPrograms'>Programas</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Camps'>Campamentos</MenuItem>
+                                    </MenuList>
+                                </Menu>
+
+                                <Menu>
+                                    <MenuButton as={Button} color={'teal'} variant='ghost' size={'sm'} rightIcon={<ChevronDownIcon />}>
+                                        Gestión Administrativa
+                                    </MenuButton>
+                                    <MenuList>
+                                        <MenuItem as={NextLink} href='/'>Empleados</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/FinancialManager'>Gestor Financiero</MenuItem>
+                                    </MenuList>
+                                </Menu>
+
                             </HStack>
-                            {/* </Hide> */}
                         </Flex>
                     </Box>
 
