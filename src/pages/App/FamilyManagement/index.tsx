@@ -4,34 +4,22 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import Parents from '../../../../components/Students/Parents/Parents';
-import Students from '../../../../components/Students/Students/Students';
+import Family from '../../../../components/FamilyManagement/Family/Family';
 
-interface Student{
-    id: string;
-    name: string;
-    lastName1: string;
-    lastName2: string | null;
-    dateBirth: string;
-    housePhone: string;
-    address: string;
-    status: string;
-  
-    idFamily: string;
-  }
 
-const Student: NextPage = () => {
-
-    const [familySiblings, setFamilySiblings] = useState<Student[]>([]);
-
+const FamilyManagement: NextPage = () => {
 
     return (
         <>
             
-            <Students familyStudents={familySiblings} familyMode={false}/>
+
+
+                <Family/>
                 
+            
             
         </>
     )
 };
 
-export default Student;
+export default FamilyManagement;

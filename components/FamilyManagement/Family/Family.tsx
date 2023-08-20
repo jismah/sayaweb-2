@@ -6,6 +6,9 @@ import { User } from '@supabase/supabase-js';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
+import Parents from '../../Students/Parents/Parents';
+import _ from 'lodash';
+import Students from '../../Students/Students/Students';
 
 
 interface Student{
@@ -18,7 +21,7 @@ interface Student{
   address: string;
   status: string;
 
-  idFamily: string;  
+  idFamily: string;
 }
 
 interface Parent {
@@ -38,16 +41,21 @@ interface Parent {
 interface Family{
   id: string;
   students: Student[];
-  parents: Parent[];
+  parents: Family[];
   // user: User;
 }
 
-export default function Parents({familyParents, familyMode} : {familyParents : Parent[]; familyMode: boolean}) {
+export default function Family() {
     
-  const [dataParents, setDataParents] = useState<Parent[]>([]);
+  const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
   const [loading, setLoading] = useState(false);
+  const [dataFamily, setDataFamily] = useState<Family>({
+    id: "",
+    students: [],
+    parents: [],
+  });
   const [dataParent, setDataParent] = useState<Parent>({
     id: "",
     identityCard: "",
@@ -60,8 +68,9 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
     idFamily: "", 
     children: [],
   });
-  const [familyChildrens, setFamilyChildrens] = useState<Student[]>([]);
-  const [familyHeaders, setFamilyHeaders] = useState<Parent[]>([]);
+
+  const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
+  const [familyParents, setFamilyParents] = useState<Parent[]>([]);
 
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -69,72 +78,112 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
 
   // GET DATA TO LOAD ARRAY
   const fetchData = async () => {
-    setLoading(true); 
+  setLoading(true); 
+
+  try {
+    const familiesResponse = await fetch(`http://localhost:3000/api/family?page=${currentPage}&pageSize=${pageSize}`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "123456",
+    },
+    });
+    const json = await familiesResponse.json();
+    console.log(json);
+
+    setDataFamilies(json.response); // ACTUALIZAR EL ESTADO
+    setTotalRecords(json.total); // Establecer el total de registros
+    setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
+
     
-    if (familyMode){
-      setDataParents(familyParents);
-      setLoading(false);
-    } else {
-      try {
-        const parentsResponse = await fetch(`http://localhost:3000/api/parents?page=${currentPage}&pageSize=${pageSize}`, {
-          method: 'GET',
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "123456",
-        },
-        });
-        const json = await parentsResponse.json();
-        console.log(json);
-    
-        setDataParents(json.response); // ACTUALIZAR EL ESTADO
-        setTotalRecords(json.total); // Establecer el total de registros
-        setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
-    
-        
-      } catch (error) {
-        console.error(error);
-          // MANEJO DE ERRORES
-        } finally {
-          setLoading(false); 
-        }
-      
+  } catch (error) {
+    console.error(error);
+      // MANEJO DE ERRORES
+    } finally {
+      setLoading(false); 
     }
   }
 
-  
+  // CRUD PARENTS
+    // CREATE DATA
+    const handleOpenCreateModalParents = () => {
+      setDataParent({
+        id: "",
+        identityCard: "",
+        name: "",
+        lastName1: "",
+        lastName2: "",
+        telephone: "",
+        email: "",
+        occupation: "",
+        idFamily: "",
+        children: [],
+      });
+      setEditMode(false);
+      setShowMode(false);
+      onOpen();
+    };
 
-  // CREATE DATA
-  const handleOpenCreateModal = () => {
-    setDataParent({
-      id: "",
-      identityCard: "",
-      name: "",
-      lastName1: "",
-      lastName2: "",
-      telephone: "",
-      email: "",
-      occupation: "",
-      idFamily: "",
-      children: [],
-    });
-    setEditMode(false);
-    setShowMode(false);
-    onOpen();
-  };
+    const handleCreateDataParents = async (e: React.FormEvent) => {
+      e.preventDefault()
+      if (editMode) {
+        handleUpdateDateParents()
+        onClose()
+      } else {
+        const res = await fetch('http://localhost:3000/api/parents/', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "123456",
+          },
+          body: JSON.stringify({
+            identityCard: dataParent.identityCard,
+            name: dataParent.name,
+            lastName1: dataParent.lastName1,
+            lastName2: dataParent.lastName2,
+            telephone: dataParent.telephone,
+            email: dataParent.email,
+            occupation: dataParent.occupation,
+          })
+        });
+        const json = await res.json();
 
-  const handleCreateData = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (editMode) {
-      handleUpdateDate()
-      onClose()
-    } else {
-      const res = await fetch('http://localhost:3000/api/parents/', {
-        method: 'POST',
+        toast({
+          title: 'Registro Creado!',
+          description: "Se creo el registro correctamente.",
+          status: 'success',
+          position: 'bottom-right',
+          duration: 4000,
+          isClosable: true,
+        });
+        
+      }
+      
+      setShowMode(false)
+      setEditMode(false)
+    
+      fetchData();
+    }
+
+    // EDIT DATA
+    const handleEditDataParents = async (parent: Parent) => {
+      const selectedParent = familyParents.find(p => p.id === parent.id)!;
+      
+      setDataParent(selectedParent);
+      onOpen();
+      
+      setEditMode(true);
+    }
+
+    const handleUpdateDateParents = async () => {
+      const res = await fetch(`http://localhost:3000/api/parents/${dataParent.id}`, {
+        method: 'PUT',
         headers: {
           "Content-Type": "application/json",
           "x-api-key": "123456",
         },
         body: JSON.stringify({
+          id: dataParent.id,
           identityCard: dataParent.identityCard,
           name: dataParent.name,
           lastName1: dataParent.lastName1,
@@ -145,93 +194,72 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
         })
       });
       const json = await res.json();
+      console.log(json)
+      onClose()
+      setEditMode(false)
+      fetchData()
+    }
 
+    // DELETE DATA
+    const handleDeleteDataParents = async (id: string) => {
+      const res = await fetch(`/api/parents/${id}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+        },
+        body: JSON.stringify({ id }),
+      })
+      const json = await res.json()
       toast({
-        title: 'Registro Creado!',
-        description: "Se creo el registro correctamente.",
+        title: 'Registro Eliminado!',
+        description: "Se elimino el registro correctamente.",
         status: 'success',
         position: 'bottom-right',
         duration: 4000,
         isClosable: true,
-      });
-      
+      })
+      fetchData();
     }
+
+  // CRUD STUDENTS
+
+
+  // CREATE DATA
+  const handleOpenCreateModal = () => {
+
+  }
+
+  const handleCreateData =async (e:React.FormEvent) => {
     
-    setShowMode(false)
-    setEditMode(false)
-   
-    fetchData();
   }
 
   // EDIT DATA
-  const handleEditData = async (parent: Parent) => {
-    const selectedParent = dataParents.find(p => p.id === parent.id)!;
-    
-    setDataParent(selectedParent);
-    onOpen();
-    
-    setEditMode(true);
+  const handleEditData = (parent : Parent) => {
+
   }
 
-  const handleUpdateDate = async () => {
-    const res = await fetch(`http://localhost:3000/api/parents/${dataParent.id}`, {
-      method: 'PUT',
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": "123456",
-      },
-      body: JSON.stringify({
-        id: dataParent.id,
-        identityCard: dataParent.identityCard,
-        name: dataParent.name,
-        lastName1: dataParent.lastName1,
-        lastName2: dataParent.lastName2,
-        telephone: dataParent.telephone,
-        email: dataParent.email,
-        occupation: dataParent.occupation,
-      })
-    });
-    const json = await res.json();
-    console.log(json)
-    onClose()
-    setEditMode(false)
-    fetchData()
-  }
+  const handleUpdateDate =async () => {
+    
+  } 
 
   // DELETE DATA
-  const handleDeleteData = async (id: string) => {
-    const res = await fetch(`/api/parents/${id}`, {
-      method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": "123456",
-      },
-      body: JSON.stringify({ id }),
-    })
-    const json = await res.json()
-    toast({
-      title: 'Registro Eliminado!',
-      description: "Se elimino el registro correctamente.",
-      status: 'success',
-      position: 'bottom-right',
-      duration: 4000,
-      isClosable: true,
-    })
-    fetchData();
+  const handleDeleteData =async (id:string) => {
+    
   }
 
   // SHOW DATA
-  const handleShowData = async (parent: Parent) => {
-    const selectedParent = dataParents.find(p => p.id === parent.id)!;
+  const handleShowData = async (family: Family) => {
+    const selectedFamily = dataFamilies.find(f => f.id === family.id)!;
 
-    setDataParent(selectedParent);
+    setDataFamily(selectedFamily);
     setShowMode(true); // Cambiar a modo "mostrar"
     onOpen()
     setLoading(true); 
 
     //Petición para obtener los demás cabeceras de la familia
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedParent?.idFamily}/parents`, {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/parents`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +267,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
       },
       });
       const json = await response.json();
-      setFamilyHeaders(json.response);
+      setFamilyParents(json.response);
     } catch (error) {
       console.error(error);
     }  finally {
@@ -248,7 +276,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
 
     //Petición para obtener los estudiantes (hijos)
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedParent?.idFamily}/students`, {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/students`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -256,7 +284,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
       },
       });
       const json = await response.json();
-      setFamilyChildrens(json.response);
+      setFamilyStudents(json.response);
     } catch (error) {
       console.error(error);
     }  finally {
@@ -269,6 +297,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
+
 
 
   const handlePageChange = (newPage: number) => {
@@ -286,7 +315,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
       <>
           <Box px={3} py={3}>
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-            <Heading as='h3' size='xl' id='Parents' >Padres</Heading>
+            <Heading as='h3' size='xl' id='Parents' >Familias</Heading>
             <ButtonGroup>
                 <Button size='sm' variant={'ghost'}>
                     Button #4
@@ -297,8 +326,8 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                 <Button size='sm' variant={'ghost'}>
                     Button #2
                 </Button>
-                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
-                    Nuevo Padre
+                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
+                    Nueva Familia
                 </Button>
             </ButtonGroup>
           </Flex>
@@ -312,40 +341,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                     <Box px={3} py={3}>
                     <form onSubmit={handleCreateData}>
                       <Stack spacing={4}>                     
-                          <FormControl isRequired>
-                              <FormLabel>Nombre</FormLabel>
-                              <Input value={dataParent.name || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, name: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl isRequired>
-                              <FormLabel>Primer apellido</FormLabel>
-                              <Input value={dataParent.lastName1 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName1: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl>
-                              <FormLabel>Segundo apellido</FormLabel>
-                              <Input value={dataParent.lastName2 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName2: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl isRequired>
-                              <FormLabel>Cédula</FormLabel>
-                              <Input value={dataParent.identityCard || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, identityCard: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl isRequired>
-                              <FormLabel>Correo eléctronico</FormLabel>
-                              <Input value={dataParent.email || ""} type='email' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, email: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl>
-                              <FormLabel>Ocupación</FormLabel>
-                              <Input value={dataParent.occupation || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, occupation: e.target.value })} />
-                          </FormControl>
-
-                          <FormControl>
-                              <FormLabel>Número de telefono</FormLabel>
-                              <Input value={dataParent.telephone || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, telephone: e.target.value })} />
-                          </FormControl>
+                          
 
 
                         {/*Tablas pertenecientes para las relaciones */}
@@ -364,40 +360,10 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                             </Box>
                           ) : (
                             <Box pt={4}>
-                              <FormLabel>Cabeceras de la familia</FormLabel>
-                              <Card variant={'outline'}>
-                                <CardBody p={0}>
-                                  <TableContainer>
-                                    <Table variant='striped'>
-                                      <Thead>
-                                          <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Cedula</Th>
-                                            <Th>Telefono</Th>
-                                            <Th>Email</Th>
-                                            <Th>Ocupación</Th>
-                                          </Tr>
-                                      </Thead>
-                                      <Tbody>
-                                          {familyHeaders.map((parent: Parent) => {
-                                              return (
-                                                <Tr key={parent.id}>
-                                                  <Td>{parent.id}</Td>
-                                                  <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                  <Td>{parent.identityCard}</Td>
-                                                  <Td>{parent.telephone}</Td>
-                                                  <Td>{parent.email}</Td>
-                                                  <Td>{parent.occupation}</Td>
-                                                </Tr>
-                                              )
-                                          })
-                                          }
-                                      </Tbody>
-                                    </Table>
-                                  </TableContainer>
-                                </CardBody>
-                              </Card>
+                              
+
+                              <Parents familyParents = {familyParents} familyMode={true}/>
+
                             </Box>
                           )
                         )}
@@ -417,38 +383,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                             </Box>
                           ) : (
                             <Box pt={4}>
-                              <FormLabel>Hijos</FormLabel>
-                              <Card variant={'outline'}>
-                                <CardBody p={0}>
-                                  <TableContainer>
-                                    <Table variant='striped'>
-                                      <Thead>
-                                          <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Telefono</Th>
-                                            <Th>Dirección</Th>
-                                            <Th>Fecha de nacimiento</Th>
-                                          </Tr>
-                                      </Thead>
-                                      <Tbody>
-                                          {familyChildrens.map((student: Student) => {
-                                              return (
-                                                <Tr key={student.id}>
-                                                  <Td>{student.id}</Td>
-                                                  <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                  <Td>{student.housePhone}</Td>
-                                                  <Td>{student.address}</Td>
-                                                  <Td>{student.dateBirth}</Td>
-                                                </Tr>
-                                              )
-                                          })
-                                          }
-                                      </Tbody>
-                                    </Table>
-                                  </TableContainer>
-                                </CardBody>
-                              </Card>
+                              <Students familyStudents={familyStudents} familyMode={true}/>
                             </Box>
                           )
                         )}
@@ -490,32 +425,26 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                                   <Thead>
                                       <Tr>
                                       <Th>ID</Th>
-                                      <Th>Nombre Completo</Th>
-                                      <Th>Cedula</Th>
-                                      <Th>Telefono</Th>
-                                      <Th>Email</Th>
-                                      <Th>Ocupación</Th>
+                                      <Th>Titulo</Th>
+                                      <Th>Nombre de usuario</Th>
                                       <Th>Acciones</Th>
                                       </Tr>
                                   </Thead>
                                   <Tbody>
-                                      {dataParents.map(parent => {
+                                      {dataFamilies.map(family => {
                                           return (
-                                              <Tr key={parent.id}>
-                                                <Td>{parent.id}</Td>
-                                                <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                <Td>{parent.identityCard}</Td>
-                                                <Td>{parent.telephone}</Td>
-                                                <Td>{parent.email}</Td>
-                                                <Td>{parent.occupation}</Td>
+                                              <Tr key={family.id}>
+                                                <Td>{family.id}</Td>
+                                                <Td>{"Apellido1Padre"} {"Apellido1Madre"} </Td>
+                                                <Td>{"username"} </Td>
                                                 <Td>
                                                     <ButtonGroup variant='ghost' spacing='1'>
-                                                        <IconButton onClick={() => handleShowData(parent)}
+                                                        <IconButton onClick={() => handleShowData(family)}
                                                         colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                        <IconButton onClick={() => handleEditData(parent)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                        {/* <IconButton onClick={() => handleEditData(family)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton> */}
 
-                                                        <IconButton onClick={() => handleDeleteData(parent.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={familyMode ? 'block' : 'none'}></IconButton>
+                                                        <IconButton onClick={() => handleDeleteData(family.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
                                                     </ButtonGroup>
                                                 </Td>
                                               </Tr>
@@ -607,10 +536,10 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                 </Button>
               </ButtonGroup>
           </Box>
-         
-          
+                
           
       </>
   )
 };
+
 
