@@ -104,126 +104,6 @@ export default function Family() {
     }
   }
 
-  // CRUD PARENTS
-    // CREATE DATA
-    const handleOpenCreateModalParents = () => {
-      setDataParent({
-        id: "",
-        identityCard: "",
-        name: "",
-        lastName1: "",
-        lastName2: "",
-        telephone: "",
-        email: "",
-        occupation: "",
-        idFamily: "",
-        children: [],
-      });
-      setEditMode(false);
-      setShowMode(false);
-      onOpen();
-    };
-
-    const handleCreateDataParents = async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (editMode) {
-        handleUpdateDateParents()
-        onClose()
-      } else {
-        const res = await fetch('http://localhost:3000/api/parents/', {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "123456",
-          },
-          body: JSON.stringify({
-            identityCard: dataParent.identityCard,
-            name: dataParent.name,
-            lastName1: dataParent.lastName1,
-            lastName2: dataParent.lastName2,
-            telephone: dataParent.telephone,
-            email: dataParent.email,
-            occupation: dataParent.occupation,
-          })
-        });
-        const json = await res.json();
-
-        toast({
-          title: 'Registro Creado!',
-          description: "Se creo el registro correctamente.",
-          status: 'success',
-          position: 'bottom-right',
-          duration: 4000,
-          isClosable: true,
-        });
-        
-      }
-      
-      setShowMode(false)
-      setEditMode(false)
-    
-      fetchData();
-    }
-
-    // EDIT DATA
-    const handleEditDataParents = async (parent: Parent) => {
-      const selectedParent = familyParents.find(p => p.id === parent.id)!;
-      
-      setDataParent(selectedParent);
-      onOpen();
-      
-      setEditMode(true);
-    }
-
-    const handleUpdateDateParents = async () => {
-      const res = await fetch(`http://localhost:3000/api/parents/${dataParent.id}`, {
-        method: 'PUT',
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "123456",
-        },
-        body: JSON.stringify({
-          id: dataParent.id,
-          identityCard: dataParent.identityCard,
-          name: dataParent.name,
-          lastName1: dataParent.lastName1,
-          lastName2: dataParent.lastName2,
-          telephone: dataParent.telephone,
-          email: dataParent.email,
-          occupation: dataParent.occupation,
-        })
-      });
-      const json = await res.json();
-      console.log(json)
-      onClose()
-      setEditMode(false)
-      fetchData()
-    }
-
-    // DELETE DATA
-    const handleDeleteDataParents = async (id: string) => {
-      const res = await fetch(`/api/parents/${id}`, {
-        method: 'DELETE',
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "123456",
-        },
-        body: JSON.stringify({ id }),
-      })
-      const json = await res.json()
-      toast({
-        title: 'Registro Eliminado!',
-        description: "Se elimino el registro correctamente.",
-        status: 'success',
-        position: 'bottom-right',
-        duration: 4000,
-        isClosable: true,
-      })
-      fetchData();
-    }
-
-  // CRUD STUDENTS
-
 
   // CREATE DATA
   const handleOpenCreateModal = () => {
@@ -235,7 +115,7 @@ export default function Family() {
   }
 
   // EDIT DATA
-  const handleEditData = (parent : Parent) => {
+  const handleEditData = (family : Family) => {
 
   }
 
@@ -442,7 +322,7 @@ export default function Family() {
                                                         <IconButton onClick={() => handleShowData(family)}
                                                         colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                        {/* <IconButton onClick={() => handleEditData(family)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton> */}
+                                                        <IconButton onClick={() => handleEditData(family)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
                                                         <IconButton onClick={() => handleDeleteData(family.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
                                                     </ButtonGroup>
