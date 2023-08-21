@@ -49,6 +49,7 @@ export default function Family() {
     
   const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
   const [editMode, setEditMode] = useState(false);
+  const [enableEditing, setEnableEditing] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
   const [loading, setLoading] = useState(false);
   const [dataFamily, setDataFamily] = useState<Family>({
@@ -108,24 +109,67 @@ export default function Family() {
   // CREATE DATA
   const handleOpenCreateModal = () => {
 
+    setEditMode(false);
+    setShowMode(false);
   }
 
   const handleCreateData =async (e:React.FormEvent) => {
-    
+    e.preventDefault()
+    if(editMode){
+      handleUpdateDate()
+      onClose()
+    }else{
+      //FETCH TO PARENT
+
+
+      //FETCH TO STUDENT
+
+      
+    }
+
+    setEditMode(false);
+    setShowMode(false);
   }
 
   // EDIT DATA
   const handleEditData = (family : Family) => {
+    const selectedFamily = dataFamilies.find(f => f.id === family.id)!;
 
+    setDataFamily(selectedFamily);
+    onOpen();
+
+    setEditMode(true);
+    setEnableEditing(true);
   }
 
   const handleUpdateDate =async () => {
-    
+
+
+    onClose();
+    setEditMode(false);
+    fetchData();
   } 
 
   // DELETE DATA
   const handleDeleteData =async (id:string) => {
-    
+    const res = await fetch(`/api/family/${id}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "123456",
+      },
+      body: JSON.stringify({ id }),
+    })
+    const json = await res.json()
+    toast({
+      title: 'Registro Eliminado!',
+      description: "Se elimino el registro correctamente.",
+      status: 'success',
+      position: 'bottom-right',
+      duration: 4000,
+      isClosable: true,
+    })
+    fetchData();
   }
 
   // SHOW DATA
@@ -212,7 +256,7 @@ export default function Family() {
             </ButtonGroup>
           </Flex>
 
-          <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
+          <Modal onClose={() => { setShowMode(false); setEditMode(false);  setEnableEditing(false); onClose();}} size={'full'} isOpen={isOpen}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>{editMode ? "Editar" : (showMode ? "Detalle" : "Crear") }</ModalHeader>
@@ -227,7 +271,7 @@ export default function Family() {
                         {/*Tablas pertenecientes para las relaciones */}
 
                         {/* Tabla los padres */}
-                        {showMode && (
+                        {(showMode || editMode) && (
                           loading ? (
                             <Box pt={4}>
                               <Card variant={'outline'}>
@@ -240,9 +284,8 @@ export default function Family() {
                             </Box>
                           ) : (
                             <Box pt={4}>
-                              
 
-                              <Parents familyParents = {familyParents} familyMode={true}/>
+                              <Parents familyParents = {familyParents} familyMode={true} enableEditing={enableEditing}/>
 
                             </Box>
                           )
@@ -250,7 +293,7 @@ export default function Family() {
 
 
                         {/* Tabla estudiantes(hijos) */}
-                        {showMode && (
+                        {(showMode || editMode) && (
                           loading ? (
                             <Box pt={4}>
                               <Card variant={'outline'}>
@@ -263,16 +306,18 @@ export default function Family() {
                             </Box>
                           ) : (
                             <Box pt={4}>
-                              <Students familyStudents={familyStudents} familyMode={true}/>
+
+                              <Students familyStudents={familyStudents} familyMode={true} enableEditing={enableEditing}/>
+
                             </Box>
                           )
                         )}
 
 
-                          <Button type='submit' colorScheme='teal' mr={3}>
-                                    {showMode ? "Cerrar" : "Agregar"}
-                                  </Button>
-                          <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>
+                        <Button type='submit' colorScheme='teal' mr={3}>
+                                  {showMode ? "Cerrar" : "Agregar"}
+                                </Button>
+                        <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>
 
                       </Stack>
                     </form>

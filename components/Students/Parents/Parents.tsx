@@ -42,7 +42,7 @@ interface Family{
   // user: User;
 }
 
-export default function Parents({familyParents, familyMode} : {familyParents : Parent[]; familyMode: boolean}) {
+export default function Parents({familyParents, familyMode, enableEditing} : {familyParents : Parent[]; familyMode: boolean; enableEditing : boolean}) {
     
   const [dataParents, setDataParents] = useState<Parent[]>([]);
   const [editMode, setEditMode] = useState(false);
@@ -73,6 +73,7 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
     
     if (familyMode){
       setDataParents(familyParents);
+
       setLoading(false);
     } else {
       try {
@@ -287,23 +288,26 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
           <Box px={3} py={3}>
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
             <Heading as='h3' size='xl' id='Parents' >Padres</Heading>
-            <ButtonGroup>
-                <Button size='sm' variant={'ghost'}>
-                    Button #4
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #3
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #2
-                </Button>
-                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
-                    Nuevo Padre
-                </Button>
-            </ButtonGroup>
+            <Box display={enableEditing ? 'block' : 'none'}>
+              <ButtonGroup>
+                  <Button size='sm' variant={'ghost'}>
+                      Button #4
+                  </Button>
+                  <Button size='sm' variant={'ghost'}>
+                      Button #3
+                  </Button>
+                  <Button size='sm' variant={'ghost'}>
+                      Button #2
+                  </Button>
+                  <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
+                      Nuevo Padre
+                  </Button>
+              </ButtonGroup>
+            </Box>
+            
           </Flex>
 
-          <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
+          <Modal onClose={() => { setShowMode(false); setEditMode(false); onClose();}} size={'full'} isOpen={isOpen}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>{editMode ? "Editar" : (showMode ? "Detalle" : "Crear") }</ModalHeader>
@@ -513,9 +517,9 @@ export default function Parents({familyParents, familyMode} : {familyParents : P
                                                         <IconButton onClick={() => handleShowData(parent)}
                                                         colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                        <IconButton onClick={() => handleEditData(parent)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                        <IconButton onClick={() => handleEditData(parent)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
 
-                                                        <IconButton onClick={() => handleDeleteData(parent.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={familyMode ? 'block' : 'none'}></IconButton>
+                                                        <IconButton onClick={() => handleDeleteData(parent.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
                                                     </ButtonGroup>
                                                 </Td>
                                               </Tr>

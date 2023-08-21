@@ -42,7 +42,7 @@ interface Family{
   // user: User;
 }
 
-export default function Students({familyStudents, familyMode} : {familyStudents : Student[]; familyMode: boolean}) {
+export default function Students({familyStudents, familyMode, enableEditing} : {familyStudents : Student[]; familyMode: boolean; enableEditing : boolean}) {
     
   const [dataStudents, setDataStudents] = useState<Student[]>([]);
   const [editMode, setEditMode] = useState(false);
@@ -286,20 +286,22 @@ export default function Students({familyStudents, familyMode} : {familyStudents 
           <Box px={3} py={3}>
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
             <Heading as='h3' size='xl' id='Parents' >Estudiantes</Heading>
-            <ButtonGroup>
-                <Button size='sm' variant={'ghost'}>
-                    Button #4
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #3
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #2
-                </Button>
-                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
-                    Nuevo Estudiante
-                </Button>
-            </ButtonGroup>
+              <Box display={enableEditing ? 'block' : 'none'}>
+                <ButtonGroup>
+                    <Button size='sm' variant={'ghost'}>
+                        Button #4
+                    </Button>
+                    <Button size='sm' variant={'ghost'}>
+                        Button #3
+                    </Button>
+                    <Button size='sm' variant={'ghost'}>
+                        Button #2
+                    </Button>
+                    <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
+                        Nuevo Estudiante
+                    </Button>
+                </ButtonGroup>
+              </Box>
           </Flex>
 
             <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
@@ -494,9 +496,9 @@ export default function Students({familyStudents, familyMode} : {familyStudents 
                                                         <IconButton onClick={() => handleShowData(student)}
                                                         colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                        <IconButton onClick={() => handleEditData(student)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                        <IconButton onClick={() => handleEditData(student)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
 
-                                                        <IconButton onClick={() => handleDeleteData(student.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={familyMode ? 'block' : 'none'}></IconButton>
+                                                        <IconButton onClick={() => handleDeleteData(student.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
                                                     </ButtonGroup>
                                                 </Td>
                                               </Tr>
