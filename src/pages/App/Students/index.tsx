@@ -27,7 +27,7 @@ const Student: NextPage = () => {
     return (
         <>
             
-            <Students familyStudents={familySiblings} familyMode={false}/>
+            <Students familyStudents={familySiblings} familyMode={false} enableEditing={true}/>
                 
             
         </>
