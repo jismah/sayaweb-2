@@ -9,44 +9,44 @@ import React, { useState, useEffect } from 'react';
 import Parents from '../../Students/Parents/Parents';
 import _ from 'lodash';
 import Students from '../../Students/Students/Students';
+import StudentForm from '../../Inscriptions/StudentForm/StudentForm';
 
 
-interface Student{
-  id: string;
-  name: string;
-  lastName1: string;
-  lastName2: string | null;
-  dateBirth: string;
-  housePhone: string;
-  address: string;
-  status: string;
+import { Student } from '../../Students/Students/Students';
 
-  idFamily: string;
-}
-
-interface Parent {
-  id: string;
-  identityCard: string;
-  name: string;
-  lastName1: string;
-  lastName2: string | null;
-  telephone: string | null;
-  email: string;
-  occupation: string | null; 
-
-  idFamily: string;
-  children: Student[];
-}
+import { Parent } from '../../Students/Parents/Parents';
 
 interface Family{
   id: string;
   students: Student[];
-  parents: Family[];
+  parents: Parent[];
   // user: User;
 }
 
 export default function Family() {
     
+  const initialStudentData: Student = {
+    id: "",
+    name: "",
+    lastName1: "",
+    lastName2: "",
+    housePhone: "",
+    address: "",
+    status: "",
+    commentary: "",
+    medicalCondition: "",
+    progressDesired: "",
+    allowedPictures: false,
+    dateBirth: "",
+    idPediatrician: "",
+    emergencyContacts: [],
+    tutors: [],
+    idCity: "",
+    idProgram: "",
+    evaluations: [],
+    idFamily: "", 
+  };
+  
   const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [enableEditing, setEnableEditing] = useState(false);
@@ -69,6 +69,8 @@ export default function Family() {
     idFamily: "", 
     children: [],
   });
+  const [dataStudent, setDataStudent] = useState<Student>(initialStudentData);
+
 
   const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
   const [familyParents, setFamilyParents] = useState<Parent[]>([]);
@@ -111,6 +113,7 @@ export default function Family() {
 
     setEditMode(false);
     setShowMode(false);
+    onOpen();
   }
 
   const handleCreateData =async (e:React.FormEvent) => {
@@ -118,17 +121,12 @@ export default function Family() {
     if(editMode){
       handleUpdateDate()
       onClose()
-    }else{
-      //FETCH TO PARENT
-
-
-      //FETCH TO STUDENT
-
-      
     }
 
     setEditMode(false);
     setShowMode(false);
+
+    fetchData();
   }
 
   // EDIT DATA
@@ -137,6 +135,9 @@ export default function Family() {
 
     setDataFamily(selectedFamily);
     onOpen();
+
+    loadParentsAndStudents(selectedFamily);
+    
 
     setEditMode(true);
     setEnableEditing(true);
@@ -178,7 +179,19 @@ export default function Family() {
 
     setDataFamily(selectedFamily);
     setShowMode(true); // Cambiar a modo "mostrar"
-    onOpen()
+    onOpen();
+
+    loadParentsAndStudents(selectedFamily);
+    
+  }
+
+  // PAGINATION
+  const pageSize = 10; // Cantidad de elementos por página
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
+
+  const loadParentsAndStudents = async (selectedFamily : Family) => {
     setLoading(true); 
 
     //Petición para obtener los demás cabeceras de la familia
@@ -215,13 +228,6 @@ export default function Family() {
       setLoading(false); 
     }
   }
-
-  // PAGINATION
-  const pageSize = 10; // Cantidad de elementos por página
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
-
 
 
   const handlePageChange = (newPage: number) => {
@@ -265,8 +271,12 @@ export default function Family() {
                     <Box px={3} py={3}>
                     <form onSubmit={handleCreateData}>
                       <Stack spacing={4}>                     
-                          
-
+                        {
+                          !(showMode || editMode) && (
+                            <StudentForm dataParents={familyParents} dataStudent={dataStudent} editingMode={false}/>
+                          )
+                        }
+                        
 
                         {/*Tablas pertenecientes para las relaciones */}
 
@@ -314,7 +324,7 @@ export default function Family() {
                         )}
 
 
-                        <Button type='submit' colorScheme='teal' mr={3}>
+                        <Button type='submit' colorScheme='teal' mr={3} display={editMode ? 'block' : (showMode ? 'block' : 'none')}>
                                   {showMode ? "Cerrar" : "Agregar"}
                                 </Button>
                         <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>

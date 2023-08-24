@@ -6,18 +6,7 @@ import React, { useState, useEffect } from 'react';
 import Parents from '../../../../components/Students/Parents/Parents';
 import Students from '../../../../components/Students/Students/Students';
 
-interface Student{
-    id: string;
-    name: string;
-    lastName1: string;
-    lastName2: string | null;
-    dateBirth: string;
-    housePhone: string;
-    address: string;
-    status: string;
-  
-    idFamily: string;
-  }
+import { Student } from '../../../../components/Students/Students/Students';
 
 const Student: NextPage = () => {
 

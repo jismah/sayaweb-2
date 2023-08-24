@@ -8,26 +8,15 @@ import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 
 
-interface Student{
-  id: string;
-  name: string;
-  lastName1: string;
-  lastName2: string | null;
-  dateBirth: string;
-  housePhone: string;
-  address: string;
-  status: string;
+import { Student } from '../../Students/Students/Students';
 
-  idFamily: string;  
-}
-
-interface Parent {
+export interface Parent {
   id: string;
   identityCard: string;
   name: string;
   lastName1: string;
   lastName2: string | null;
-  telephone: string | null;
+  telephone: string ;
   email: string;
   occupation: string | null; 
 
@@ -35,12 +24,12 @@ interface Parent {
   children: Student[];
 }
 
-interface Family{
-  id: string;
-  students: Student[];
-  parents: Parent[];
-  // user: User;
-}
+// interface Family{
+//   id: string;
+//   students: Student[];
+//   parents: Parent[];
+//   // user: User;
+// }
 
 export default function Parents({familyParents, familyMode, enableEditing} : {familyParents : Parent[]; familyMode: boolean; enableEditing : boolean}) {
     
@@ -170,6 +159,8 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
     
     setDataParent(selectedParent);
     onOpen();
+
+    loadHeadersAndChildrens(selectedParent);
     
     setEditMode(true);
   }
@@ -228,6 +219,10 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
     setDataParent(selectedParent);
     setShowMode(true); // Cambiar a modo "mostrar"
     onOpen()
+    
+  }
+
+  const loadHeadersAndChildrens = async (selectedParent : Parent) => {
     setLoading(true); 
 
     //Petición para obtener los demás cabeceras de la familia

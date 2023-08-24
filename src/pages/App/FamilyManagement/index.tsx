@@ -7,6 +7,7 @@ import Parents from '../../../../components/Students/Parents/Parents';
 import Family from '../../../../components/FamilyManagement/Family/Family';
 
 
+
 const FamilyManagement: NextPage = () => {
 
     return (
