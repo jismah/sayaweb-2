@@ -1,7 +1,6 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
 import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
-import { User } from '@supabase/supabase-js';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
 import { NextPage } from 'next';
 import Head from 'next/head';
@@ -16,11 +15,13 @@ import { Student } from '../../Students/Students/Students';
 
 import { Parent } from '../../Students/Parents/Parents';
 
-interface Family{
+import { User } from '../User/Users';
+
+export interface Family{
   id: string;
   students: Student[];
   parents: Parent[];
-  // user: User;
+  user?: User | null;
 }
 
 export default function Family() {
@@ -46,8 +47,23 @@ export default function Family() {
     evaluations: [],
     idFamily: "", 
   };
+
+  const initialUserData: User = {
+    id: "",
+    username: "",
+    name: "",
+    lastName1: "",
+    lastName2: "",
+    password: "",
+    email: "",
+    phone: "",
+    role: "",
+
+    idFamily: "",
+  };
   
   const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
+  const [dataUsers, setDataUsers] = useState<User[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [enableEditing, setEnableEditing] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
@@ -56,6 +72,7 @@ export default function Family() {
     id: "",
     students: [],
     parents: [],
+    user: initialUserData,
   });
   const [dataParent, setDataParent] = useState<Parent>({
     id: "",
@@ -70,8 +87,9 @@ export default function Family() {
     children: [],
   });
   const [dataStudent, setDataStudent] = useState<Student>(initialStudentData);
+  
 
-
+  const [familyUser, setFamilyUser] = useState<User>(initialUserData);
   const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
   const [familyParents, setFamilyParents] = useState<Parent[]>([]);
 
@@ -80,31 +98,55 @@ export default function Family() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // GET DATA TO LOAD ARRAY
-  const fetchData = async () => {
-  setLoading(true); 
+  const fetchFamilyData  = async () => {
+    setLoading(true); 
 
-  try {
-    const familiesResponse = await fetch(`http://localhost:3000/api/family?page=${currentPage}&pageSize=${pageSize}`, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": "123456",
-    },
-    });
-    const json = await familiesResponse.json();
-    console.log(json);
+    try {
+      const familyResponse = await fetch(`http://localhost:3000/api/family?page=${currentPage}&pageSize=${pageSize}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+        },
+      });
+      const familyJson = await familyResponse .json();
+      const families: Family[] = familyJson.response;
 
-    setDataFamilies(json.response); // ACTUALIZAR EL ESTADO
-    setTotalRecords(json.total); // Establecer el total de registros
-    setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
+      //setDataFamilies(familyIdsJson.response); // ACTUALIZAR EL ESTADO
+      setTotalRecords(familyJson.total); // Establecer el total de registros
+      setTotalPages(Math.ceil(familyJson.total / pageSize)); // Calcular y establecer el total de páginas
 
-    
-  } catch (error) {
-    console.error(error);
-      // MANEJO DE ERRORES
-    } finally {
-      setLoading(false); 
-    }
+      const usersResponse = await fetch(`http://localhost:3000/api/users`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+        },
+      });
+      
+      const usersJson = await usersResponse.json();
+      const users : User[] = usersJson.response;
+
+      // Vincular usuarios a las familias por idFamilia
+      const familiesWithUsers = families.map((family: Family) => {
+        const usersForFamily = users.filter((user: User) => user.idFamily === family.id);
+        const user = usersForFamily.length > 0 ? usersForFamily[0] : null;
+        return {
+          ...family,
+          user: user,
+        };
+      });
+
+      setDataFamilies(familiesWithUsers);
+      setDataUsers(users);
+      console.log(familiesWithUsers)
+
+    } catch (error) {
+        console.error(error);
+        // MANEJO DE ERRORES
+      } finally {
+        setLoading(false); 
+      }
   }
 
 
@@ -126,7 +168,7 @@ export default function Family() {
     setEditMode(false);
     setShowMode(false);
 
-    fetchData();
+    fetchFamilyData();
   }
 
   // EDIT DATA
@@ -148,7 +190,7 @@ export default function Family() {
 
     onClose();
     setEditMode(false);
-    fetchData();
+    fetchFamilyData();
   } 
 
   // DELETE DATA
@@ -170,7 +212,7 @@ export default function Family() {
       duration: 4000,
       isClosable: true,
     })
-    fetchData();
+    fetchFamilyData();
   }
 
   // SHOW DATA
@@ -227,6 +269,23 @@ export default function Family() {
     }  finally {
       setLoading(false); 
     }
+
+    //Petición para obtener el usuario
+    try {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/user`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+      },
+      });
+      const json = await response.json();
+      setFamilyUser(json.response);
+    } catch (error) {
+      console.error(error);
+    }  finally {
+      setLoading(false); 
+    }
   }
 
 
@@ -237,7 +296,7 @@ export default function Family() {
   
 
   useEffect(() => {
-    fetchData();
+    fetchFamilyData();
   }, [currentPage]);
 
 
@@ -370,8 +429,8 @@ export default function Family() {
                                           return (
                                               <Tr key={family.id}>
                                                 <Td>{family.id}</Td>
-                                                <Td>{"Apellido1Padre"} {"Apellido1Madre"} </Td>
-                                                <Td>{"username"} </Td>
+                                                <Td>{family.user ? `${family.user.lastName1} ${family.user.lastName2}` : "N/A"}</Td>
+                                                <Td>{family.user ? `${family.user.username}` : "N/A"} </Td>
                                                 <Td>
                                                     <ButtonGroup variant='ghost' spacing='1'>
                                                         <IconButton onClick={() => handleShowData(family)}
