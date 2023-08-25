@@ -1,5 +1,5 @@
 import { AddIcon, ArrowForwardIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Button, Card, CardBody, CardHeader, Flex, FormControl, FormLabel, SimpleGrid, HStack, Heading, Input, Radio, RadioGroup, Select, Stack, Text, useToast, NumberInput, NumberInputField, NumberDecrementStepper, NumberIncrementStepper, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr, ButtonGroup, IconButton } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, CardHeader, Flex, FormControl, FormLabel, SimpleGrid, HStack, Heading, Input, Radio, RadioGroup, Select, Stack, Text, useToast, NumberInput, NumberInputField, NumberDecrementStepper, NumberIncrementStepper, NumberInputStepper, Table, TableContainer, Tbody, Td, Th, Thead, Tr, ButtonGroup, IconButton, Spinner } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
 
 
@@ -15,6 +15,8 @@ import { City } from "../../Students/Cities/Cities";
 import { Program } from "../../StudentProgram/Programs/Programs";
 
 export default function StudentForm({dataParents, dataStudent, editingMode} : {dataParents : Parent[]; dataStudent : Student; editingMode : boolean}) {
+    const [loading, setLoading] = useState(false);
+
     const [dataStudentLocal, setDataStudentLocal] = useState<Student>({
         ...dataStudent,
     });
@@ -198,6 +200,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
     }
 
     const fetchSelects = async () => {
+        setLoading(true);
         try {
             const citiesResponse = await fetch('http://localhost:3000/api/cities', {
                 method: 'GET',
@@ -211,12 +214,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
 
             setDataCities(jsonCities.response); // Guarda las ciudades en el estado dataCities
 
-        } catch (error) {
-            console.error(error);
-            // MANEJO DE ERRORES
-        }
-
-        try {
             const programsResponse = await fetch('http://localhost:3000/api/programs', {
                 method: 'GET',
                 headers: {
@@ -232,10 +229,13 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
         } catch (error) {
             console.error(error);
             // MANEJO DE ERRORES
+        }finally{
+            setLoading(false);
         }
     };
    
     useEffect(() => {
+        setLoading(true);
         if(editingMode){
             fetchStudentsRelations();
         }
@@ -245,26 +245,28 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
     
     useEffect(() => {
         
-        if (dataParents.length > 0) {
-            setDataParentLocal(dataParents[0]);
-            setParentList(dataParents);
-        }
-
-        if (dataTutors.length > 0) {
-            setDataTutor(dataTutors[0]);
-            setTutorList(dataTutors);
-        }
-
-        if (dataEmergencyContacts.length > 0) {
-            setDataEmergencyContact(dataEmergencyContacts[0]);
-            setEmergencyContactList(dataEmergencyContacts);
-        }
+        if(!editingMode){
+            if (dataParents.length > 0) {
+                setDataParentLocal(dataParents[0]);
+                setParentList(dataParents);
+            }
     
-         // Configurar el estado de selectedCityId
-        setSelectedCityId(dataStudentLocal.idCity);
-
-         // Configurar el estado de selectedProgramId
-         setSelectedProgramId(dataStudentLocal.idProgram);
+            if (dataTutors.length > 0) {
+                setDataTutor(dataTutors[0]);
+                setTutorList(dataTutors);
+            }
+    
+            if (dataEmergencyContacts.length > 0) {
+                setDataEmergencyContact(dataEmergencyContacts[0]);
+                setEmergencyContactList(dataEmergencyContacts);
+            }
+        
+             // Configurar el estado de selectedCityId
+            setSelectedCityId(dataStudentLocal.idCity);
+    
+             // Configurar el estado de selectedProgramId
+             setSelectedProgramId(dataStudentLocal.idProgram);
+        }
         
     }, [dataParents, dataTutors, dataEmergencyContacts, dataStudentLocal.idCity, dataStudentLocal.idProgram]);
     
@@ -365,392 +367,397 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
                     <Text pb={6}>Ingresa los datos sobre tu hijo/a</Text>
                     <Card variant={'outline'}>
                         <CardBody>
-                            <form onSubmit={handleSubmit}>
-                                <Stack spacing={4}>
-                                    <SimpleGrid columns={3} spacing={10}>
-                                        <FormControl isRequired >
-                                            <FormLabel>Nombre </FormLabel>
-                                            <Input type='text' placeholder="Nombre" value={dataStudentLocal.name || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, name: e.target.value})}/>
-                                        </FormControl>
+                            {loading ?
+                                <Box height={'100'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                </Box>
 
-                                        <FormControl isRequired >
-                                            <FormLabel>Primer apellido</FormLabel>
-                                            <Input type='text' placeholder="Primer apellido" value={dataStudentLocal.lastName1 || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, lastName1: e.target.value})} / > 
-                                        </FormControl>
+                            : <form onSubmit={handleSubmit}>
+                                    <Stack spacing={4}>
+                                        <SimpleGrid columns={3} spacing={10}>
+                                            <FormControl isRequired >
+                                                <FormLabel>Nombre </FormLabel>
+                                                <Input type='text' placeholder="Nombre" value={dataStudentLocal.name || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, name: e.target.value})}/>
+                                            </FormControl>
 
-                                        <FormControl >
-                                            <FormLabel>Segundo apellido</FormLabel>
-                                            <Input type='text' placeholder="Segundo apellido" value={dataStudentLocal.lastName2 || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, lastName2: e.target.value})} />
-                                        </FormControl>
-                                    </SimpleGrid>
-                                    
-                                    <SimpleGrid columns={2} spacing={10}>
-                                        <FormControl>
-                                            <FormLabel>Fecha de nacimiento</FormLabel>
-                                            <Input
-                                            placeholder="Fecha de nacimiento"
-                                            size="md"
-                                            type="date"
-                                            value={dataStudentLocal.dateBirth || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, dateBirth: e.target.value})} / >
-                                        </FormControl>
+                                            <FormControl isRequired >
+                                                <FormLabel>Primer apellido</FormLabel>
+                                                <Input type='text' placeholder="Primer apellido" value={dataStudentLocal.lastName1 || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, lastName1: e.target.value})} / > 
+                                            </FormControl>
 
-                                        <FormControl isRequired>
-                                            <FormLabel>Número de teléfono de la casa</FormLabel>
-                                            <Input type="tel" placeholder='(000)-000-0000' value={dataStudentLocal.housePhone || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, housePhone: e.target.value})} />
-                                        </FormControl>
-                                    </SimpleGrid>
-                                    
-
-                                    <FormControl isRequired>
-                                        <FormLabel>Dirección</FormLabel>
-                                        <Input type="text" placeholder='Dirección del hogar' value={dataStudentLocal.address || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, address: e.target.value})} />
-                                    </FormControl>
-
-                                    <SimpleGrid columns={2} spacing={10} mb={3}>
-                                        <FormControl isRequired>
-                                            <FormLabel>Ciudad</FormLabel>
-                                            <Select value={selectedCityId} onChange={(e) => setSelectedCityId(e.target.value)} placeholder='Seleccionar ciudad'>
-                                                {dataCities.map(city => (
-                                                    <option key={city.id} value={city.id}>
-                                                        {city.name}
-                                                    </option>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-
-                                        <FormControl isRequired>
-                                            <FormLabel>Programa</FormLabel>
-                                            <Select value={selectedProgramId} onChange={(e) => setSelectedProgramId(e.target.value)} placeholder='Seleccionar programa'>
-                                                {dataPrograms.map(program => (
-                                                    <option key={program.id} value={program.id}>
-                                                        {program.description}
-                                                    </option>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </SimpleGrid>
-                                    
-
-                                    <Card >
-                                        <CardHeader>
-                                            <Heading size='md'>Padre o madre</Heading>
-                                        </CardHeader>
+                                            <FormControl >
+                                                <FormLabel>Segundo apellido</FormLabel>
+                                                <Input type='text' placeholder="Segundo apellido" value={dataStudentLocal.lastName2 || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, lastName2: e.target.value})} />
+                                            </FormControl>
+                                        </SimpleGrid>
                                         
-                                        <CardBody>
-                                            <SimpleGrid columns={3} spacing={10} mb={3}>
+                                        <SimpleGrid columns={2} spacing={10}>
+                                            <FormControl>
+                                                <FormLabel>Fecha de nacimiento</FormLabel>
+                                                <Input
+                                                placeholder="Fecha de nacimiento"
+                                                size="md"
+                                                type="date"
+                                                value={dataStudentLocal.dateBirth || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, dateBirth: e.target.value})} / >
+                                            </FormControl>
+
+                                            <FormControl isRequired>
+                                                <FormLabel>Número de teléfono de la casa</FormLabel>
+                                                <Input type="tel" placeholder='(000)-000-0000' value={dataStudentLocal.housePhone || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, housePhone: e.target.value})} />
+                                            </FormControl>
+                                        </SimpleGrid>
+                                        
+
+                                        <FormControl isRequired>
+                                            <FormLabel>Dirección</FormLabel>
+                                            <Input type="text" placeholder='Dirección del hogar' value={dataStudentLocal.address || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, address: e.target.value})} />
+                                        </FormControl>
+
+                                        <SimpleGrid columns={2} spacing={10} mb={3}>
+                                            <FormControl isRequired>
+                                                <FormLabel>Ciudad</FormLabel>
+                                                <Select value={selectedCityId} onChange={(e) => setSelectedCityId(e.target.value)} placeholder='Seleccionar ciudad'>
+                                                    {dataCities.map(city => (
+                                                        <option key={city.id} value={city.id}>
+                                                            {city.name}
+                                                        </option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+
+                                            <FormControl isRequired>
+                                                <FormLabel>Programa</FormLabel>
+                                                <Select value={selectedProgramId} onChange={(e) => setSelectedProgramId(e.target.value)} placeholder='Seleccionar programa'>
+                                                    {dataPrograms.map(program => (
+                                                        <option key={program.id} value={program.id}>
+                                                            {program.   description}
+                                                        </option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </SimpleGrid>
+                                        
+
+                                        <Card >
+                                            <CardHeader>
+                                                <Heading size='md'>Padre o madre</Heading>
+                                            </CardHeader>
+                                            
+                                            <CardBody>
+                                                <SimpleGrid columns={3} spacing={10} mb={3}>
+                                                    <FormControl isRequired>
+                                                        <FormLabel>Nombre</FormLabel>
+                                                        <Input placeholder="Nombre" value={dataParentLocal.name || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, name: e.target.value })} />
+                                                    </FormControl>
+
+                                                    <FormControl isRequired>
+                                                        <FormLabel>Primer apellido</FormLabel>
+                                                        <Input placeholder="Primer apellido" value={dataParentLocal.lastName1 || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, lastName1: e.target.value })} />
+                                                    </FormControl>
+
+                                                    <FormControl>
+                                                        <FormLabel>Segundo apellido</FormLabel>
+                                                        <Input placeholder="Segundo apellido" value={dataParentLocal.lastName2 || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, lastName2: e.target.value })} />
+                                                    </FormControl>
+                                                </SimpleGrid>
+                                            
+                                                <SimpleGrid columns={2} spacing={10} mb={3}>
+                                                    <FormControl isRequired>
+                                                        <FormLabel>Cédula</FormLabel>
+                                                        <Input placeholder="Cédula" value={dataParentLocal.identityCard || ""} type='text' onChange={(e) => setDataParentLocal({ ...dataParentLocal, identityCard: e.target.value })} />
+                                                    </FormControl>
+
+                                                    <FormControl isRequired>
+                                                        <FormLabel>Correo electrónico</FormLabel>
+                                                        <Input placeholder="Correo electrónico" value={dataParentLocal.email || ""} type='email'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, email: e.target.value })} />
+                                                    </FormControl>
+                                                </SimpleGrid>
+                                            
+                                                <SimpleGrid columns={2} spacing={10} mb={3}>
+                                                    <FormControl>
+                                                        <FormLabel>Ocupación</FormLabel>
+                                                        <Input placeholder="Ocupación" value={dataParentLocal.occupation || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, occupation: e.target.value })} />
+                                                    </FormControl>
+
+                                                    <FormControl>
+                                                        <FormLabel>Número de teléfono</FormLabel>
+                                                        <Input placeholder="Número de teléfono" value={dataParentLocal.telephone || ""} type='tel'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, telephone: e.target.value })} />
+                                                    </FormControl>
+                                                </SimpleGrid>
+
+                                                <Button onClick={handleAddParent} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                    Agregar Padre
+                                                </Button>
+
+                                                <Box pt={4}>
+                                                    <FormLabel>Padres agregados</FormLabel>
+                                                    <Card variant={'outline'}>
+                                                        <CardBody p={0}>
+                                                        <TableContainer>
+                                                            <Table variant='striped'>
+                                                            <Thead>
+                                                                <Tr>
+                                                                    <Th>Nombre Completo</Th>
+                                                                    <Th>Cedula</Th>
+                                                                    <Th>Teléfono</Th>
+                                                                    <Th>Email</Th>
+                                                                    <Th>Ocupación</Th>
+                                                                    <Th>Acciones</Th>
+                                                                </Tr>
+                                                            </Thead>
+                                                            <Tbody>
+                                                                {parentList.map((parent, index) => {
+                                                                    return (
+                                                                        <Tr key={parent.id}>
+                                                                            <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
+                                                                            <Td>{parent.identityCard}</Td>
+                                                                            <Td>{parent.telephone}</Td>
+                                                                            <Td>{parent.email}</Td>
+                                                                            <Td>{parent.occupation}</Td>
+                                                                            <Td>
+                                                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                                                    <IconButton onClick={() => handleEditParent(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+
+                                                                                    <IconButton onClick={() => handleDeleteParent(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                                                </ButtonGroup>
+                                                                            </Td>
+                                                                        </Tr>
+                                                                    )
+                                                                })
+                                                                }
+                                                            </Tbody>
+                                                            </Table>
+                                                        </TableContainer>
+                                                        </CardBody>
+                                                    </Card>
+                                                </Box>
+
+                                            </CardBody>
+                                        </Card>
+
+
+                                        
+                                    
+
+                                        <Card>
+                                            <CardHeader>
+                                                <Heading size='md'>Datos del tutor</Heading>
+                                            </CardHeader>
+                                            
+                                            <CardBody>
                                                 <FormControl isRequired>
-                                                    <FormLabel>Nombre</FormLabel>
-                                                    <Input placeholder="Nombre" value={dataParentLocal.name || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, name: e.target.value })} />
+                                                    <FormLabel>Nombre completo</FormLabel>
+                                                    <Input placeholder='Nombre' value={dataTutor.name || ""} onChange={(e) => setDataTutor({ ...dataTutor, name: e.target.value })} />
                                                 </FormControl>
 
-                                                <FormControl isRequired>
-                                                    <FormLabel>Primer apellido</FormLabel>
-                                                    <Input placeholder="Primer apellido" value={dataParentLocal.lastName1 || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, lastName1: e.target.value })} />
-                                                </FormControl>
-
-                                                <FormControl>
-                                                    <FormLabel>Segundo apellido</FormLabel>
-                                                    <Input placeholder="Segundo apellido" value={dataParentLocal.lastName2 || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, lastName2: e.target.value })} />
-                                                </FormControl>
-                                            </SimpleGrid>
-                                           
-                                            <SimpleGrid columns={2} spacing={10} mb={3}>
-                                                <FormControl isRequired>
-                                                    <FormLabel>Cédula</FormLabel>
-                                                    <Input placeholder="Cédula" value={dataParentLocal.identityCard || ""} type='text' onChange={(e) => setDataParentLocal({ ...dataParentLocal, identityCard: e.target.value })} />
-                                                </FormControl>
-
-                                                <FormControl isRequired>
-                                                    <FormLabel>Correo electrónico</FormLabel>
-                                                    <Input placeholder="Correo electrónico" value={dataParentLocal.email || ""} type='email'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, email: e.target.value })} />
-                                                </FormControl>
-                                            </SimpleGrid>
-                                           
-                                            <SimpleGrid columns={2} spacing={10} mb={3}>
                                                 <FormControl>
                                                     <FormLabel>Ocupación</FormLabel>
-                                                    <Input placeholder="Ocupación" value={dataParentLocal.occupation || ""} type='text'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, occupation: e.target.value })} />
+                                                    <Input placeholder='Ocupación' value={dataTutor.occupation || ""} onChange={(e) => setDataTutor({ ...dataTutor, occupation: e.target.value })} />
+                                                </FormControl>
+
+                                                <FormControl isRequired>
+                                                    <FormLabel>Número de teléfono</FormLabel>
+                                                    <Input type="tel" placeholder='(000)-000-0000' value={dataTutor.phone || ""} onChange={(e) => setDataTutor({ ...dataTutor, phone: e.target.value })} />
+                                                </FormControl>
+
+
+                                                <Button onClick={handleAddTutor} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                    Agregar Tutor
+                                                </Button>
+
+                                                <Box pt={4}>
+                                                    <FormLabel>Tutores agregados</FormLabel>
+                                                    <Card variant={'outline'}>
+                                                        <CardBody p={0}>
+                                                        <TableContainer>
+                                                            <Table variant='striped'>
+                                                            <Thead>
+                                                                <Tr>
+                                                                    <Th>Nombre Completo</Th>
+                                                                    <Th>Teléfono</Th>
+                                                                    <Th>Ocupación</Th>
+                                                                    <Th>Acciones</Th>
+                                                                </Tr>
+                                                            </Thead>
+                                                            <Tbody>
+                                                                {tutorList.map((tutor, index) => {
+                                                                    return (
+                                                                        <Tr key={tutor.id}>
+                                                                            <Td>{tutor.name}</Td>
+                                                                            <Td>{tutor.phone}</Td>
+                                                                            <Td>{tutor.occupation}</Td>
+                                                                            <Td>
+                                                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                                                    <IconButton onClick={() => handleEditTutor(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+
+                                                                                    <IconButton onClick={() => handleDeleteTutor(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                                                </ButtonGroup>
+                                                                            </Td>
+                                                                        </Tr>
+                                                                    )
+                                                                })
+                                                                }
+                                                            </Tbody>
+                                                            </Table>
+                                                        </TableContainer>
+                                                        </CardBody>
+                                                    </Card>
+                                                </Box>
+                                            </CardBody>
+                                        </Card>
+
+                                        <Card>
+                                            <CardHeader>
+                                                <Heading size='md'>Datos del contacto de emergencia</Heading>
+                                            </CardHeader>
+                                            
+                                            <CardBody>
+                                                <FormControl isRequired>
+                                                    <FormLabel>Nombre completo</FormLabel>
+                                                    <Input placeholder='Nombre' value={dataEmergencyContact.name || ""} onChange={(e) => setDataEmergencyContact({ ...dataEmergencyContact, name: e.target.value })} />
+                                                </FormControl>
+
+                                                <FormControl isRequired>
+                                                    <FormLabel>Número de telefono</FormLabel>
+                                                    <Input type="tel" placeholder='(000)-000-0000' value={dataEmergencyContact.phone || ""} onChange={(e) => setDataEmergencyContact({ ...dataEmergencyContact, phone: e.target.value })} />
+                                                </FormControl>
+
+                                                <Button onClick={handleAddEmergencyContact} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                    Agregar Contacto de Emergencia
+                                                </Button>
+
+                                                <Box pt={4}>
+                                                    <FormLabel>Contactos de emergencia agregados</FormLabel>
+                                                    <Card variant={'outline'}>
+                                                        <CardBody p={0}>
+                                                        <TableContainer>
+                                                            <Table variant='striped'>
+                                                            <Thead>
+                                                                <Tr>
+                                                                    <Th>Nombre Completo</Th>
+                                                                    <Th>Teléfono</Th>
+                                                                    <Th>Acciones</Th>
+                                                                </Tr>
+                                                            </Thead>
+                                                            <Tbody>
+                                                                {emergencyContactList.map((emergencyContact, index) => {
+                                                                    return (
+                                                                        <Tr key={emergencyContact.id}>
+                                                                            <Td>{emergencyContact.name}</Td>
+                                                                            <Td>{emergencyContact.phone}</Td>
+                                                                            <Td>
+                                                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                                                    <IconButton onClick={() => handleEditEmergencyContact(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+
+                                                                                    <IconButton onClick={() => handleDeleteEmergencyContact(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                                                </ButtonGroup>
+                                                                            </Td>
+                                                                        </Tr>
+                                                                    )
+                                                                })
+                                                                }
+                                                            </Tbody>
+                                                            </Table>
+                                                        </TableContainer>
+                                                        </CardBody>
+                                                    </Card>
+                                                </Box>
+                                            </CardBody>
+                                        </Card>
+                                        
+                                        <Card>
+                                            <CardHeader>
+                                                <Heading size='md'>Datos del pediatra</Heading>
+                                            </CardHeader>
+                                            
+                                            <CardBody>
+                                                <FormControl isRequired>
+                                                    <FormLabel>Nombre completo</FormLabel>
+                                                    <Input placeholder='Nombre' value={dataPediatrician?.name || ""} type='text'  onChange={(e) => setDataPediatrician({ ...dataPediatrician, name: e.target.value })} />
                                                 </FormControl>
 
                                                 <FormControl>
-                                                    <FormLabel>Número de teléfono</FormLabel>
-                                                    <Input placeholder="Número de teléfono" value={dataParentLocal.telephone || ""} type='tel'  onChange={(e) => setDataParentLocal({ ...dataParentLocal, telephone: e.target.value })} />
+                                                    <FormLabel>Institución médica</FormLabel>
+                                                    <Input type="text" list="lista-medical-institution" placeholder="Escriba la institución médica"
+                                                    value={dataPediatrician?.medicalInstitution || ""}
+                                                    onChange={(e) => setDataPediatrician({ ...dataPediatrician, medicalInstitution: e.target.value })} />
+                                                    <datalist id="lista-medical-institution">
+                                                        <option value="HOMS"></option>
+                                                        <option value="Unión Médica"></option>
+                                                    </datalist>
                                                 </FormControl>
-                                            </SimpleGrid>
 
-                                            <Button onClick={handleAddParent} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
-                                                Agregar Padre
-                                            </Button>
+                                                <FormControl>
+                                                    <FormLabel>Número de oficina</FormLabel>
+                                                    <NumberInput max={20} min={1}
+                                                    value={dataPediatrician?.officeNumber ? parseInt(dataPediatrician.officeNumber) : ""}
+                                                    onChange={(valueAsString, valueAsNumber) =>
+                                                        setDataPediatrician({
+                                                            ...dataPediatrician,
+                                                            officeNumber: valueAsString,
+                                                        })
+                                                    }>
+                                                        <NumberInputField/>
+                                                        <NumberInputStepper>
+                                                            <NumberIncrementStepper />
+                                                            <NumberDecrementStepper />
+                                                        </NumberInputStepper>
+                                                    </NumberInput>
+                                                </FormControl>
 
-                                            <Box pt={4}>
-                                                <FormLabel>Padres agregados</FormLabel>
-                                                <Card variant={'outline'}>
-                                                    <CardBody p={0}>
-                                                    <TableContainer>
-                                                        <Table variant='striped'>
-                                                        <Thead>
-                                                            <Tr>
-                                                                <Th>Nombre Completo</Th>
-                                                                <Th>Cedula</Th>
-                                                                <Th>Teléfono</Th>
-                                                                <Th>Email</Th>
-                                                                <Th>Ocupación</Th>
-                                                                <Th>Acciones</Th>
-                                                            </Tr>
-                                                        </Thead>
-                                                        <Tbody>
-                                                            {parentList.map((parent, index) => {
-                                                                return (
-                                                                    <Tr key={parent.id}>
-                                                                        <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                                        <Td>{parent.identityCard}</Td>
-                                                                        <Td>{parent.telephone}</Td>
-                                                                        <Td>{parent.email}</Td>
-                                                                        <Td>{parent.occupation}</Td>
-                                                                        <Td>
-                                                                            <ButtonGroup variant='ghost' spacing='1'>
-                                                                                <IconButton onClick={() => handleEditParent(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                <FormControl isRequired>
+                                                    <FormLabel>Número de telefono</FormLabel>
+                                                    <Input placeholder='(000)-000-0000'
+                                                    value={dataPediatrician?.phone || ""}
+                                                    onChange={(e) => setDataPediatrician({ ...dataPediatrician, phone: e.target.value })}
 
-                                                                                <IconButton onClick={() => handleDeleteParent(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                                            </ButtonGroup>
-                                                                        </Td>
-                                                                    </Tr>
-                                                                )
-                                                            })
-                                                            }
-                                                        </Tbody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                    </CardBody>
-                                                </Card>
-                                            </Box>
+                                                    />
+                                                </FormControl>
+                                            </CardBody>
+                                        </Card>
 
-                                        </CardBody>
-                                    </Card>
-
-
-                                    
-                                
-
-                                    <Card>
-                                        <CardHeader>
-                                            <Heading size='md'>Datos del tutor</Heading>
-                                        </CardHeader>
+                                        <FormControl>
+                                                    <FormLabel>Condición médica</FormLabel>
+                                                    <Input placeholder='Condición médica' value={dataStudentLocal.medicalCondition || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, medicalCondition: e.target.value})} />
+                                        </FormControl>
                                         
-                                        <CardBody>
-                                            <FormControl isRequired>
-                                                <FormLabel>Nombre completo</FormLabel>
-                                                <Input placeholder='Nombre' value={dataTutor.name || ""} onChange={(e) => setDataTutor({ ...dataTutor, name: e.target.value })} />
-                                            </FormControl>
+                                        <FormControl>
+                                                    <FormLabel>Progreso deseado</FormLabel>
+                                                    <Input placeholder='Progreso deseado' value={dataStudentLocal.progressDesired || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, progressDesired: e.target.value})} />
+                                        </FormControl>
 
-                                            <FormControl>
-                                                <FormLabel>Ocupación</FormLabel>
-                                                <Input placeholder='Ocupación' value={dataTutor.occupation || ""} onChange={(e) => setDataTutor({ ...dataTutor, occupation: e.target.value })} />
-                                            </FormControl>
-
-                                            <FormControl isRequired>
-                                                <FormLabel>Número de teléfono</FormLabel>
-                                                <Input type="tel" placeholder='(000)-000-0000' value={dataTutor.phone || ""} onChange={(e) => setDataTutor({ ...dataTutor, phone: e.target.value })} />
-                                            </FormControl>
-
-
-                                            <Button onClick={handleAddTutor} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
-                                                Agregar Tutor
-                                            </Button>
-
-                                            <Box pt={4}>
-                                                <FormLabel>Tutores agregados</FormLabel>
-                                                <Card variant={'outline'}>
-                                                    <CardBody p={0}>
-                                                    <TableContainer>
-                                                        <Table variant='striped'>
-                                                        <Thead>
-                                                            <Tr>
-                                                                <Th>Nombre Completo</Th>
-                                                                <Th>Teléfono</Th>
-                                                                <Th>Ocupación</Th>
-                                                                <Th>Acciones</Th>
-                                                            </Tr>
-                                                        </Thead>
-                                                        <Tbody>
-                                                            {tutorList.map((tutor, index) => {
-                                                                return (
-                                                                    <Tr key={tutor.id}>
-                                                                        <Td>{tutor.name}</Td>
-                                                                        <Td>{tutor.phone}</Td>
-                                                                        <Td>{tutor.occupation}</Td>
-                                                                        <Td>
-                                                                            <ButtonGroup variant='ghost' spacing='1'>
-                                                                                <IconButton onClick={() => handleEditTutor(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
-
-                                                                                <IconButton onClick={() => handleDeleteTutor(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                                            </ButtonGroup>
-                                                                        </Td>
-                                                                    </Tr>
-                                                                )
-                                                            })
-                                                            }
-                                                        </Tbody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                    </CardBody>
-                                                </Card>
-                                            </Box>
-                                        </CardBody>
-                                    </Card>
-
-                                    <Card>
-                                        <CardHeader>
-                                            <Heading size='md'>Datos del contacto de emergencia</Heading>
-                                        </CardHeader>
+                                        <FormControl>
+                                                    <FormLabel>¿Algun comentario sobre su hijo/a?</FormLabel>
+                                                    <Input placeholder='Escriba su comentario' value={dataStudentLocal.commentary || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, commentary: e.target.value})} />
+                                        </FormControl>
                                         
-                                        <CardBody>
-                                            <FormControl isRequired>
-                                                <FormLabel>Nombre completo</FormLabel>
-                                                <Input placeholder='Nombre' value={dataEmergencyContact.name || ""} onChange={(e) => setDataEmergencyContact({ ...dataEmergencyContact, name: e.target.value })} />
-                                            </FormControl>
-
-                                            <FormControl isRequired>
-                                                <FormLabel>Número de telefono</FormLabel>
-                                                <Input type="tel" placeholder='(000)-000-0000' value={dataEmergencyContact.phone || ""} onChange={(e) => setDataEmergencyContact({ ...dataEmergencyContact, phone: e.target.value })} />
-                                            </FormControl>
-
-                                            <Button onClick={handleAddEmergencyContact} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
-                                                Agregar Contacto de Emergencia
-                                            </Button>
-
-                                            <Box pt={4}>
-                                                <FormLabel>Contactos de emergencia agregados</FormLabel>
-                                                <Card variant={'outline'}>
-                                                    <CardBody p={0}>
-                                                    <TableContainer>
-                                                        <Table variant='striped'>
-                                                        <Thead>
-                                                            <Tr>
-                                                                <Th>Nombre Completo</Th>
-                                                                <Th>Teléfono</Th>
-                                                                <Th>Acciones</Th>
-                                                            </Tr>
-                                                        </Thead>
-                                                        <Tbody>
-                                                            {emergencyContactList.map((emergencyContact, index) => {
-                                                                return (
-                                                                    <Tr key={emergencyContact.id}>
-                                                                        <Td>{emergencyContact.name}</Td>
-                                                                        <Td>{emergencyContact.phone}</Td>
-                                                                        <Td>
-                                                                            <ButtonGroup variant='ghost' spacing='1'>
-                                                                                <IconButton onClick={() => handleEditEmergencyContact(index)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
-
-                                                                                <IconButton onClick={() => handleDeleteEmergencyContact(index)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                                            </ButtonGroup>
-                                                                        </Td>
-                                                                    </Tr>
-                                                                )
-                                                            })
-                                                            }
-                                                        </Tbody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                    </CardBody>
-                                                </Card>
-                                            </Box>
-                                        </CardBody>
-                                    </Card>
-                                    
-                                    <Card>
-                                        <CardHeader>
-                                            <Heading size='md'>Datos del pediatra</Heading>
-                                        </CardHeader>
-                                        
-                                        <CardBody>
-                                            <FormControl isRequired>
-                                                <FormLabel>Nombre completo</FormLabel>
-                                                <Input placeholder='Nombre' value={dataPediatrician?.name || ""} type='text'  onChange={(e) => setDataPediatrician({ ...dataPediatrician, name: e.target.value })} />
-                                            </FormControl>
-
-                                            <FormControl>
-                                                <FormLabel>Institución médica</FormLabel>
-                                                <Input type="text" list="lista-medical-institution" placeholder="Escriba la institución médica"
-                                                value={dataPediatrician?.medicalInstitution || ""}
-                                                onChange={(e) => setDataPediatrician({ ...dataPediatrician, medicalInstitution: e.target.value })} />
-                                                <datalist id="lista-medical-institution">
-                                                    <option value="HOMS"></option>
-                                                    <option value="Unión Médica"></option>
-                                                </datalist>
-                                            </FormControl>
-
-                                            <FormControl>
-                                                <FormLabel>Número de oficina</FormLabel>
-                                                <NumberInput max={20} min={1}
-                                                 value={dataPediatrician?.officeNumber ? parseInt(dataPediatrician.officeNumber) : ""}
-                                                 onChange={(valueAsString, valueAsNumber) =>
-                                                     setDataPediatrician({
-                                                         ...dataPediatrician,
-                                                         officeNumber: valueAsString,
-                                                     })
-                                                 }>
-                                                    <NumberInputField/>
-                                                    <NumberInputStepper>
-                                                        <NumberIncrementStepper />
-                                                        <NumberDecrementStepper />
-                                                    </NumberInputStepper>
-                                                </NumberInput>
-                                            </FormControl>
-
-                                            <FormControl isRequired>
-                                                <FormLabel>Número de telefono</FormLabel>
-                                                <Input placeholder='(000)-000-0000'
-                                                value={dataPediatrician?.phone || ""}
-                                                onChange={(e) => setDataPediatrician({ ...dataPediatrician, phone: e.target.value })}
-
-                                                 />
-                                            </FormControl>
-                                        </CardBody>
-                                    </Card>
-
-                                    <FormControl>
-                                                <FormLabel>Condición médica</FormLabel>
-                                                <Input placeholder='Condición médica' value={dataStudentLocal.medicalCondition || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, medicalCondition: e.target.value})} />
-                                    </FormControl>
-                                    
-                                    <FormControl>
-                                                <FormLabel>Progreso deseado</FormLabel>
-                                                <Input placeholder='Progreso deseado' value={dataStudentLocal.progressDesired || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, progressDesired: e.target.value})} />
-                                    </FormControl>
-
-                                    <FormControl>
-                                                <FormLabel>¿Algun comentario sobre su hijo/a?</FormLabel>
-                                                <Input placeholder='Escriba su comentario' value={dataStudentLocal.commentary || ""}  onChange={(e)=> setDataStudentLocal({ ... dataStudentLocal, commentary: e.target.value})} />
-                                    </FormControl>
-                                    
-                                    <FormControl as='fieldset'>
-                                        <FormLabel as='legend'>
-                                            ¿Nos permites que su hijo salga en las fotos para nuestras redes sociales, documentos informativos y álbum de fotos de Saya Montessori?
-                                        </FormLabel>
-                                        <RadioGroup
-                                            value={dataStudentLocal.allowedPictures.toString()} // Convierte el valor booleano a string
-                                            onChange={(value) =>
-                                            setDataStudentLocal({
-                                                ...dataStudentLocal,
-                                                allowedPictures: value === 'true', // Convierte el string de nuevo a booleano
-                                            })
-                                            }
-                                        >
-                                            <HStack spacing='24px'>
-                                            <Radio value='true'>Si</Radio>
-                                            <Radio value='false'>No</Radio>
-                                            </HStack>
-                                        </RadioGroup>
-                                    </FormControl>
+                                        <FormControl as='fieldset'>
+                                            <FormLabel as='legend'>
+                                                ¿Nos permites que su hijo salga en las fotos para nuestras redes sociales, documentos informativos y álbum de fotos de Saya Montessori?
+                                            </FormLabel>
+                                            <RadioGroup
+                                                value={dataStudentLocal.allowedPictures.toString()} // Convierte el valor booleano a string
+                                                onChange={(value) =>
+                                                setDataStudentLocal({
+                                                    ...dataStudentLocal,
+                                                    allowedPictures: value === 'true', // Convierte el string de nuevo a booleano
+                                                })
+                                                }
+                                            >
+                                                <HStack spacing='24px'>
+                                                <Radio value='true'>Si</Radio>
+                                                <Radio value='false'>No</Radio>
+                                                </HStack>
+                                            </RadioGroup>
+                                        </FormControl>
 
 
-                                    <Button rightIcon={<ArrowForwardIcon />} colorScheme='blue' type="submit" variant='outline'>
-                                        Enviar Solicitud
-                                    </Button>
-                                </Stack>
-                            </form>
-                            
+                                        <Button rightIcon={<ArrowForwardIcon />} colorScheme='blue' type="submit" variant='outline'>
+                                            Enviar Solicitud
+                                        </Button>
+                                    </Stack>
+                                </form>
+                            }
                         </CardBody>
                     </Card>
 

@@ -1,5 +1,5 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
-import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps } from '@chakra-ui/react';
+import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 import { User } from '@supabase/supabase-js';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
@@ -311,40 +311,46 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
                     <Box px={3} py={3}>
                     <form onSubmit={handleCreateData}>
                       <Stack spacing={4}>                     
+                        <SimpleGrid columns={3} spacing={10} mb={3}>
                           <FormControl isRequired>
                               <FormLabel>Nombre</FormLabel>
-                              <Input value={dataParent.name || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, name: e.target.value })} />
+                              <Input placeholder="Nombre" value={dataParent.name || ""} type='text'  onChange={(e) => setDataParent({ ...dataParent, name: e.target.value })} />
                           </FormControl>
 
                           <FormControl isRequired>
                               <FormLabel>Primer apellido</FormLabel>
-                              <Input value={dataParent.lastName1 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName1: e.target.value })} />
+                              <Input placeholder="Primer apellido" value={dataParent.lastName1 || ""} type='text'  onChange={(e) => setDataParent({ ...dataParent, lastName1: e.target.value })} />
                           </FormControl>
 
                           <FormControl>
                               <FormLabel>Segundo apellido</FormLabel>
-                              <Input value={dataParent.lastName2 || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, lastName2: e.target.value })} />
+                              <Input placeholder="Segundo apellido" value={dataParent.lastName2 || ""} type='text'  onChange={(e) => setDataParent({ ...dataParent, lastName2: e.target.value })} />
                           </FormControl>
-
+                      </SimpleGrid>
+                  
+                      <SimpleGrid columns={2} spacing={10} mb={3}>
                           <FormControl isRequired>
                               <FormLabel>Cédula</FormLabel>
-                              <Input value={dataParent.identityCard || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, identityCard: e.target.value })} />
+                              <Input placeholder="Cédula" value={dataParent.identityCard || ""} type='text' onChange={(e) => setDataParent({ ...dataParent, identityCard: e.target.value })} />
                           </FormControl>
 
                           <FormControl isRequired>
-                              <FormLabel>Correo eléctronico</FormLabel>
-                              <Input value={dataParent.email || ""} type='email' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, email: e.target.value })} />
+                              <FormLabel>Correo electrónico</FormLabel>
+                              <Input placeholder="Correo electrónico" value={dataParent.email || ""} type='email'  onChange={(e) => setDataParent({ ...dataParent, email: e.target.value })} />
                           </FormControl>
-
+                      </SimpleGrid>
+                  
+                      <SimpleGrid columns={2} spacing={10} mb={3}>
                           <FormControl>
                               <FormLabel>Ocupación</FormLabel>
-                              <Input value={dataParent.occupation || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, occupation: e.target.value })} />
+                              <Input placeholder="Ocupación" value={dataParent.occupation || ""} type='text'  onChange={(e) => setDataParent({ ...dataParent, occupation: e.target.value })} />
                           </FormControl>
 
                           <FormControl>
-                              <FormLabel>Número de telefono</FormLabel>
-                              <Input value={dataParent.telephone || ""} type='text' readOnly={showMode} onChange={(e) => setDataParent({ ...dataParent, telephone: e.target.value })} />
+                              <FormLabel>Número de teléfono</FormLabel>
+                              <Input placeholder="Número de teléfono" value={dataParent.telephone || ""} type='tel'  onChange={(e) => setDataParent({ ...dataParent, telephone: e.target.value })} />
                           </FormControl>
+                        </SimpleGrid>
 
 
                         {/*Tablas pertenecientes para las relaciones */}
