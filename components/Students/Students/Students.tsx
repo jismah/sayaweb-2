@@ -343,7 +343,7 @@ export default function Students({familyStudents, familyMode, enableEditing} : {
                         <form onSubmit={handleCreateData}>
                             <Stack spacing={4}>                     
                             
-                              <StudentForm dataParents={familyHeaders} dataStudent={dataStudent} editingMode={true}/>
+                              <StudentForm dataParents={familyHeaders} dataStudent={dataStudent} editingMode={(editMode ? true : false)}/>
 
                               {/*Tablas pertenecientes para las relaciones */}
 

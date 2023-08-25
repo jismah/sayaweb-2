@@ -1,5 +1,5 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
-import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps } from '@chakra-ui/react';
+import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
 import { NextPage } from 'next';
@@ -336,6 +336,53 @@ export default function Family() {
                           )
                         }
                         
+                        {(showMode || editMode) && (
+                          loading ?(
+                            <Box pt={4}>
+                              <Card variant={'outline'}>
+                                  <CardBody>
+                                      <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                          <Spinner color='teal' size='xl' thickness='3px' />
+                                      </Box>
+                                  </CardBody>
+                              </Card>
+                            </Box>
+                          ) : (
+                              <Card variant={'outline'}>
+                                <CardBody>
+                                  <Heading as='h3' size='lg' id='Parents' mb={6} >Usuario familiar</Heading>
+                                  
+                                  <SimpleGrid columns={2} spacing={10} mb={3}>
+                                    <div>
+                                      <FormLabel>Titulo</FormLabel>
+                                      <Input value={`${familyUser.lastName1} ${familyUser.lastName2}`} variant={'filled'} color={'teal'} placeholder='Titulo' readOnly={true}></Input>
+                                    </div>
+                                   
+                                   <div>
+                                      <FormLabel>Nombre de usuario</FormLabel>
+                                      <Input value={familyUser.username} variant={'filled'} color={'teal'} placeholder='Nombre de usuario' readOnly={true}></Input>
+                                   </div>
+                                    
+                                  </SimpleGrid>
+
+                                  <SimpleGrid columns={2} spacing={10}>
+                                    <div>
+                                        <FormLabel>Correo electrónico</FormLabel>
+                                        <Input value={familyUser.email} variant={'filled'} color={'teal'} placeholder='Correo electrónico' readOnly={true}></Input>
+                                    </div>
+
+                                     <div>
+                                        <FormLabel>Número de teléfono</FormLabel>
+                                        <Input value={familyUser.phone} variant={'filled'} color={'teal'} placeholder='Número de teléfono' readOnly={true}></Input>
+                                    </div>
+                                  </SimpleGrid>
+                                  
+                                  
+                                </CardBody>
+                              </Card>
+                          )
+                          
+                        )}
 
                         {/*Tablas pertenecientes para las relaciones */}
 

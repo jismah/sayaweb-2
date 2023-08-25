@@ -243,9 +243,10 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
         
     }, [editingMode]);
     
+    //Llenar las listas locales de las relaciones del estudiante seleccionado 
     useEffect(() => {
         
-        if(!editingMode){
+        if(editingMode){
             if (dataParents.length > 0) {
                 setDataParentLocal(dataParents[0]);
                 setParentList(dataParents);
@@ -265,7 +266,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
             setSelectedCityId(dataStudentLocal.idCity);
     
              // Configurar el estado de selectedProgramId
-             setSelectedProgramId(dataStudentLocal.idProgram);
+            setSelectedProgramId(dataStudentLocal.idProgram);
         }
         
     }, [dataParents, dataTutors, dataEmergencyContacts, dataStudentLocal.idCity, dataStudentLocal.idProgram]);
