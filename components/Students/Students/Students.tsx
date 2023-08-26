@@ -42,27 +42,34 @@ import { Program } from '../../StudentProgram/Programs/Programs';
 
 export default function Students({familyStudents, dataFamily, familyMode, enableEditing} : {familyStudents : Student[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean}) {
   
-  const initialStudentData: Student = {
-    id: "",
-    name: "",
-    lastName1: "",
-    lastName2: "",
-    housePhone: "",
-    address: "",
-    status: "",
-    commentary: "",
-    medicalCondition: "",
-    progressDesired: "",
-    allowedPictures: false,
-    dateBirth: "",
-    idPediatrician: "",
-    emergencyContacts: [],
-    tutors: [],
-    idCity: "",
-    idProgram: "",
-    evaluations: [],
-    idFamily: "", 
+  
+  const getInitialStudentData = () => {
+    const initialData: Student = {
+      id: "",
+      name: "",
+      lastName1: "",
+      lastName2: "",
+      housePhone: "",
+      address: "",
+      status: "",
+      commentary: "",
+      medicalCondition: "",
+      progressDesired: "",
+      allowedPictures: false,
+      dateBirth: "",
+      idPediatrician: "",
+      emergencyContacts: [],
+      tutors: [],
+      idCity: "",
+      idProgram: "",
+      evaluations: [],
+      idFamily: familyMode ? familyStudents[0].idFamily : "", // Initialize idFamily conditionally
+    };
+    return initialData;
   };
+
+  const initialStudentData = getInitialStudentData();
+  
   const [dataStudents, setDataStudents] = useState<Student[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
@@ -128,8 +135,16 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
   // CREATE DATA
   const handleOpenCreateModal = () => {
     setDataStudent(initialStudentData);
+    console.log('Crear student - Inicialiación de datos:');
+    console.log(dataStudent);
     setEditMode(false);
     setShowMode(false);
+    if(familyMode){
+      setFamilyHeaders(dataFamily.parents);
+      console.log('Al abrir create - Datos de los padres');
+      console.log(dataFamily.parents);
+    }
+
     onOpen();
   };
 
@@ -268,6 +283,8 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
       });
       const json = await response.json();
       setFamilyHeaders(json.response);
+      console.log("Respuesta de padres:")
+      console.log(json.response);
     } catch (error) {
       console.error(error);
     }  finally {
@@ -310,7 +327,6 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
     fetchData();
   }, [currentPage]);
 
-
   return (
       <>
           <Box px={3} py={3}>
@@ -332,7 +348,7 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
                     </Button>
                 </ButtonGroup>
               </Box>
-          </Flex>
+          </Flex> 
 
             <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
                 <ModalOverlay />
@@ -343,8 +359,11 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
                         <Box px={3} py={3}>
                         <form onSubmit={handleCreateData}>
                             <Stack spacing={4}>                     
-                            
-                              <StudentForm  dataParents={familyHeaders} dataStudent={dataStudent} editingMode={(editMode ? true : false)}/>
+                              
+                              {!showMode && (
+                                <StudentForm  dataParents={dataFamily.parents} dataStudent={dataStudent} editingMode={(editMode ? true : false)} createStudentWithFamily={true} />
+                              )}
+                              
 
                               {/*Tablas pertenecientes para las relaciones */}
 

@@ -16,7 +16,7 @@ import { Tutor } from "../../Students/Tutors/Tutor";
 import { City } from "../../Students/Cities/Cities";
 import { Program } from "../../StudentProgram/Programs/Programs";
 
-export default function StudentForm({dataParents, dataStudent, editingMode} : {dataParents : Parent[]; dataStudent : Student; editingMode : boolean}) {
+export default function StudentForm({dataParents, dataStudent, editingMode, createStudentWithFamily} : {dataParents : Parent[]; dataStudent : Student; editingMode : boolean; createStudentWithFamily : boolean}) {
     const [loading, setLoading] = useState(false);
 
     const [dataStudentLocal, setDataStudentLocal] = useState<Student>({
@@ -276,6 +276,13 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
     
              // Configurar el estado de selectedProgramId
             setSelectedProgramId(dataStudentLocal.idProgram);
+        }else{
+            if( createStudentWithFamily){
+                if (dataParents.length > 0) {
+                    setDataParentLocal(dataParents[0]);
+                    setParentList(dataParents);
+                }
+            }
         }
         
     }, [dataParents, dataTutors, dataEmergencyContacts, dataStudentLocal.idCity, dataStudentLocal.idProgram]);

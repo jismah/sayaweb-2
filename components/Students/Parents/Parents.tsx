@@ -10,6 +10,8 @@ import React, { useState, useEffect } from 'react';
 
 import { Student } from '../../Students/Students/Students';
 
+import { Family } from '../../FamilyManagement/Family/Family';
+
 export interface Parent {
   id: string;
   identityCard: string;
@@ -24,31 +26,32 @@ export interface Parent {
   children: Student[];
 }
 
-// interface Family{
-//   id: string;
-//   students: Student[];
-//   parents: Parent[];
-//   // user: User;
-// }
-
-export default function Parents({familyParents, familyMode, enableEditing} : {familyParents : Parent[]; familyMode: boolean; enableEditing : boolean}) {
+export default function Parents({familyParents, dataFamily, familyMode, enableEditing} : {familyParents : Parent[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean}) {
     
+  const getInitialParentData = () => {
+    const initialData: Parent = {
+      id: "",
+      identityCard: "",
+      name: "",
+      lastName1: "",
+      lastName2: "",
+      telephone: "",
+      email: "",
+      occupation: "",
+      idFamily: familyMode ? familyParents[0].idFamily : "", // Initialize idFamily conditionally
+      children: [],
+    };
+    return initialData;
+  };
+
+
+  const initialParentData = getInitialParentData();
+  
   const [dataParents, setDataParents] = useState<Parent[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
   const [loading, setLoading] = useState(false);
-  const [dataParent, setDataParent] = useState<Parent>({
-    id: "",
-    identityCard: "",
-    name: "",
-    lastName1: "",
-    lastName2: "",
-    telephone: "",
-    email: "",
-    occupation: "",
-    idFamily: "", 
-    children: [],
-  });
+  const [dataParent, setDataParent] = useState<Parent>(initialParentData);
   const [familyChildrens, setFamilyChildrens] = useState<Student[]>([]);
   const [familyHeaders, setFamilyHeaders] = useState<Parent[]>([]);
 
@@ -93,18 +96,9 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
 
   // CREATE DATA
   const handleOpenCreateModal = () => {
-    setDataParent({
-      id: "",
-      identityCard: "",
-      name: "",
-      lastName1: "",
-      lastName2: "",
-      telephone: "",
-      email: "",
-      occupation: "",
-      idFamily: "",
-      children: [],
-    });
+    setDataParent(initialParentData);
+    console.log('Crear padre - Inicialiación de datos:');
+    console.log(dataParent);
     setEditMode(false);
     setShowMode(false);
     onOpen();

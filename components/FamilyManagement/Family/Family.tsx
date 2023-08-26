@@ -1,5 +1,5 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
-import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
+import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid, Container } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
 import { NextPage } from 'next';
@@ -121,7 +121,10 @@ export default function Family() {
       const familyJson = await familyResponse .json();
       const families: Family[] = familyJson.response;
 
-      //setDataFamilies(familyIdsJson.response); // ACTUALIZAR EL ESTADO
+      // Validar el campo idFamily
+      const validFamilies = families.filter((family: Family) => family.id);
+
+
       setTotalRecords(familyJson.total); // Establecer el total de registros
       setTotalPages(Math.ceil(familyJson.total / pageSize)); // Calcular y establecer el total de páginas
 
@@ -137,7 +140,7 @@ export default function Family() {
       const users : User[] = usersJson.response;
 
       // Vincular usuarios a las familias por idFamilia
-      const familiesWithUsers = families.map((family: Family) => {
+      const familiesWithUsers = validFamilies.map((family: Family) => {
         const usersForFamily = users.filter((user: User) => user.idFamily === family.id);
         const user = usersForFamily.length > 0 ? usersForFamily[0] : null;
         return {
@@ -162,6 +165,7 @@ export default function Family() {
   // CREATE DATA
   const handleOpenCreateModal = () => {
 
+    setDataFamily(initialFamilyData);
     setEditMode(false);
     setShowMode(false);
     onOpen();
@@ -188,11 +192,16 @@ export default function Family() {
     onOpen();
 
     loadParentsAndStudents(selectedFamily);
-    
 
     setEditMode(true);
     setEnableEditing(true);
   }
+
+  useEffect(() => {
+    console.log('FamiliaFuera - El id de la familia es: ');
+    console.log(dataFamily.id);
+  }, [dataFamily]);
+  
 
   const handleUpdateDate =async () => {
 
@@ -330,7 +339,7 @@ export default function Family() {
                           !(showMode || editMode) && (
                             // <StudentForm dataParents={familyParents} dataStudent={dataStudent} editingMode={false}/>
                             // <StudentForm dataFamilies={dataFamilies} editingMode={false}/>
-                            <StudentForm dataParents={dataFamily.parents} dataStudent={initialStudentData} editingMode={false}/>
+                            <StudentForm dataParents={dataFamily.parents} dataStudent={initialStudentData} editingMode={false} createStudentWithFamily={false}/>
                           )
                         }
                         
@@ -351,28 +360,28 @@ export default function Family() {
                                   <Heading as='h3' size='lg' id='Parents' mb={6} >Usuario familiar</Heading>
                                   
                                   <SimpleGrid columns={2} spacing={10} mb={3}>
-                                    <div>
+                                    <FormControl>
                                       <FormLabel>Titulo</FormLabel>
                                       <Input value={`${dataFamily.user?.lastName1} ${dataFamily.user?.lastName2}`} variant={'filled'} color={'teal'} placeholder='Titulo' readOnly={true}></Input>
-                                    </div>
+                                    </FormControl>
                                    
-                                   <div>
+                                   <FormControl>
                                       <FormLabel>Nombre de usuario</FormLabel>
                                       <Input value={dataFamily.user?.username} variant={'filled'} color={'teal'} placeholder='Nombre de usuario' readOnly={true}></Input>
-                                   </div>
+                                   </FormControl>
                                     
                                   </SimpleGrid>
 
                                   <SimpleGrid columns={2} spacing={10}>
-                                    <div>
+                                    <FormControl>
                                         <FormLabel>Correo electrónico</FormLabel>
                                         <Input value={dataFamily.user?.email} variant={'filled'} color={'teal'} placeholder='Correo electrónico' readOnly={true}></Input>
-                                    </div>
+                                    </FormControl>
 
-                                     <div>
+                                     <FormControl>
                                         <FormLabel>Número de teléfono</FormLabel>
                                         <Input value={dataFamily.user?.phone} variant={'filled'} color={'teal'} placeholder='Número de teléfono' readOnly={true}></Input>
-                                    </div>
+                                    </FormControl>
                                   </SimpleGrid>
                                   
                                   
@@ -399,7 +408,7 @@ export default function Family() {
                           ) : (
                             <Box pt={4}>
 
-                              <Parents familyParents = {dataFamily.parents} familyMode={true} enableEditing={enableEditing}/>
+                              <Parents familyParents = {dataFamily.parents} dataFamily={dataFamily} familyMode={true} enableEditing={enableEditing}/>
 
                             </Box>
                           )
