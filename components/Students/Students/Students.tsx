@@ -32,6 +32,7 @@ export interface Student{
 }
 
 import { Parent } from '../Parents/Parents';
+import { Family } from '../../FamilyManagement/Family/Family';
 import { Tutor } from '../Tutors/Tutor';
 import { EmergencyContact } from '../EmergencyContacts/EmergencyContacts';
 import StudentForm from '../../Inscriptions/StudentForm/StudentForm';
@@ -39,7 +40,7 @@ import { Evaluation } from '../../StudentProgram/Evaluations/Evaluations';
 import { Program } from '../../StudentProgram/Programs/Programs';
 
 
-export default function Students({familyStudents, familyMode, enableEditing} : {familyStudents : Student[]; familyMode: boolean; enableEditing : boolean}) {
+export default function Students({familyStudents, dataFamily, familyMode, enableEditing} : {familyStudents : Student[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean}) {
   
   const initialStudentData: Student = {
     id: "",
@@ -343,7 +344,7 @@ export default function Students({familyStudents, familyMode, enableEditing} : {
                         <form onSubmit={handleCreateData}>
                             <Stack spacing={4}>                     
                             
-                              <StudentForm dataParents={familyHeaders} dataStudent={dataStudent} editingMode={(editMode ? true : false)}/>
+                              <StudentForm  dataParents={familyHeaders} dataStudent={dataStudent} editingMode={(editMode ? true : false)}/>
 
                               {/*Tablas pertenecientes para las relaciones */}
 
@@ -568,7 +569,6 @@ export default function Students({familyStudents, familyMode, enableEditing} : {
                 </ModalContent>
             </Modal>   
 
-          
 
 
             {loading ?

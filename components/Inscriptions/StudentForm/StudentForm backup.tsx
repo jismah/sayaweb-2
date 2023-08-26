@@ -7,8 +7,6 @@ import { Student } from '../../Students/Students/Students';
   
 import { Parent } from '../../Students/Parents/Parents';
 
-import { Family } from "../../FamilyManagement/Family/Family";
-
 import { Pediatrician } from "../../Students/Pediatricians/Pediatricians";
 import { EmergencyContact } from "../../Students/EmergencyContacts/EmergencyContacts";
 import { Tutor } from "../../Students/Tutors/Tutor";
@@ -184,7 +182,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
     
     const fetchStudentsRelations = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/students/relations/${dataStudentLocal.id}`, {
+            const response = await fetch(`http://localhost:3000/api/students/realtions/${dataStudentLocal.id}`, {
                 method: 'GET',
                 headers: {
                 "Content-Type": "application/json",
@@ -712,15 +710,12 @@ export default function StudentForm({dataParents, dataStudent, editingMode} : {d
                                                     <datalist id="lista-medical-institution">
                                                         <option value="HOMS"></option>
                                                         <option value="Unión Médica"></option>
-                                                        <option value="Instituto Materno Infantil"></option>
-                                                        <option value="Centro Médico Cibao"></option>
-                                                        <option value="Clínica Coromina"></option>
                                                     </datalist>
                                                 </FormControl>
 
                                                 <FormControl>
                                                     <FormLabel>Número de oficina</FormLabel>
-                                                    <NumberInput min={1}
+                                                    <NumberInput max={20} min={1}
                                                     value={dataPediatrician?.officeNumber ? parseInt(dataPediatrician.officeNumber) : ""}
                                                     onChange={(valueAsString, valueAsNumber) =>
                                                         setDataPediatrician({

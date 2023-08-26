@@ -62,8 +62,21 @@ export default function Family() {
 
     idFamily: "",
   };
-
-  const initialParentData: Parent = {
+  
+  const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
+  const [dataUsers, setDataUsers] = useState<User[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [enableEditing, setEnableEditing] = useState(false);
+  const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
+  const [loading, setLoading] = useState(false);
+  const [dataFamily, setDataFamily] = useState<Family>({
+    id: "",
+    title: "",
+    students: [],
+    parents: [],
+    user: initialUserData,
+  });
+  const [dataParent, setDataParent] = useState<Parent>({
     id: "",
     identityCard: "",
     name: "",
@@ -72,35 +85,15 @@ export default function Family() {
     telephone: "",
     email: "",
     occupation: "",
-    idFamily: "",
+    idFamily: "", 
     children: [],
-  };
-
-  const initialFamilyData: Family = {
-    id: "",
-    title: "",
-    students: [],
-    parents: [],
-    user: initialUserData,
-  };
-
-  //Datos de Familia
-  const [dataFamilies, setDataFamilies] = useState<Family[]>([]);
-  const [dataFamily, setDataFamily] = useState<Family>(initialFamilyData);
-
-  //const [dataUsers, setDataUsers] = useState<User[]>([]);
-  const [editMode, setEditMode] = useState(false);
-  const [enableEditing, setEnableEditing] = useState(false);
-  const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
-  const [loading, setLoading] = useState(false);
-
-  //const [dataParent, setDataParent] = useState<Parent>(initialParentData);
-  //const [dataStudent, setDataStudent] = useState<Student>(initialStudentData);
+  });
+  const [dataStudent, setDataStudent] = useState<Student>(initialStudentData);
   
 
-  //const [familyUser, setFamilyUser] = useState<User>(initialUserData);
-  //const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
-  //const [familyParents, setFamilyParents] = useState<Parent[]>([]);
+  const [familyUser, setFamilyUser] = useState<User>(initialUserData);
+  const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
+  const [familyParents, setFamilyParents] = useState<Parent[]>([]);
 
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -147,7 +140,7 @@ export default function Family() {
       });
 
       setDataFamilies(familiesWithUsers);
-      //setDataUsers(users);
+      setDataUsers(users);
       console.log(familiesWithUsers)
 
     } catch (error) {
@@ -227,13 +220,14 @@ export default function Family() {
   // SHOW DATA
   const handleShowData = async (family: Family) => {
     const selectedFamily = dataFamilies.find(f => f.id === family.id)!;
-  
+
     setDataFamily(selectedFamily);
     setShowMode(true); // Cambiar a modo "mostrar"
     onOpen();
-  
-    await loadParentsAndStudents(selectedFamily);
-  };
+
+    loadParentsAndStudents(selectedFamily);
+    
+  }
 
   // PAGINATION
   const pageSize = 10; // Cantidad de elementos por página
@@ -241,46 +235,60 @@ export default function Family() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
 
-  const loadParentsAndStudents = async (selectedFamily: Family) => {
-    const updatedParents = await loadDataByType(selectedFamily, 'parents');
-    const updatedStudents = await loadDataByType(selectedFamily, 'students');
-    const updatedUser = await loadDataByType(selectedFamily, 'user');
-    console.log(updatedParents);
-  
-    const updatedFamily: Family = {
-      ...dataFamily,
-      parents: updatedParents,
-      students: updatedStudents,
-      user: updatedUser,
-    };
-  
-    setDataFamily(updatedFamily);
-  };
-  
-  const loadDataByType = async (selectedFamily: Family, type: string) => {
-    setLoading(true);
-  
+  const loadParentsAndStudents = async (selectedFamily : Family) => {
+    setLoading(true); 
+
+    //Petición para obtener los demás cabeceras de la familia
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/${type}`, {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/parents`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
           "x-api-key": "123456",
-        },
+      },
       });
       const json = await response.json();
-  
-      setLoading(false);
-  
-      return json.response;
+      setFamilyParents(json.response);
     } catch (error) {
       console.error(error);
-      setLoading(false);
-      return [];
+    }  finally {
+      setLoading(false); 
     }
-  };
-  
-  
+
+    //Petición para obtener los estudiantes (hijos)
+    try {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/students`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+      },
+      });
+      const json = await response.json();
+      setFamilyStudents(json.response);
+    } catch (error) {
+      console.error(error);
+    }  finally {
+      setLoading(false); 
+    }
+
+    //Petición para obtener el usuario
+    try {
+      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/user`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "123456",
+      },
+      });
+      const json = await response.json();
+      setFamilyUser(json.response);
+    } catch (error) {
+      console.error(error);
+    }  finally {
+      setLoading(false); 
+    }
+  }
 
 
   const handlePageChange = (newPage: number) => {
@@ -315,8 +323,6 @@ export default function Family() {
             </ButtonGroup>
           </Flex>
 
-        
-
           <Modal onClose={() => { setShowMode(false); setEditMode(false);  setEnableEditing(false); onClose();}} size={'full'} isOpen={isOpen}>
             <ModalOverlay />
             <ModalContent>
@@ -328,9 +334,7 @@ export default function Family() {
                       <Stack spacing={4}>                     
                         {
                           !(showMode || editMode) && (
-                            // <StudentForm dataParents={familyParents} dataStudent={dataStudent} editingMode={false}/>
-                            // <StudentForm dataFamilies={dataFamilies} editingMode={false}/>
-                            <StudentForm dataParents={dataFamily.parents} dataStudent={initialStudentData} editingMode={false}/>
+                            <StudentForm dataParents={familyParents} dataStudent={dataStudent} editingMode={false}/>
                           )
                         }
                         
@@ -353,12 +357,12 @@ export default function Family() {
                                   <SimpleGrid columns={2} spacing={10} mb={3}>
                                     <div>
                                       <FormLabel>Titulo</FormLabel>
-                                      <Input value={`${dataFamily.user?.lastName1} ${dataFamily.user?.lastName2}`} variant={'filled'} color={'teal'} placeholder='Titulo' readOnly={true}></Input>
+                                      <Input value={`${familyUser.lastName1} ${familyUser.lastName2}`} variant={'filled'} color={'teal'} placeholder='Titulo' readOnly={true}></Input>
                                     </div>
                                    
                                    <div>
                                       <FormLabel>Nombre de usuario</FormLabel>
-                                      <Input value={dataFamily.user?.username} variant={'filled'} color={'teal'} placeholder='Nombre de usuario' readOnly={true}></Input>
+                                      <Input value={familyUser.username} variant={'filled'} color={'teal'} placeholder='Nombre de usuario' readOnly={true}></Input>
                                    </div>
                                     
                                   </SimpleGrid>
@@ -366,12 +370,12 @@ export default function Family() {
                                   <SimpleGrid columns={2} spacing={10}>
                                     <div>
                                         <FormLabel>Correo electrónico</FormLabel>
-                                        <Input value={dataFamily.user?.email} variant={'filled'} color={'teal'} placeholder='Correo electrónico' readOnly={true}></Input>
+                                        <Input value={familyUser.email} variant={'filled'} color={'teal'} placeholder='Correo electrónico' readOnly={true}></Input>
                                     </div>
 
                                      <div>
                                         <FormLabel>Número de teléfono</FormLabel>
-                                        <Input value={dataFamily.user?.phone} variant={'filled'} color={'teal'} placeholder='Número de teléfono' readOnly={true}></Input>
+                                        <Input value={familyUser.phone} variant={'filled'} color={'teal'} placeholder='Número de teléfono' readOnly={true}></Input>
                                     </div>
                                   </SimpleGrid>
                                   
@@ -399,7 +403,7 @@ export default function Family() {
                           ) : (
                             <Box pt={4}>
 
-                              <Parents familyParents = {dataFamily.parents} familyMode={true} enableEditing={enableEditing}/>
+                              <Parents familyParents = {familyParents} familyMode={true} enableEditing={enableEditing}/>
 
                             </Box>
                           )
@@ -421,8 +425,7 @@ export default function Family() {
                           ) : (
                             <Box pt={4}>
 
-                              {/* <Students familyStudents={dataFamily.students} familyMode={true} enableEditing={enableEditing}/> */}
-                              <Students familyStudents={dataFamily.students} dataFamily={dataFamily} familyMode={true} enableEditing={enableEditing}/>
+                              <Students familyStudents={familyStudents} familyMode={true} enableEditing={enableEditing}/>
 
                             </Box>
                           )

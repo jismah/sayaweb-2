@@ -89,9 +89,7 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
         }
       
     }
-  }
-
-  
+  } 
 
   // CREATE DATA
   const handleOpenCreateModal = () => {
@@ -147,8 +145,8 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
       
     }
     
-    setShowMode(false)
-    setEditMode(false)
+    setShowMode(false);
+    setEditMode(false);
    
     fetchData();
   }
@@ -184,10 +182,10 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
       })
     });
     const json = await res.json();
-    console.log(json)
-    onClose()
-    setEditMode(false)
-    fetchData()
+    console.log(json);
+    onClose();
+    setEditMode(false);
+    fetchData();
   }
 
   // DELETE DATA
@@ -218,7 +216,7 @@ export default function Parents({familyParents, familyMode, enableEditing} : {fa
 
     setDataParent(selectedParent);
     setShowMode(true); // Cambiar a modo "mostrar"
-    onOpen()
+    onOpen();
     
   }
 
