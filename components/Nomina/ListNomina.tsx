@@ -1,8 +1,9 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs } from '@chakra-ui/react';
+import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 
 interface NominaData {
@@ -33,7 +34,8 @@ interface MonthlyData {
   };
 }
 
-export default function ListNomina() {
+export default function ListNomina({ setSearchId }: { setSearchId: (arg0: string) => void }) {
+  const router = useRouter();
 
   const [dataNomina, setDataNomina] = useState<Array<NominaData>>([]);
   const [displayData, setDisplayData] = useState<Array<NominaData>>([]);
@@ -42,6 +44,7 @@ export default function ListNomina() {
   const [displayMonthly, setDisplayMonthly] = useState<Array<MonthlyData>>([]);  
 
   const [loading, setLoading] = useState(false);
+  const [connected, setConnected] = useState(false);
 
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -49,6 +52,7 @@ export default function ListNomina() {
 
   // Year Input
   const [selectedYear, setSelectedYear] = useState(DateTime.now().toFormat('yyyy'));
+  let validatedYear = DateTime.now().toFormat('yyyy');
   
   const handleYearDecrease = () => {
     if (!loading) {
@@ -73,6 +77,7 @@ export default function ListNomina() {
   // GET DATA TO LOAD ARRAY
   const fetchData = async (year: string) => {
     setLoading(true);
+    setConnected(false);
 
     try {
       const res = await fetch(`http://localhost:3000/api/nomina/quincenal?year=${year}`, {
@@ -101,14 +106,16 @@ export default function ListNomina() {
       updateDisplayData(json.response, monthly);
 
       if (selectedTab == 0) {
-        setTotalPages(Math.ceil(json.total/pageSize));
+        setTotalPages(Math.ceil(json.total/pageSizeQuincenal));
       } else {
-        setTotalPages(Math.ceil(monthly.length/pageSize));
+        setTotalPages(Math.ceil(monthly.length/pageSizeMonthly));
       }
+
+      setConnected(true);
 
     } catch (error) {
       console.error(error);
-        // MANEJO DE ERRORES
+      setConnected(false);
     } finally {
       setLoading(false);
     }
@@ -165,18 +172,22 @@ export default function ListNomina() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 7;
+  const pageSizeQuincenal = 7;
+  const pageSizeMonthly = 12;
 
   function updateDisplayData(quincenal: any[] | undefined, mensual: any[] | undefined) {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
+    const startIndex = (currentPage - 1) * pageSizeQuincenal;
+    const endIndex = startIndex + pageSizeQuincenal;
+
+    const startMonthly = (currentPage - 1) * pageSizeMonthly;
+    const endMonthly = startIndex + pageSizeMonthly;
 
     if (quincenal && mensual) {
       setDisplayData(quincenal.slice(startIndex, endIndex));
-      setDisplayMonthly(mensual.slice(startIndex, endIndex));
+      setDisplayMonthly(mensual.slice(startMonthly, endMonthly));
     } else {
       setDisplayData(dataNomina.slice(startIndex, endIndex));
-      setDisplayMonthly(dataMonthly.slice(startIndex, endIndex));
+      setDisplayMonthly(dataMonthly.slice(startMonthly, endMonthly));
     }
   }
 
@@ -193,9 +204,9 @@ export default function ListNomina() {
       setCurrentPage(1);
 
       if (index == 0) {
-        setTotalPages(Math.ceil(dataNomina.length/pageSize))
+        setTotalPages(Math.ceil(dataNomina.length/pageSizeQuincenal))
       } else {
-        setTotalPages(Math.ceil(dataMonthly.length/pageSize))
+        setTotalPages(Math.ceil(dataMonthly.length/pageSizeMonthly))
       }
     }
   };
@@ -281,9 +292,13 @@ export default function ListNomina() {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(e.target.value)}
                         onBlur={() => {
-                          const validatedYear = Math.min(Math.max(parseInt(selectedYear), 2000), 2100);
-                          setSelectedYear(validatedYear.toString());
-                          fetchData(validatedYear.toString());
+                          if (!/^\d+$/.test(selectedYear)) {
+                            setSelectedYear(validatedYear);
+                          } else {
+                            validatedYear = (Math.min(Math.max(parseInt(selectedYear), 2000), 2100)).toString();
+                            setSelectedYear(validatedYear);
+                            fetchData(validatedYear);
+                          }
                         }}
                         isDisabled={loading}
                       />
@@ -301,12 +316,17 @@ export default function ListNomina() {
                       <Box>
                           <Card variant={'outline'}>
                               <CardBody>
-                                  <Box height={'69vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                  <Box height={'65vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                       <Spinner color='teal' size='xl' thickness='3px' />
                                   </Box>
                               </CardBody>
                           </Card>
                       </Box>
+                      : !connected ?
+                        <Box><Card variant={'outline'} px={0} py={200}>
+                          <Text textAlign={'center'} textColor={'#C44D4D'}>No se logro conectar con el servidor</Text>
+                        </Card></Box>
+
                       : dataNomina.length <= 0 ? 
                         <Box><Card variant={'outline'} px={0} py={200}>
                           <Text textAlign={'center'}>No se encontraron records para mostrar</Text>
@@ -314,7 +334,7 @@ export default function ListNomina() {
 
                       : <Box>
                           { selectedTab == 0 ?
-                          <Box h={'67vh'}>
+                          <Box h={'65vh'}>
                           <Card variant={'outline'}>
                               <CardBody p={0}>
                                   <TableContainer>
@@ -338,7 +358,10 @@ export default function ListNomina() {
                                                   return (
                                                       <Tr key={id}>
                                                             <Td>{id}</Td>
-                                                            <Td>{date}</Td>
+                                                            <Td>{DateTime.fromISO(date)
+                                                                .setLocale('es')
+                                                                .toFormat('MMMM dd, yyyy')
+                                                                .replace(/^\w/, firstChar => firstChar.toUpperCase())}</Td>
                                                             <Td>{totals.salary ? totals.salary.toLocaleString() : 0}</Td>
                                                             <Td>{totals.overtimePay ? totals.overtimePay.toLocaleString() : '0'}</Td>
                                                             <Td>{totals.sfs ? totals.sfs.toLocaleString() : '0'}</Td>
@@ -347,8 +370,14 @@ export default function ListNomina() {
                                                             <Td>{totals.other ? totals.other.toLocaleString() : '0'}</Td>
                                                             <Td>{totals.total ? totals.total.toLocaleString() : '0'}</Td>
                                                           <Td>
-                                                              <ButtonGroup variant='ghost' spacing='1'>
-                                                                  <IconButton colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                                                              <ButtonGroup variant='ghost' spacing='1' display={'flex'} justifyContent={'start'}>
+                                                                <Tooltip label='Ir a nomina'>
+                                                                    <IconButton colorScheme='blue' icon={<ViewIcon />} aria-label='Show'
+                                                                    onClick={() => {
+                                                                      setSearchId(id);
+                                                                    }}>
+                                                                    </IconButton>
+                                                                </Tooltip>
                                                               </ButtonGroup>
                                                           </Td>
                                                       </Tr>
@@ -375,13 +404,13 @@ export default function ListNomina() {
                           </Card>
                           </Box> :
                           
-                          <Box h={'67vh'}>
-                          <Card variant={'outline'}>
+                          <Box>
+                          <Card variant={'outline'} >
                               <CardBody p={0}>
-                                  <TableContainer>
-                                      <Table variant='striped'>
-                                          <Thead>
-                                              <Tr>
+                                  <TableContainer maxH={'70vh'} overflowY={'scroll'}>
+                                      <Table variant='striped' position={'sticky'}>
+                                          <Thead position={'sticky'} top={0} backgroundColor={'white'} zIndex={1}>
+                                              <Tr boxShadow={'inset 0 -1px 0 #e2e8f0'}>
                                                   <Th colSpan={2}>Mes</Th>
                                                   <Th>Salario</Th>
                                                   <Th>Días Extra</Th>
@@ -390,7 +419,7 @@ export default function ListNomina() {
                                                   <Th>Prestamos</Th>
                                                   <Th>Otros</Th>
                                                   <Th>Total</Th>
-                                                  <Th>Acciones</Th>
+
                                               </Tr>
                                           </Thead>
                                           <Tbody>
@@ -405,18 +434,14 @@ export default function ListNomina() {
                                                             <Td>{totals.loans ? totals.loans.toLocaleString() : '0'}</Td>
                                                             <Td>{totals.other ? totals.other.toLocaleString() : '0'}</Td>
                                                             <Td>{totals.total ? totals.total.toLocaleString() : '0'}</Td>
-                                                          <Td>
-                                                              <ButtonGroup variant='ghost' spacing='1'>
-                                                                  <IconButton colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
-                                                              </ButtonGroup>
-                                                          </Td>
+
                                                       </Tr>
                                                   )
                                               })
                                               }
                                           </Tbody>
-                                          <Tfoot>
-                                            <Tr>
+                                          <Tfoot position={'sticky'} bottom={-0.1} backgroundColor={'white'} zIndex={1}>
+                                            <Tr boxShadow={'inset 0 1px 0 #e2e8f0'}>
                                               <Th colSpan={2}>Totales del año</Th>
                                               <Th>{columnTotals.salary ? columnTotals.salary.toLocaleString() : '0'}</Th>
                                               <Th>{columnTotals.overtimePay ? columnTotals.overtimePay.toLocaleString() : '0'}</Th>
@@ -425,7 +450,7 @@ export default function ListNomina() {
                                               <Th>{columnTotals.loans ? columnTotals.loans.toLocaleString() : '0'}</Th>
                                               <Th>{columnTotals.other ? columnTotals.other.toLocaleString() : '0'}</Th>
                                               <Th>{columnTotals.total ? columnTotals.total.toLocaleString() : '0'}</Th>
-                                              <Th></Th>
+
                                             </Tr>
                                           </Tfoot>
                                       </Table>
@@ -436,7 +461,7 @@ export default function ListNomina() {
                           }
                           
                           {/* Pagination */}
-                          <Box display={'flex'} justifyContent={'center'} px={2} pt={0} pb={2}>
+                          <Box display={selectedTab == 0 ? 'flex' : 'none'} justifyContent={'center'} px={2} pt={2} pb={0}>
                             <HStack maxW={'200px'} gap={3} textColor={'#008080'}>
                               <IconButton
                                 textColor={'#008080'}
