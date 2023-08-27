@@ -34,7 +34,20 @@ interface MonthlyData {
   };
 }
 
-export default function ListNomina({ setSearchId }: { setSearchId: (arg0: string) => void }) {
+export default function ListNomina({ displayYear, setDisplayYear, setSearchId }: {
+    displayYear: string,
+    setDisplayYear: (arg0: string) => void, 
+    setSearchId: (arg0: string) => void 
+  }) {
+
+  useEffect(() => {
+    if (displayYear != '') {
+      setSelectedYear(displayYear)
+      fetchData(displayYear)
+      setDisplayYear('')
+    }
+  }, [displayYear]);
+
   const router = useRouter();
 
   const [dataNomina, setDataNomina] = useState<Array<NominaData>>([]);
@@ -103,7 +116,7 @@ export default function ListNomina({ setSearchId }: { setSearchId: (arg0: string
       setDataMonthly(monthly)
       setCurrentPage(1);
 
-      updateDisplayData(json.response, monthly);
+      updateDisplayData(sortedDataNomina, monthly);
 
       if (selectedTab == 0) {
         setTotalPages(Math.ceil(json.total/pageSizeQuincenal));
@@ -164,8 +177,10 @@ export default function ListNomina({ setSearchId }: { setSearchId: (arg0: string
   }, [dataNomina]);
 
   useEffect(() => {
-    if (dataNomina.length <= 0) {
-      fetchData(selectedYear)
+    if (displayYear == '') {
+      if (dataNomina.length <= 0) {
+        fetchData(selectedYear)
+      }
     }
   }, []);
 
