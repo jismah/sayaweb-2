@@ -1,17 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button, FormControl, FormLabel, Input, Card, useToast, Box, Text, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, IconButton, Spinner, position, } from '@chakra-ui/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button, FormControl, FormLabel, Input, Card, useToast, Box, Text, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, IconButton, Spinner, position, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { SearchSelect, SearchSelectItem } from "@tremor/react";
 import { DateTime } from 'luxon';
 import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
 
+interface Data {
+    idNomina: number,
+    idStaff: number,
+    date: string,
+    salary: number,
+    extraDays: number,
+    overtimePay: number,
+    sfs: number,
+    afp: number,
+    loans: number,
+    other: number,
+    total: number,
+}
+
 interface CreateNominaProps {
     isOpen: boolean;
     onClose: () => void;
-    reloadData: (arg0: boolean) => void;
-    reloadYear: (arg0: string) => void;
     id?: number;
     staffId?: number;
+    editMode: boolean;
+    editData: Data;
+    setters: {
+        reloadData: (arg0: boolean) => void;
+        reloadYear: (arg0: string) => void;
+        setEditMode: (arg0: boolean) => void,
+        setEditData: (arg0: Data) => void,
+        remoteSearchId: (arg0: string) => void;
+    }
 }
 
 interface NominaProps {
@@ -27,13 +48,14 @@ interface StaffProps {
     salary: number
 }
 
-export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, id, staffId }: CreateNominaProps) {
-    const router = useRouter();
+export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, editData, setters }: CreateNominaProps) {
     const toast = useToast(); 
 
     const [error, setError] = useState('');
     const [locked, setLocked] = useState(true);
+    const [resetOnChange, setResetOnChange] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [processing, setProcessing] = useState(false);
     const [connected, setConnected] = useState(false);
 
     const [nominas, setNominas] = useState<Array<NominaProps>>([]);
@@ -65,6 +87,11 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
         const foundStaff = staff.find(staffMember => Number(staffMember.id) === data.idStaff);
         return foundStaff?.name + " " + foundStaff?.lastName1
     };
+
+    const getDate = () => {
+        const found = nominas.find(nomina => Number(nomina.id) === data.idNomina);
+        return found?.date ? found?.date : "";
+    }
 
     const fetchNew = async () => {
         setLoading(true);
@@ -129,34 +156,59 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                 total: 0,
             });
             setError('');
+            handleExit();
 
         } else {
             fetchNew();
-            setData(prevData => ({ ...prevData, idNomina: Number(id), idStaff: Number(staffId) }))
             setError('');
+
+            if (editMode && editData) {
+                setLocked(checkLocking());
+                setResetOnChange(false)
+                setData(editData);
+            } else {
+                setData(prevData => ({ ...prevData, idNomina: Number(id), idStaff: Number(staffId) }));
+            }
         }
     }, [isOpen]);
 
+    const checkLocking = () => {
+        const sfs = parseFloat((editData.salary * (3.04 / 100)).toFixed(2));
+        const afp = parseFloat((editData.salary * (2.78 / 100)).toFixed(2));
+        const overtimePay = parseFloat(((editData.salary / 23.83) * editData.extraDays).toFixed(2));
+
+        if (editData.sfs != sfs) {
+            return false
+        }
+        if (editData.afp != afp) {
+            return false
+        }
+        if (editData.overtimePay != overtimePay) {
+            return false
+        }
+        return true;
+    }
+
     useEffect(() => {
         setButtonDisable((Number.isNaN(data.idStaff) || data.idStaff === 0));
-        setData(prevData => ({ ...prevData,
-            salary: 0,
-            extraDays: 0,
-            overtimePay: 0,
-            sfs: 0,
-            afp: 0,
-            loans: 0,
-            other: 0,
-        }))
+        if (resetOnChange) {
+            setData(prevData => ({ ...prevData,
+                salary: 0,
+                extraDays: 0,
+                overtimePay: 0,
+                sfs: 0,
+                afp: 0,
+                loans: 0,
+                other: 0,
+            }))
+        } else {
+            setResetOnChange(true);
+        }
     }, [data.idStaff]);
 
     useEffect(() => {
         if (locked) {
-            setData(prevData => ({ ...prevData, 
-                sfs: parseFloat((data.salary * (3.04 / 100)).toFixed(2)),
-                afp: parseFloat((data.salary * (2.78 / 100)).toFixed(2)),
-                overtimePay: parseFloat(((data.salary / 23.83) * data.extraDays).toFixed(2)) 
-            }))
+            updateLockedData()
         }
     }, [data.salary, data.extraDays]);
 
@@ -170,15 +222,26 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
         return parseFloat((Number(data.salary) + Number(data.overtimePay) - Number(data.sfs)
         - Number(data.afp) - Number(data.loans) - Number(data.other)).toFixed(2));
     };
+
+    const updateLockedData = () => {
+        setData(prevData => ({ ...prevData, 
+            sfs: parseFloat((data.salary * (3.04 / 100)).toFixed(2)),
+            afp: parseFloat((data.salary * (2.78 / 100)).toFixed(2)),
+            overtimePay: parseFloat(((data.salary / 23.83) * data.extraDays).toFixed(2)) 
+        }))
+    }
   
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setProcessing(true)
 
         if (Number.isNaN(data.idNomina) || data.idNomina === 0) {
             setError("Debe seleccionar una nomina para continuar");
         } else if (Number.isNaN(data.idStaff) || data.idStaff === 0) {
             setError("Debe seleccionar una empleado para continuar");
+        } else if (data.total < 0) {
+            setError("El total no puede ser negativo");
         } else {
             const found = nominas.find(nomina => Number(nomina.id) === data.idNomina);
             const dateFound = found?.date ? found?.date : "";
@@ -195,62 +258,262 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                 loans: data.loans.toString(),
                 other: data.other.toString(),
                 total: data.total.toString(),
+                deleted: 'false',
             };
 
-            try {
-                const res = await fetch('http://localhost:3000/api/detailNomina', {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": "123456",
-                    },
-                    body: JSON.stringify(stringifiedData),
-                });
-                const json = await res.json();
+            let exists: boolean = false;
+            let deleted: boolean = true;
 
-                if (json.code.toString() === '200') {
-                    toast({
-                        title: `Detalle de nomina creado`,
-                        description: `Para ${getStaffName()} para ${DateTime.fromISO(dateFound)
-                            .setLocale('es')
-                            .toFormat('MMMM dd yyyy')}`,
-                        status: 'success',
-                        position: 'bottom-right',
-                        duration: 4000,
-                        isClosable: true,
-                    })
+            if (!editMode) {
+                try {
+                    const validate = await fetch(`http://localhost:3000/api/detailNomina/validate/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
+                        method: 'GET',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": "123456",
+                        },
+                    });
 
-                    onClose();
+                    const json = await validate.json();
 
-                    if (id || staffId) {
-                        reloadData(true);
-                        reloadYear(DateTime.fromISO(dateFound).toFormat('yyyy'));
+                    if (json.code.toString() === '200' && json.response == null) {
+                        exists = false;
+                        deleted = false;
+                    } else if (json.code.toString() === '201' && json.response) {
+                        if (json.response.deleted) {
+                            exists = true;
+                            deleted = true;
+                        } else {
+                            exists = true;
+                            deleted = false;
+                            setError("Ya existe un detalle de nómina para esta nómina y empleado")
+                        }
                     } else {
-                        router.push(`/App/Nomina?id=${data.idNomina}`);
+                        console.log(json);
+                        toast({
+                            title: `Error`,
+                            description: `Hubo un error al intentar crear la nómina`,
+                            status: 'error',
+                            position: 'bottom-right',
+                            duration: 4000,
+                            isClosable: true,
+                        })
+                        setProcessing(false);
+                        return
                     }
-                } else {
-                    console.log(data)
-                    console.log(json)
+
+                } catch {
+                    console.log(error);
                     toast({
                         title: `Error`,
-                        description: `Hubo un error al intenrar crear el detalle de nomina`,
+                        description: `Hubo un error al intentar crear la nómina`,
                         status: 'error',
                         position: 'bottom-right',
                         duration: 4000,
                         isClosable: true,
                     })
+                    setProcessing(false);
+                    return
                 }
-            } catch (error: any) {     
-                console.log(error);
+            }
+
+            if (!editMode && !exists && !deleted) {
+                try {
+                    const res = await fetch('http://localhost:3000/api/detailNomina', {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": "123456",
+                        },
+                        body: JSON.stringify(stringifiedData),
+                    });
+                    const json = await res.json();
+
+                    if (json.code.toString() === '200') {
+                        toast({
+                            title: `Detalle de nomina creado`,
+                            description: `Para ${getStaffName()} para ${DateTime.fromISO(dateFound)
+                                .setLocale('es')
+                                .toFormat('MMMM dd yyyy')}`,
+                            status: 'success',
+                            position: 'bottom-right',
+                            duration: 4000,
+                            isClosable: true,
+                        })
+
+                        onClose();
+
+                        if (id || staffId) {
+                            setters.reloadData(true);
+                            setters.reloadYear(DateTime.fromISO(dateFound).toFormat('yyyy'));
+                        } else {
+                            setters.remoteSearchId(data.idNomina.toString());
+                        }
+                    } else {
+                        console.log(data)
+                        console.log(json)
+                        toast({
+                            title: `Error`,
+                            description: `Hubo un error al intentar crear el detalle de nomina`,
+                            status: 'error',
+                            position: 'bottom-right',
+                            duration: 4000,
+                            isClosable: true,
+                        })
+                    }
+                } catch (error: any) {     
+                    console.log(error);
+                    toast({
+                        title: `Error`,
+                        description: `Hubo un error al intentar crear el detalle de nomina`,
+                        status: 'error',
+                        position: 'bottom-right',
+                        duration: 4000,
+                        isClosable: true,
+                    })
+                } finally {
+                    setProcessing(false)
+                }
+
+            } else if (editMode || (exists && deleted) ) {
+                try {
+                    const res = await fetch(`http://localhost:3000/api/detailNomina/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
+                        method: 'PUT',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": "123456",
+                        },
+                        body: JSON.stringify(stringifiedData),
+                    });
+                    const json = await res.json();
+
+                    if (json.code.toString() === '200') {
+                        toast({
+                            title: `Detalle de nomina editado correctamente`,
+                            description: `Para ${getStaffName()} para ${DateTime.fromISO(dateFound)
+                                .setLocale('es')
+                                .toFormat('MMMM dd yyyy')}`,
+                            status: 'success',
+                            position: 'bottom-right',
+                            duration: 4000,
+                            isClosable: true,
+                        })
+
+                        onClose();
+
+                        if (id || staffId) {
+                            setters.reloadData(true);
+                            setters.reloadYear(DateTime.fromISO(dateFound).toFormat('yyyy'));
+                        } else {
+                            setters.remoteSearchId(data.idNomina.toString());
+                        }
+                    } else {
+                        console.log(data)
+                        console.log(json)
+                        toast({
+                            title: `Error`,
+                            description: `Hubo un error al intentar crear el detalle de nomina`,
+                            status: 'error',
+                            position: 'bottom-right',
+                            duration: 4000,
+                            isClosable: true,
+                        })
+                    }
+                } catch (error: any) {     
+                    console.log(error);
+                    toast({
+                        title: `Error`,
+                        description: `Hubo un error al intentar crear el detalle de nomina`,
+                        status: 'error',
+                        position: 'bottom-right',
+                        duration: 4000,
+                        isClosable: true,
+                    })
+                } finally {
+                    setProcessing(false)
+                }
+            }
+        }
+        setProcessing(false);
+    };
+
+    const handleExit = () => {
+        setters.setEditMode(false);
+        setters.setEditData({
+            idNomina: 0,
+            idStaff: 0,
+            date: "",
+            salary: 0,
+            extraDays: 0,
+            overtimePay: 0,
+            sfs: 0,
+            afp: 0,
+            loans: 0,
+            other: 0,
+            total: 0,
+        })
+    };
+
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const onDeleteClose = () => setDeleteOpen(false);
+    const cancelRef = useRef<HTMLButtonElement | null>(null);
+  
+    const handleDelete = async () => {
+        setProcessing(true);
+        try {
+            const res = await fetch(`http://localhost:3000/api/detailNomina/${data.idNomina}/${data.idStaff}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "123456",
+                }
+            });
+            const json = await res.json();
+
+            if (json.code.toString() === '200') {
                 toast({
-                    title: `Error`,
-                    description: `Hubo un error al intenrar crear el detalle de nomina`,
-                    status: 'error',
+                    title: `Detalle de nómina eliminado`,
+                    description: `Se elimino correctamente el detalle para ${getStaffName()} (${DateTime.fromISO(data.date)
+                                    .setLocale('es')
+                                    .toFormat('MMMM dd, yyyy')})`,
+                    status: 'success',
                     position: 'bottom-right',
                     duration: 4000,
                     isClosable: true,
                 })
+
+                onClose();
+
+                if (id || staffId) {
+                    setters.reloadData(true);
+                    setters.reloadYear(DateTime.fromISO(getDate()).toFormat('yyyy'));
+                } else {
+                    setters.remoteSearchId(editData.idNomina.toString());
+                }
+
+            } else {
+                toast({
+                    title: `Error`,
+                    description: `Ocurrio un error al intentar eliminar el detalle de nómina`,
+                    status: 'error',
+                    position: 'bottom-right',
+                    duration: 4000,
+                    isClosable: true,
+                }) 
             }
+        } catch (error: any) {
+            console.log(error);
+            toast({
+                title: `Error`,
+                description: `Ocurrio un error al intentar eliminar el detalle de nómina`,
+                status: 'error',
+                position: 'bottom-right',
+                duration: 4000,
+                isClosable: true,
+            })
+        } finally {
+            setProcessing(false);
+            onDeleteClose()
         }
     };
 
@@ -258,7 +521,7 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
         <Modal onClose={onClose} size="full" isOpen={isOpen}>
             <ModalOverlay />
             <ModalContent maxW={'1000px'} minH={'48vh'} alignSelf={'center'} borderRadius={8} p={8}>
-                <ModalHeader textAlign={'center'}>Nuevo Detalle Nomina</ModalHeader>
+                <ModalHeader textAlign={'center'}>{editMode ? 'Editar Detalle Nómina' : 'Nuevo Detalle Nómina'}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit} autoComplete='off' style={{ position: 'relative' }}>
@@ -271,9 +534,9 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                         {!loading && connected && error != '' &&
                         <Text color={'#C44D4D'} textAlign={'center'} pb={2}>{error}</Text>}
                         <Card variant={'outline'} display={'flex'} flexDirection={'column'} gap={'20px'} borderRadius={8} p={4} >
-                            <FormControl>
+                            <FormControl isDisabled={editMode}>
                                 <FormLabel>Nomina</FormLabel>
-                                <SearchSelect placeholder='Selecciona una nomina' value={data.idNomina}
+                                <SearchSelect disabled={editMode} placeholder='Selecciona una nomina' value={data.idNomina}
                                     onChange={(value) => setData(prevData => ({ ...prevData, idNomina: Number(value) }))}>
                                     {nominas.map(item => (
                                         <SearchSelectItem key={item.id} value={item.id} >
@@ -290,9 +553,9 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                                 </SearchSelect>
                             </FormControl>
 
-                            <FormControl>
+                            <FormControl isDisabled={editMode}>
                                 <FormLabel>Empleado</FormLabel>
-                                <SearchSelect placeholder='Selecciona una empleado' value={data.idStaff}
+                                <SearchSelect disabled={editMode} placeholder='Selecciona una empleado' value={data.idStaff}
                                     onChange={(value) => setData(prevData => ({ ...prevData, idStaff: Number(value) }))}>
                                     {staff.map(item => (
                                         <SearchSelectItem key={item.id} value={item.id} >
@@ -307,11 +570,20 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                         </Card>
                         
                         <Box mt={5} display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                            <Button w={'25%'} size='sm' variant={'outline'} isDisabled={staffButtonDisable} 
-                            onClick={handleLoadStaffData}>Cargar datos de empleado</Button>
+                            <Button w={'25%'} size='sm' variant={'outline'} 
+                                isDisabled={staffButtonDisable || loading || processing} 
+                                onClick={handleLoadStaffData}
+                            >
+                                Cargar datos de empleado
+                            </Button>
 
                             <IconButton opacity={0.7} bg={'transparent'} aria-label='Unlock' icon={locked ? <LockIcon /> : <UnlockIcon />} 
-                            onClick={() => {setLocked(!locked)} }/>
+                            onClick={() => {
+                                if (!locked) {
+                                    updateLockedData()
+                                }
+                                setLocked(!locked);
+                            } }/>
                         </Box>
                         <Card variant={'outline'} display={'flex'} flexDirection={'row'} gap={4} borderRadius={8} mt={2} p={4} >            
                             <Box display={'flex'} flexDirection={'column'} gap={'20px'} w={'100%'}>
@@ -411,7 +683,66 @@ export default function CreateNomina({ isOpen, onClose, reloadData, reloadYear, 
                             </Box>
                         </Card>
                         
-                        <Button  type="submit" mt={4} colorScheme="teal">Crear</Button>
+                        {/* Submit and Delete Buttons */}
+                        <Box display={'flex'} flexDirection={'row'} gap={3} mt={4} alignItems={'center'}>
+                        
+                        <Button isDisabled={loading || !connected || processing } type="submit" colorScheme="teal">{editMode ? 'Editar' : 'Crear'}</Button>
+                       
+                        {editMode && (
+                            <Button isDisabled={loading || !connected || processing } colorScheme='red' bg={'#C44D4D'} color={'white'} onClick={() => setDeleteOpen(true)}>Eliminar</Button>
+                        )}
+
+                        {processing && <Box ml={3} h={'25px'} w={'25px'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner w={'100%'} h={'100%'} color='teal' size='x1' thickness='2px' />
+                        </Box>}
+                        </Box>
+
+                        {/* Delete Confirmation */}
+                        {editMode && (
+                            <AlertDialog isOpen={deleteOpen} leastDestructiveRef={cancelRef} onClose={onDeleteClose}>
+                                <AlertDialogOverlay>
+                                <AlertDialogContent alignSelf={'center'}>
+                                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                    Confirmar Eliminación
+                                    </AlertDialogHeader>
+
+                                    <AlertDialogBody>
+                                        <Text>¿Estás seguro de que deseas eliminar este detalle de nómina?</Text>
+                                        <Card mt={3} variant={'outline'} bg={'#f9fbfd'} p={4} display={'flex'} gap={3} fontWeight={600} opacity={0.7}>
+                                            <Text>ID Nómina: #{editData.idNomina}</Text>
+                                            <Text>Empleado: {getStaffName()}</Text>
+                                            <Text>Fecha: {DateTime.fromISO(getDate())
+                                                    .setLocale('es')
+                                                    .toFormat('MMMM dd, yyyy')
+                                                    .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                            </Text>
+                                        </Card>
+                                    </AlertDialogBody>
+
+                                    <AlertDialogFooter>
+                                        <Box display={'flex'} flexDirection={'row'} gap={0} alignItems={'center'} justifyContent={'space-between'} w={'100%'}>
+
+                                            {processing ?
+                                                <Box h={'25px'} w={'25px'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                    <Spinner w={'100%'} h={'100%'} color='teal' size='x1' thickness='2px' />
+                                                </Box>
+                                            :<Box></Box>
+                                            }
+                                            
+                                            <Box>
+                                                <Button ref={cancelRef} onClick={onDeleteClose}>
+                                                    Cancelar
+                                                </Button>
+                                                <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                                                    Eliminar
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                                </AlertDialogOverlay>
+                            </AlertDialog>
+                        )}
                     </form>
                 </ModalBody>
             </ModalContent>

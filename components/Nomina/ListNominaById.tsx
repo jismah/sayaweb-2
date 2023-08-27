@@ -1,12 +1,14 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon } from '@chakra-ui/icons';
-import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs } from '@chakra-ui/react';
+import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useState, useEffect, Fragment } from 'react';
+import { MdPersonSearch } from "react-icons/md";
 
 interface ResponseData {
   salary: number;
+  extraDays: number;
   overtimePay: number;
   sfs: number;
   afp: number;
@@ -23,8 +25,30 @@ interface ResponseData {
   };
 }
 
-export default function ListNomina({ idNomina, reload, setReload, remote }: {
-   idNomina: string, reload: boolean, setReload: (arg0: boolean) => void, remote: (arg0: boolean) => void 
+interface DetailData {
+  idNomina: number,
+  idStaff: number,
+  date: string,
+  salary: number,
+  extraDays: number,
+  overtimePay: number,
+  sfs: number,
+  afp: number,
+  loans: number,
+  other: number,
+  total: number,
+}
+
+export default function ListNomina({ idNomina, reload, setters }: {
+   idNomina: string, reload: boolean, 
+   setters: { 
+    setReload: (arg0: boolean) => void, 
+    remote: ({status, id}: {status: boolean, id: string}) => void,
+    setEditMode: (arg0: boolean) => void,
+    setEditData: ({idNomina, date}: {idNomina: string, date: string}) => void,
+    setDetailEditMode: (arg0: boolean) => void,
+    setDetailEditData: (arg0: DetailData) => void,
+  }
   }) {
 
   const [dataNomina, setDataNomina] = useState<Array<ResponseData>>([]);
@@ -116,6 +140,13 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
     }
   }
 
+  const handleEdit = () => {
+    if (dataNomina.length == 0) {
+      setters.setEditData({ idNomina: idNomina, date: date });
+      setters.setEditMode(true);
+    } 
+  }
+
   useEffect(() => {
     updateDisplayData(undefined);
   }, [currentPage]);
@@ -127,7 +158,7 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
   useEffect(() => {
     if (reload) {
       fetchData();
-      setReload(false)
+      setters.setReload(false)
     }
   }, [reload]);
   
@@ -135,12 +166,19 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
       <>
           <main>
             <Box position={'relative'} px={0} py={1}>
-              <Box position={'absolute'} right={1} top={'-40px'} display={'flex'} gap={'20px'}>
+              <Box position={'absolute'} right={1} top={'-45px'} display={'flex'} gap={'20px'}>
 
                   {/* Nomina General Info */}
-                  <Box display={'flex'} gap={4} alignItems={'center'} justifyContent={'center'} px={12} py={2} 
+                  <Box display={'flex'} gap={4} alignItems={'center'} justifyContent={'center'} pr={12} pl={2} py={4} 
                     minW={'340.44px'} h={'49.33px'}
                     bg={'rgba(247, 250, 252, 0.7)'} borderRadius={'8px 8px 0 0'} border={'1px solid #edf2f7'}>
+
+                    {!loading && connected && found && (
+                      <Tooltip label={dataNomina.length > 0 ? 'Solo puede editar nóminas vacías' : 'Editar Nómina'}>
+                        <IconButton isDisabled={dataNomina.length > 0} variant={'outline'} color={'#5bc0bb'} bg={'transparent'} border={'none'} icon={<EditIcon />} aria-label="Editar" 
+                        onClick={handleEdit}/>
+                      </Tooltip>
+                    )}
 
                     {!loading && connected && found && (
                       <Text pr={2} fontSize={'18px'} fontWeight={700} color={'#38B2AC'}>Nomina #{idNomina}</Text>
@@ -186,7 +224,7 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
                           <Text textAlign={'center'}>No se encontraron records para mostrar</Text>
                           <Button maxW={'300px'} variant={'outline'} fontWeight={400} textColor={'#008080'} 
                           leftIcon={<AddIcon boxSize={3} />}
-                          onClick={() => {remote(true)}}
+                          onClick={() => {setters.remote({status: true, id: idNomina})}}
                           >Nuevo detalle de nomina</Button>
                         </Card></Box>
 
@@ -210,7 +248,7 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
                                               </Tr>
                                           </Thead>
                                           <Tbody>
-                                              {displayData.map(({ salary, overtimePay, sfs, afp, loans, other, total, staff}) => {
+                                              {displayData.map(({ salary, extraDays, overtimePay, sfs, afp, loans, other, total, staff}) => {
                                                   return (
                                                   <Fragment key={staff.id}>
                                                     <Tr>
@@ -239,7 +277,29 @@ export default function ListNomina({ idNomina, reload, setReload, remote }: {
                                                       <Td>{total.toLocaleString()}</Td>
                                                       <Td>
                                                         <ButtonGroup variant="ghost" spacing="1">
-                                                          <IconButton colorScheme="blue" icon={<EditIcon />} aria-label="Editar" />
+                                                          <Tooltip label='Editar'>
+                                                            <IconButton colorScheme="blue" icon={<EditIcon />} aria-label="Editar"
+                                                            onClick={() => {
+                                                              setters.setDetailEditData({
+                                                                idNomina: Number(idNomina),
+                                                                idStaff: staff.id,
+                                                                date: "",
+                                                                salary: salary,
+                                                                extraDays: extraDays,
+                                                                overtimePay: overtimePay,
+                                                                sfs: sfs,
+                                                                afp: afp,
+                                                                loans: loans,
+                                                                other: other,
+                                                                total: total,
+                                                              });
+
+                                                              setters.setDetailEditMode(true);
+                                                            }} />
+                                                          </Tooltip>
+                                                          <Tooltip label='Ver empleado'>
+                                                            <IconButton colorScheme="blue" icon={<MdPersonSearch />}aria-label="Editar" />
+                                                          </Tooltip>
                                                         </ButtonGroup>
                                                       </Td>
                                                     </Tr>

@@ -15,22 +15,33 @@ const Nominas: NextPage = () => {
     const toast = useToast();
     
     const [SearchId, setSearchId] = useState('');
+    const [SearchYear, setSearchYear] = useState('');
+    const [displayYear, setDisplayYear] = useState('');
 
-    useEffect(() => {
-        if ((!Number.isNaN(Number(SearchId))) && !(SearchId === '')) {
-            setidNomina(SearchId);
-            setDisplayId(SearchId);
+    const [nominaEditMode, setNominaEditMode] = useState(false);
+    const [nominaEditData, setNominaEditData] = useState({
+        idNomina: '',
+        date: '',
+    });
 
-            setByStaff(false);
-            setById(true);
-
-            setSearchId('');
-        }
-    }, [SearchId]);
+    const [detailEditMode, setDetailEditMode] = useState(false);
+    const [detailEditData, setDetailEditData] = useState({
+        idNomina: 1,
+        idStaff: 2,
+        date: "",
+        salary: 3,
+        extraDays: 4,
+        overtimePay: 5,
+        sfs: 6,
+        afp: 7,
+        loans: 8,
+        other: 9,
+        total: 10,
+    });
 
     const [reloadComponents, setReloadComponents] = useState(false);
     const [reloadYear, setReloadYear] = useState('');
-    const [remoteOpenDetail, setRemoteOpenDetail] = useState(false);
+    const [remoteOpenDetail, setRemoteOpenDetail] = useState({status: false, id: ''});
 
     const [byId, setById] = useState(false);
     const [idNomina, setidNomina] = useState('');
@@ -91,11 +102,51 @@ const Nominas: NextPage = () => {
     };
     
     useEffect(() => {
-        if (remoteOpenDetail) {
+        if (remoteOpenDetail.status) {
+            setidNomina(remoteOpenDetail.id);
+            setDisplayId(remoteOpenDetail.id);
+
+            setByStaff(false);
+            setById(true);
+
             openDetail();
-            setRemoteOpenDetail(false);
+            setRemoteOpenDetail({status: false, id: ''})
         }
     }, [remoteOpenDetail]);
+
+    useEffect(() => {
+        if (nominaEditMode) {
+            openModal();
+        }
+    }, [nominaEditMode]);
+
+    useEffect(() => {
+        if (detailEditMode) {
+            openDetail();
+        }
+    }, [detailEditMode]);
+
+    useEffect(() => {
+        if ((!Number.isNaN(Number(SearchYear))) && !(SearchYear === '')) {
+            setByStaff(false);
+            setById(false);
+            
+            setDisplayYear(SearchYear)
+            setSearchYear('');
+        }
+    }, [SearchYear]);
+
+    useEffect(() => {
+        if ((!Number.isNaN(Number(SearchId))) && !(SearchId === '')) {
+            setidNomina(SearchId);
+            setDisplayId(SearchId);
+
+            setByStaff(false);
+            setById(true);
+
+            setSearchId('');
+        }
+    }, [SearchId]);
 
     return (
         <>
@@ -103,22 +154,36 @@ const Nominas: NextPage = () => {
                 <Box px={3} py={3}>
                     
                     {/* Create New Nomina Modal */}
-                    <CreateNomina isOpen={isModalOpen} onClose={closeModal}/>
+                    <CreateNomina isOpen={isModalOpen} onClose={closeModal} editMode={nominaEditMode} data={nominaEditData}
+                        setters = {{
+                            setEditMode: setNominaEditMode,
+                            setEditData: setNominaEditData,
+                            remoteSearch: setSearchId,
+                            setRemoteYear: setSearchYear,
+                        }
+                     }/>
 
                     {/* Create New Detail Nomina Modal */}
-                    <CreateDetailNomina isOpen={isDetailOpen} onClose={closeDetail} reloadData={setReloadComponents} 
+                    <CreateDetailNomina isOpen={isDetailOpen} onClose={closeDetail}  
                     id={byId ? Number(displayId) : undefined} staffId={byStaff ? Number(displayStaff) : undefined}
-                    reloadYear={setReloadYear}/>
+                    editMode={detailEditMode} editData={detailEditData}
+                    setters={{
+                        reloadData: setReloadComponents,
+                        reloadYear: setReloadYear,
+                        setEditMode: setDetailEditMode,
+                        setEditData: setDetailEditData,
+                        remoteSearchId: setSearchId, 
+                    }}/>
 
                     {/* Buttons */}
                     <Flex justifyContent={'space-between'} alignItems={'center'}>
-                        <Heading as='h3' size='xl'><Link href='/App/Nomina' textDecoration={'none'}>Nominas</Link></Heading>
+                        <Heading as='h3' size='xl'><Link href='/App/Nomina' textDecoration={'none'}>Nóminas</Link></Heading>
                         <ButtonGroup gap={3} alignItems={'center'}>
                             <Button size='sm' variant={'outline'} leftIcon={<AddIcon />} onClick={openDetail}>
-                                Nuevo Detalle Nomina
+                                Nuevo Detalle Nómina
                             </Button>
                             <Button size='sm' variant={'outline'} leftIcon={<AddIcon />} onClick={openModal}>
-                                Nueva Nomina
+                                Nueva Nómina
                             </Button>
                         </ButtonGroup>
                     </Flex>
@@ -146,7 +211,7 @@ const Nominas: NextPage = () => {
                             zIndex: -1,
                             }}
                         >
-                            ID NOMINA
+                            ID NÓMINA
                         </Text>
                         </Box>
 
@@ -269,11 +334,19 @@ const Nominas: NextPage = () => {
                     {/* Table */}
                     <Box>
                     { byId ?
-                        <ListNominaById idNomina={displayId} reload={reloadComponents} setReload={setReloadComponents} remote={setRemoteOpenDetail}/>
+                        <ListNominaById idNomina={displayId} reload={reloadComponents} 
+                            setters = {{
+                                setReload: setReloadComponents,
+                                remote: setRemoteOpenDetail,
+                                setEditMode: setNominaEditMode,
+                                setEditData: setNominaEditData,
+                                setDetailEditMode: setDetailEditMode,
+                                setDetailEditData: setDetailEditData,
+                        }}/>
                     : byStaff ?
                         <ListNominaByStaff idStaff={displayStaff} reload={reloadComponents} setReload={setReloadComponents} reloadYear={reloadYear}/>
                     :
-                        <ListNomina setSearchId={setSearchId}/>
+                        <ListNomina displayYear={displayYear} setDisplayYear={setDisplayYear} setSearchId={setSearchId}/>
                     }
                     </Box>
 
