@@ -1,10 +1,9 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon } from '@chakra-ui/icons';
-import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
+import { AddIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon } from '@chakra-ui/icons';
+import { Text, TableContainer, Table, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Spinner, ButtonGroup, IconButton, useColorMode, useDisclosure, useToast, Card, CardBody, HStack, Tooltip } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import { NextPage } from 'next';
-import Head from 'next/head';
 import React, { useState, useEffect, Fragment } from 'react';
 import { MdPersonSearch } from "react-icons/md";
+import { HiDocument } from "react-icons/hi2";
 
 interface ResponseData {
   salary: number;
@@ -48,6 +47,7 @@ export default function ListNomina({ idNomina, reload, setters }: {
     setEditData: ({idNomina, date}: {idNomina: string, date: string}) => void,
     setDetailEditMode: (arg0: boolean) => void,
     setDetailEditData: (arg0: DetailData) => void,
+    remoteDoc: (arg0: string) => void,
   }
   }) {
 
@@ -173,12 +173,19 @@ export default function ListNomina({ idNomina, reload, setters }: {
                     minW={'340.44px'} h={'49.33px'}
                     bg={'rgba(247, 250, 252, 0.7)'} borderRadius={'8px 8px 0 0'} border={'1px solid #edf2f7'}>
 
-                    {!loading && connected && found && (
+                    {!loading && connected && found && (<Box>
+                      <Tooltip label='Documento ACH'>
+                          <IconButton variant={'outline'} color={'#5bc0bb'} bg={'transparent'} border={'none'} icon={<HiDocument />} aria-label='Bank Transfer Document'
+                          onClick={() => {
+                            setters.remoteDoc(idNomina)
+                          }}>
+                          </IconButton>
+                      </Tooltip>
                       <Tooltip label={dataNomina.length > 0 ? 'Solo puede editar nóminas vacías' : 'Editar Nómina'}>
                         <IconButton isDisabled={dataNomina.length > 0} variant={'outline'} color={'#5bc0bb'} bg={'transparent'} border={'none'} icon={<EditIcon />} aria-label="Editar" 
                         onClick={handleEdit}/>
                       </Tooltip>
-                    )}
+                    </Box>)}
 
                     {!loading && connected && found && (
                       <Text pr={2} fontSize={'18px'} fontWeight={700} color={'#38B2AC'}>Nomina #{idNomina}</Text>
@@ -298,7 +305,7 @@ export default function ListNomina({ idNomina, reload, setters }: {
                                                             }} />
                                                           </Tooltip>
                                                           <Tooltip label='Ver empleado'>
-                                                            <IconButton colorScheme="blue" icon={<MdPersonSearch />}aria-label="Editar" />
+                                                            <IconButton colorScheme="blue" icon={<MdPersonSearch />}aria-label="Ver empleado" />
                                                           </Tooltip>
                                                         </ButtonGroup>
                                                       </Td>

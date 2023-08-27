@@ -1,16 +1,15 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon } from '@chakra-ui/icons';
-import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
+import { ViewIcon, ChevronLeftIcon, ChevronRightIcon, EditIcon } from '@chakra-ui/icons';
+import { Text, TableContainer, Table, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Center, Spinner, ButtonGroup, IconButton, Input, Card, CardBody, HStack, Tooltip } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import { NextPage } from 'next';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import { MdPersonSearch } from "react-icons/md";
 
 interface NominaData {
   idNomina: string;
   idStaff: string;
   date: string;
   salary: number;
+  extraDays: number;
   overtimePay: number;
   sfs: number;
   afp: number;
@@ -28,10 +27,29 @@ interface Staff {
   position: string;
 }
 
-export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
-   idStaff: string, reload: boolean, setReload: (arg0: boolean) => void, reloadYear: string 
+interface DetailData {
+  idNomina: number,
+  idStaff: number,
+  date: string,
+  salary: number,
+  extraDays: number,
+  overtimePay: number,
+  sfs: number,
+  afp: number,
+  loans: number,
+  other: number,
+  total: number,
+}
+
+export default function ListNomina({ idStaff, reload, reloadYear, setters }: {
+   idStaff: string, reload: boolean, reloadYear: string
+   setters:{
+     setReload: (arg0: boolean) => void,
+     remoteSearchId: (arg0: string) => void,
+     setDetailEditMode: (arg0: boolean) => void,
+     setDetailEditData: (arg0: DetailData) => void,
+   }
   }) {
-  const router = useRouter();
 
   const [dataNomina, setDataNomina] = useState<Array<NominaData>>([]);
   const [displayData, setDisplayData] = useState<Array<NominaData>>([]);
@@ -186,7 +204,7 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
     if (reload) {
       setSelectedYear(reloadYear)
       fetchData(reloadYear);
-      setReload(false)
+      setters.setReload(false)
     }
   }, [reload]);
   
@@ -236,9 +254,16 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
               </Box>
               <Box position={'relative'}>   
                 <Box position={'absolute'} right={1} top={'-120px'} minH={'59.33px'} minW={'355px'}
-                  display={'flex'} gap={4} alignItems={'center'}
-                  px={12} py={2}
+                  display={'flex'} gap={4} alignItems={'center'} justifyContent={'center'}
+                  pr={12} pl={(!staffLoading && staffConnected && found) ? 2 : 12 } py={2}
                   bg={'rgba(247, 250, 252, 0.7)'} borderRadius={'8px 8px 0 0'} border={'1px solid #edf2f7'}>
+                      
+                      {!staffLoading && staffConnected && found && (
+                      <Tooltip label='Ver empleado'>
+                        <IconButton variant={'outline'} color={'#5bc0bb'} bg={'transparent'} border={'none'} icon={<MdPersonSearch />}aria-label="Buscar Empleado" />
+                      </Tooltip>
+                      )}
+
                     {!staffLoading && staffConnected && found && (
                     <Box pr={'10px'}>
                       <Text fontSize={'14px'} fontWeight={700} color={'#4A5568'}>
@@ -248,6 +273,7 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
                           {staff.position}
                         </Text>
                     </Box> )}
+
                     {!staffLoading && staffConnected && found && (
                     <Box pl={0}>
                       <Text fontSize={'14px'} fontWeight={400} color={'#4A5568'}>
@@ -257,11 +283,13 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
                           {staff.status ? "Activo" : "No activo"}
                         </Text>  
                     </Box> )}
+
                     {!staffLoading && !staffConnected && (
-                      <Box color={'#C44D4D'}>Hubo un error al buscar los datos del empleado</Box>
+                      <Box textAlign={'center'} color={'#C44D4D'}>Hubo un error al buscar los datos del empleado</Box>
                     )}
+
                     {!staffLoading && staffConnected && !found && (
-                      <Box color={'#C44D4D'}>Empleado con ID #{idStaff} no encontrado</Box>
+                      <Box textAlign={'center'} color={'#C44D4D'}>Empleado con ID #{idStaff} no encontrado</Box>
                     )}
                 </Box>
               {loading ?
@@ -305,7 +333,7 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
                                               </Tr>
                                           </Thead>
                                           <Tbody>
-                                              {displayData.map(({ idNomina, date, salary, overtimePay, sfs, afp, loans, other, total }) => {
+                                              {displayData.map(({ idNomina, date, salary, extraDays, overtimePay, sfs, afp, loans, other, total }) => {
                                                   return (
                                                       <Tr key={idNomina}>
                                                             <Td>{idNomina}</Td>
@@ -322,15 +350,32 @@ export default function ListNomina({ idStaff, reload, setReload, reloadYear }: {
                                                             <Td>{total.toLocaleString()}</Td>
                                                           <Td>
                                                               <ButtonGroup variant='ghost' spacing='1'>
-                                                                <Tooltip label="Editar">
-                                                                  <IconButton colorScheme='blue' icon={<EditIcon />} aria-label='Show'>
-                                                                  </IconButton>
-                                                                </Tooltip>
+                                                              <Tooltip label='Editar'>
+                                                                <IconButton colorScheme="blue" icon={<EditIcon />} aria-label="Editar"
+                                                                onClick={() => {
+                                                                  setters.setDetailEditData({
+                                                                    idNomina: Number(idNomina),
+                                                                    idStaff: Number(idStaff),
+                                                                    date: "",
+                                                                    salary: salary,
+                                                                    extraDays: extraDays,
+                                                                    overtimePay: overtimePay,
+                                                                    sfs: sfs,
+                                                                    afp: afp,
+                                                                    loans: loans,
+                                                                    other: other,
+                                                                    total: total,
+                                                                  });
+
+                                                                  setters.setDetailEditMode(true);
+                                                                }} />
+                                                              </Tooltip>
 
                                                                 <Tooltip label='Ir a nomina'>
                                                                   <IconButton colorScheme='blue' icon={<ViewIcon />} aria-label='Show'
                                                                   onClick={() => {
-                                                                    router.push(`/App/Nomina?id=${idNomina}`);}}>
+                                                                    setters.remoteSearchId(idNomina);
+                                                                  }}>
                                                                   </IconButton>
                                                                 </Tooltip>
                                                               </ButtonGroup>

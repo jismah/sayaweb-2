@@ -1,18 +1,15 @@
-import { AddIcon, ChevronLeftIcon, ChevronRightIcon, RepeatIcon } from '@chakra-ui/icons';
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Center, Flex, Grid, GridItem, HStack, Heading, IconButton, Input, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberInput, NumberInputField, SimpleGrid, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, Tab, TabList, Tabs, Text, useDisclosure, useNumberInput, useToast } from '@chakra-ui/react';
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons';
+import { Box, Button, ButtonGroup, Flex, Heading, IconButton, Input, Link, NumberInput, Text } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
-import { DateTime } from 'luxon';
 import ListNomina from '../../../../components/Nomina/ListNomina';
 import ListNominaById from '../../../../components/Nomina/ListNominaById';
-import { useRouter } from 'next/router';
 import ListNominaByStaff from '../../../../components/Nomina/ListNominaByStaff';
 import CreateNomina from '../../../../components/Nomina/CreateNomina';
 import CreateDetailNomina from '../../../../components/Nomina/CreateDetailNomina';
+import NominaDoc from '../../../../components/Nomina/NominaDoc';
 
 const Nominas: NextPage = () => {
-    const router = useRouter();
-    const toast = useToast();
     
     const [SearchId, setSearchId] = useState('');
     const [SearchYear, setSearchYear] = useState('');
@@ -148,6 +145,19 @@ const Nominas: NextPage = () => {
         }
     }, [SearchId]);
 
+    // ACH Document Modal
+    const [isDocOpen, setIsDocOpen] = useState(false);
+    const [docNomina, setDocNomina] = useState('');
+
+    const openDoc = (id: string) => {
+        setDocNomina(id)
+        setIsDocOpen(true);
+    };
+
+    const closeDoc = () => {
+        setIsDocOpen(false);
+    };
+
     return (
         <>
             <main>
@@ -174,6 +184,9 @@ const Nominas: NextPage = () => {
                         setEditData: setDetailEditData,
                         remoteSearchId: setSearchId, 
                     }}/>
+
+                    {/* Nomina Document */}
+                    <NominaDoc isOpen={isDocOpen} onClose={closeDoc} idNomina={docNomina}/>
 
                     {/* Buttons */}
                     <Flex justifyContent={'space-between'} alignItems={'center'}>
@@ -342,11 +355,18 @@ const Nominas: NextPage = () => {
                                 setEditData: setNominaEditData,
                                 setDetailEditMode: setDetailEditMode,
                                 setDetailEditData: setDetailEditData,
+                                remoteDoc: openDoc
                         }}/>
                     : byStaff ?
-                        <ListNominaByStaff idStaff={displayStaff} reload={reloadComponents} setReload={setReloadComponents} reloadYear={reloadYear}/>
+                        <ListNominaByStaff idStaff={displayStaff} reload={reloadComponents} reloadYear={reloadYear}
+                        setters={{
+                            setReload: setReloadComponents,
+                            remoteSearchId: setSearchId,
+                            setDetailEditMode: setDetailEditMode,
+                            setDetailEditData: setDetailEditData,
+                        }}/>
                     :
-                        <ListNomina displayYear={displayYear} setDisplayYear={setDisplayYear} setSearchId={setSearchId}/>
+                        <ListNomina displayYear={displayYear} setDisplayYear={setDisplayYear} setSearchId={setSearchId} remoteDoc= {openDoc}/>
                     }
                     </Box>
 

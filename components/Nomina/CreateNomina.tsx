@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button, FormControl, FormLabel, Input, Card, useToast, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Spinner } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
 import { DateTime } from 'luxon';
 
 interface CreateNominaProps {

@@ -1,10 +1,9 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { Text, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, HStack, useNumberInput, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
+import { ViewIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { Text, TableContainer, Table, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Center, Spinner, ButtonGroup, IconButton, Input, useColorMode, useDisclosure, useToast, Card, CardBody, HStack, Tab, TabList, Tabs, Tooltip } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import { NextPage } from 'next';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import { HiDocument } from "react-icons/hi2";
 
 interface NominaData {
   id: string;
@@ -34,10 +33,11 @@ interface MonthlyData {
   };
 }
 
-export default function ListNomina({ displayYear, setDisplayYear, setSearchId }: {
+export default function ListNomina({ displayYear, setDisplayYear, setSearchId, remoteDoc }: {
     displayYear: string,
     setDisplayYear: (arg0: string) => void, 
-    setSearchId: (arg0: string) => void 
+    setSearchId: (arg0: string) => void,
+    remoteDoc: (arg0: string) => void
   }) {
 
   useEffect(() => {
@@ -390,6 +390,13 @@ export default function ListNomina({ displayYear, setDisplayYear, setSearchId }:
                                                                     <IconButton colorScheme='blue' icon={<ViewIcon />} aria-label='Show'
                                                                     onClick={() => {
                                                                       setSearchId(id);
+                                                                    }}>
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                                <Tooltip label='Documento ACH'>
+                                                                    <IconButton colorScheme='blue' icon={<HiDocument />} aria-label='Bank Transfer Document'
+                                                                    onClick={() => {
+                                                                      remoteDoc(id)
                                                                     }}>
                                                                     </IconButton>
                                                                 </Tooltip>
