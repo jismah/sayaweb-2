@@ -23,7 +23,6 @@ export interface Parent {
   occupation: string | null; 
 
   idFamily: string;
-  children: Student[];
 }
 
 export default function Parents({familyParents, dataFamily, familyMode, enableEditing} : {familyParents : Parent[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean}) {
@@ -39,7 +38,6 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
       email: "",
       occupation: "",
       idFamily: familyMode ? familyParents[0].idFamily : "", // Initialize idFamily conditionally
-      children: [],
     };
     return initialData;
   };

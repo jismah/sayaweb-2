@@ -7,8 +7,6 @@ export interface Pediatrician{
     medicalInstitution: string;
     officeNumber: string;
     phone: string;
-
-    students: Student[];
 }
 
 export default function Pediatricians(){

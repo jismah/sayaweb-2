@@ -5,6 +5,5 @@ export interface Evaluation{
     date: string;
     comment: string | null;
 
-    objectives: Objective[];
     idStudent: string;
 }

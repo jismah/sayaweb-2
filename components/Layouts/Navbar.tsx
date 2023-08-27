@@ -63,6 +63,7 @@ const Navbar: React.FC = () => {
                                         <MenuItem as={NextLink} href='/App/FamilyManagement'>Gestion Familiar</MenuItem>
                                         <MenuItem as={NextLink} href='/App/StudentPrograms'>Programas</MenuItem>
                                         <MenuItem as={NextLink} href='/App/Camps'>Campamentos</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Groups'>Grupos</MenuItem>
                                     </MenuList>
                                 </Menu>
 

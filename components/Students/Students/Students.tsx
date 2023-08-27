@@ -22,13 +22,11 @@ export interface Student{
   progressDesired: string | null;
   allowedPictures: boolean;
 
-  emergencyContacts: EmergencyContact[];
   idPediatrician: string;
-  tutors: Tutor[];
   idCity: string;
   idProgram: string;
-  evaluations: Evaluation[];
   idFamily: string;
+  idParent: string;
 }
 
 import { Parent } from '../Parents/Parents';
@@ -58,12 +56,10 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
       allowedPictures: false,
       dateBirth: "",
       idPediatrician: "",
-      emergencyContacts: [],
-      tutors: [],
       idCity: "",
       idProgram: "",
-      evaluations: [],
       idFamily: familyMode ? familyStudents[0].idFamily : "", // Initialize idFamily conditionally
+      idParent: familyMode ? familyStudents[0].idParent : "",
     };
     return initialData;
   };

@@ -14,25 +14,12 @@ const Student: NextPage = () => {
 
     const [familySiblings, setFamilySiblings] = useState<Student[]>([]);
     
-    const initialUserData: User = {
-    id: "",
-    username: "",
-    name: "",
-    lastName1: "",
-    lastName2: "",
-    password: "",
-    email: "",
-    phone: "",
-    role: "",
-
-    idFamily: "",
-  };
     const [dataFamily, setDataFamily] = useState<Family>({
         id: "",
-        title: "",
+        name: "",
         students: [],
         parents: [],
-        user: initialUserData,
+        user: {} as User,
     });
 
 

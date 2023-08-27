@@ -8,9 +8,5 @@ export interface Program{
     inscription: number;
     montlyAmount: number;
     status: boolean;
-
-    students: Student[];
-
-    objectives: Objective[];
 }
 

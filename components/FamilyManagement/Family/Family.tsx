@@ -19,7 +19,7 @@ import { User } from '../User/Users';
 
 export interface Family{
   id: string;
-  title: string;
+  name: string;
   students: Student[];
   parents: Parent[];
   user?: User | null;
@@ -41,12 +41,10 @@ export default function Family() {
     allowedPictures: false,
     dateBirth: "",
     idPediatrician: "",
-    emergencyContacts: [],
-    tutors: [],
     idCity: "",
     idProgram: "",
-    evaluations: [],
     idFamily: "", 
+    idParent: "",
   };
 
   const initialUserData: User = {
@@ -73,12 +71,11 @@ export default function Family() {
     email: "",
     occupation: "",
     idFamily: "",
-    children: [],
   };
 
   const initialFamilyData: Family = {
     id: "",
-    title: "",
+    name: "",
     students: [],
     parents: [],
     user: initialUserData,

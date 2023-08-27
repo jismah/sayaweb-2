@@ -33,7 +33,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
         email: "",
         occupation: "",
         idFamily: "",
-        children: [],
     };
 
     const initialStudentData: Student = {
@@ -50,12 +49,10 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
         allowedPictures: false,
         dateBirth: "",
         idPediatrician: "",
-        emergencyContacts: [],
-        tutors: [],
         idCity: "",
         idProgram: "",
-        evaluations: [],
         idFamily: "", 
+        idParent: "",
       };
 
     const initialTutorData: Tutor = {
@@ -79,7 +76,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
         medicalInstitution: "",
         officeNumber: "",
         phone: "",
-        students: [],
     }
     
 
@@ -87,8 +83,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
     const initialCityData: City = {
         id: "",
         name: "",
-
-        students: [],
     };
     
 
