@@ -91,7 +91,7 @@ export default function Groups(){
     const fetchData = async () => {
         setLoading(true);
         try{
-            const res = await fetch(`http://localhost:3000/api/groups?page=${currentPage}&pageSize=${pageSize}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/groups?page=${currentPage}&pageSize=${pageSize}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -142,7 +142,7 @@ export default function Groups(){
             };
     
             console.log(requestBody);
-            const resGroupsBulk = await fetch('http://localhost:3000/api/groups/bulk', {
+            const resGroupsBulk = await fetch('https://sayaserver.onrender.com//api/groups/bulk', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -184,7 +184,7 @@ export default function Groups(){
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/groups/${dataGroup.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/groups/${dataGroup.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -205,7 +205,7 @@ export default function Groups(){
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/groups/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/groups/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export default function Groups(){
 
         //Petición para obtener los demás cabeceras de la familia
         try{
-        const response = await fetch(`http://localhost:3000/api/groups/info`, {
+        const response = await fetch(`https://sayaserver.onrender.com//api/groups/info`, {
             method: 'GET',
             headers: {
             "Content-Type": "application/json",
@@ -280,8 +280,6 @@ export default function Groups(){
         loadGroupInformation();
     }, []);
 
-
-    
     
 
 

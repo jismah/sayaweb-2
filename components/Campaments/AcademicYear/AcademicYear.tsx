@@ -48,7 +48,7 @@ export default function AcademicYears(){
     const fetchData = async () => {
         setLoading(true);
         try{
-            const res = await fetch(`http://localhost:3000/api/academicYears?page=${currentPage}&pageSize=${pageSize}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/academicYears?page=${currentPage}&pageSize=${pageSize}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export default function AcademicYears(){
             handleUpdateData()
             onClose()
         }else{
-            const res = await fetch('http://localhost:3000/api/academicYears/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/academicYears/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export default function AcademicYears(){
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/academicYears/${dataAcademicYear.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/academicYears/${dataAcademicYear.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export default function AcademicYears(){
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/academicYears/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/academicYears/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",

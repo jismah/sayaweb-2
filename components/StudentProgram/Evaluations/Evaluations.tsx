@@ -72,7 +72,7 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
             setLoading(false);
         }else{
             try{
-                const res = await fetch(`http://localhost:3000/api/evaluations?page=${currentPage}&pageSize=${pageSize}`, {
+                const res = await fetch(`https://sayaserver.onrender.com/api/evaluations?page=${currentPage}&pageSize=${pageSize}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
             handleUpdateData()
             onClose()
         }else{
-            const res = await fetch('http://localhost:3000/api/evaluations/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/evaluations/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -156,7 +156,7 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/evaluations/${dataEvaluation.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/evaluations/${dataEvaluation.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/evaluations/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/evaluations/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -238,7 +238,7 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
     const fetchRelations = async () => {
         setLoading(true);
         try {
-            const responseStudents = await fetch(`http://localhost:3000/api/students/${dataEvaluation.idStudent}`, {
+            const responseStudents = await fetch(`https://sayaserver.onrender.com/api/students/${dataEvaluation.idStudent}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",

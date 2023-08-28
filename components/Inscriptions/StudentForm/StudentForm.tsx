@@ -114,71 +114,61 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
     
 
 
-    const handleSubmit  = async (e:React.FormEvent) => {
-      e.preventDefault()
-      try{
-        //FETCH TO PARENT
-        const resParent = await fetch('http://localhost:3000/api/parents/', {
-            method: 'POST',
-            headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "123456",
-            },
-            body: JSON.stringify(dataStudentLocal)
-        });
-        const jsonParent = await resParent.json();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+    
+        const requestBody = {
+            student: dataStudentLocal,
+            pediatrician: dataPediatrician,
+            parents: parentList,
+            emergencyContacts: emergencyContactList,
+            tutors: tutorList,
+        };
+    
+        console.log('Request Body:', JSON.stringify(requestBody));
+    
+        try {
+            const response = await fetch('https://sayaserver.onrender.com/api/inscription/', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "123456",
+                },
+                body: JSON.stringify(requestBody),
+            });
+    
+            const jsonResponse = await response.json();
+            console.log('Response:', jsonResponse);
+    
+            toast({
+                title: 'Registro Creado!',
+                description: "Se creo el registro correctamente.",
+                status: 'success',
+                position: 'bottom-right',
+                duration: 4000,
+                isClosable: true,
+            });
 
-        toast({
-            title: 'Registro Creado!',
-            description: "Se creo el registro correctamente.",
-            status: 'success',
-            position: 'bottom-right',
-            duration: 4000,
-            isClosable: true,
-        });
-
-
-        //FETCH TO STUDENT
-        const resStudent = await fetch('http://localhost:3000/api/students/', {
-            method: 'POST',
-            headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "123456",
-            },
-            body: JSON.stringify(dataStudentLocal)
-        });
-        const jsonStudent = await resStudent.json();
-
-        toast({
-            title: 'Registro Creado!',
-            description: "Se creo el registro correctamente.",
-            status: 'success',
-            position: 'bottom-right',
-            duration: 4000,
-            isClosable: true,
-        });
-
-        //FETCH TO TUTOR
-
-        //FETCH TO EMERGENCY CONTACT
-
-        //FETCH TO PEDIATRICIAN
-
-
-        setDataStudentLocal(initialStudentData);
-        setDataEmergencyContact(initialEmergencyContactData);
-        setDataParentLocal(initialParentData);
-        setDataTutor(initialTutorData);
-        setDataPediatrician(initialPediatricianData)
-        
-      }catch(error){
-        console.error(error);
-      }
+            setDataStudentLocal(initialStudentData);
+            setDataEmergencyContact(initialEmergencyContactData);
+            setDataParentLocal(initialParentData);
+            setDataTutor(initialTutorData);
+            setDataPediatrician(initialPediatricianData);
+            setParentList([]);
+            setTutorList([]);
+            setEmergencyContactList([]);
+            setSelectedCityId("");
+            setSelectedProgramId("");
+            
+        } catch (error) {
+            console.error(error);
+        } 
     };
+    
     
     const fetchStudentsRelations = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/students/relations/${dataStudentLocal.id}`, {
+            const response = await fetch(`https://sayaserver.onrender.com/api/students/relations/${dataStudentLocal.id}`, {
                 method: 'GET',
                 headers: {
                 "Content-Type": "application/json",
@@ -205,7 +195,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
     const fetchSelects = async () => {
         setLoading(true);
         try {
-            const citiesResponse = await fetch('http://localhost:3000/api/cities', {
+            const citiesResponse = await fetch('https://sayaserver.onrender.com/api/cities', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -217,7 +207,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
             setDataCities(jsonCities.response); // Guarda las ciudades en el estado dataCities
 
-            const programsResponse = await fetch('http://localhost:3000/api/programs', {
+            const programsResponse = await fetch('https://sayaserver.onrender.com/api/programs', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -545,26 +535,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
                                             </CardBody>
                                         </Card>
-
-                                        <Card>
-                                            <CardHeader>
-                                                <Heading size={"md"}>Familia</Heading>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <SimpleGrid columns={2} spacing={10}>
-                                                    <FormControl isRequired>
-                                                        <FormLabel>Título de la familia</FormLabel>
-                                                        <Input type="text" placeholder="Título de la familia" ></Input>
-                                                        <Input placeholder='Nombre'  />
-                                                    </FormControl>
-                                                    <FormControl isRequired>
-                                                        <FormLabel>Correo electrónico</FormLabel>
-                                                        <Input type="email" placeholder="Correo electrónico" ></Input>
-                                                    </FormControl>
-                                                </SimpleGrid>
-                                            </CardBody>
-                                        </Card>
-
 
                                         
                                     

@@ -70,7 +70,7 @@ export default function Shifts(){
     const fetchData = async () => {
         setLoading(true);
         try{
-            const res = await fetch(`http://localhost:3000/api/shifts?page=${currentPage}&pageSize=${pageSize}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/shifts?page=${currentPage}&pageSize=${pageSize}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export default function Shifts(){
             handleUpdateData()
             onClose()
         }else{
-            const res = await fetch('http://localhost:3000/api/shifts/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/shifts/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export default function Shifts(){
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/shifts/${dataShift.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/shifts/${dataShift.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -179,7 +179,7 @@ export default function Shifts(){
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/shifts/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/shifts/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -212,7 +212,7 @@ export default function Shifts(){
     const fetchSelects = async () => {
         setLoading(true);
         try {
-            const citiesResponse = await fetch('http://localhost:3000/api/academicYears', {
+            const citiesResponse = await fetch('https://sayaserver.onrender.com/api/academicYears', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -223,7 +223,7 @@ export default function Shifts(){
             console.log(jsonAcademicYears);
             setDataAcademicYears(jsonAcademicYears.response); 
 
-            const staffResponse = await fetch('http://localhost:3000/api/staff', {
+            const staffResponse = await fetch('https://sayaserver.onrender.com/api/staff', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -234,7 +234,7 @@ export default function Shifts(){
             console.log(jsonStaff);
             setDataStaffs(jsonStaff.response);
 
-            const weekDaysResponse = await fetch('http://localhost:3000/api/weekDays', {
+            const weekDaysResponse = await fetch('https://sayaserver.onrender.com/api/weekDays', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",

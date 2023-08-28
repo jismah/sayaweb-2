@@ -73,7 +73,7 @@ export default function Programs(){
     const fetchData = async () => {      
         setLoading(true);
         try{
-            const res = await fetch(`http://localhost:3000/api/programs?page=${currentPage}&pageSize=${pageSize}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/programs?page=${currentPage}&pageSize=${pageSize}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export default function Programs(){
         }else{
             console.log('datos crear programa');
             console.log(dataProgram);
-            const res = await fetch('http://localhost:3000/api/programs/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/programs/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -161,7 +161,7 @@ export default function Programs(){
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/programs/${dataProgram.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/programs/${dataProgram.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -185,7 +185,7 @@ export default function Programs(){
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/programs/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/programs/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -237,7 +237,7 @@ export default function Programs(){
     const fetchRelations = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3000/api/programs/info/${dataProgram.id}`, {
+            const response = await fetch(`https://sayaserver.onrender.com/api/programs/info/${dataProgram.id}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -272,15 +272,6 @@ export default function Programs(){
                     <Heading as='h3' size='xl' id='Parents' >Programas</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nuevo programa
                             </Button>

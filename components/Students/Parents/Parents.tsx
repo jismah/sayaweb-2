@@ -67,7 +67,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
       setLoading(false);
     } else {
       try {
-        const parentsResponse = await fetch(`http://localhost:3000/api/parents?page=${currentPage}&pageSize=${pageSize}`, {
+        const parentsResponse = await fetch(`https://sayaserver.onrender.com/api/parents?page=${currentPage}&pageSize=${pageSize}`, {
           method: 'GET',
           headers: {
             "Content-Type": "application/json",
@@ -108,7 +108,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
       handleUpdateDate()
       onClose()
     } else {
-      const res = await fetch('http://localhost:3000/api/parents/', {
+      const res = await fetch('https://sayaserver.onrender.com/api/parents/', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +158,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
   }
 
   const handleUpdateDate = async () => {
-    const res = await fetch(`http://localhost:3000/api/parents/${dataParent.id}`, {
+    const res = await fetch(`https://sayaserver.onrender.com/api/parents/${dataParent.id}`, {
       method: 'PUT',
       headers: {
         "Content-Type": "application/json",
@@ -219,7 +219,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
 
     //Petición para obtener los demás cabeceras de la familia
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedParent?.idFamily}/parents`, {
+      const response = await fetch(`https://sayaserver.onrender.com/api/family/${selectedParent?.idFamily}/parents`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -236,7 +236,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
 
     //Petición para obtener los estudiantes (hijos)
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedParent?.idFamily}/students`, {
+      const response = await fetch(`https://sayaserver.onrender.com/api/family/${selectedParent?.idFamily}/students`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -277,15 +277,6 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
             <Heading as='h3' size='xl' id='Parents' >Padres</Heading>
             <Box display={enableEditing ? 'block' : 'none'}>
               <ButtonGroup>
-                  <Button size='sm' variant={'ghost'}>
-                      Button #4
-                  </Button>
-                  <Button size='sm' variant={'ghost'}>
-                      Button #3
-                  </Button>
-                  <Button size='sm' variant={'ghost'}>
-                      Button #2
-                  </Button>
                   <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
                       Nuevo Padre
                   </Button>

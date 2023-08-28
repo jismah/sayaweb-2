@@ -51,7 +51,7 @@ export default function WeekDays(){
     const fetchData = async () => {
         setLoading(true);
         try{
-            const res = await fetch(`http://localhost:3000/api/weekdays?page=${currentPage}&pageSize=${pageSize}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/weekdays?page=${currentPage}&pageSize=${pageSize}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export default function WeekDays(){
             handleUpdateData()
             onClose()
         }else{
-            const res = await fetch('http://localhost:3000/api/weekdays/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/weekdays/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -103,6 +103,8 @@ export default function WeekDays(){
             });
             const json = await res.json();
             console.log(json);
+
+            setDataWeekDay(initialWeekDay);
 
             toast({
                 title: 'Registro Creado!',
@@ -132,7 +134,7 @@ export default function WeekDays(){
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/weekdays/${dataWeekDay.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/weekdays/${dataWeekDay.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -152,7 +154,7 @@ export default function WeekDays(){
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/weekdays/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/weekdays/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -203,15 +205,6 @@ export default function WeekDays(){
                     <Heading as='h3' size='xl' id='Parents' >Dias de la semana</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nuevo día de la semana
                             </Button>
@@ -271,6 +264,7 @@ export default function WeekDays(){
                                         <Tr>
                                             <Th>ID</Th>
                                             <Th>Nombre</Th>
+                                            <Th>Acciones</Th>
                                         </Tr>
                                     </Thead>
                                     <Tbody>

@@ -108,7 +108,7 @@ export default function Family() {
     setLoading(true); 
 
     try {
-      const familyResponse = await fetch(`http://localhost:3000/api/family?page=${currentPage}&pageSize=${pageSize}`, {
+      const familyResponse = await fetch(`https://sayaserver.onrender.com/api/family?page=${currentPage}&pageSize=${pageSize}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ export default function Family() {
       setTotalRecords(familyJson.total); // Establecer el total de registros
       setTotalPages(Math.ceil(familyJson.total / pageSize)); // Calcular y establecer el total de páginas
 
-      const usersResponse = await fetch(`http://localhost:3000/api/users`, {
+      const usersResponse = await fetch(`https://sayaserver.onrender.com/api/users`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -210,7 +210,7 @@ export default function Family() {
 
   // DELETE DATA
   const handleDeleteData =async (id:string) => {
-    const res = await fetch(`/api/family/${id}`, {
+    const res = await fetch(`https://sayaserver.onrender.com/api/family/${id}`, {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json",
@@ -267,7 +267,7 @@ export default function Family() {
     setLoading(true);
   
     try {
-      const response = await fetch(`http://localhost:3000/api/family/${selectedFamily?.id}/${type}`, {
+      const response = await fetch(`https://sayaserver.onrender.com/api/family/${selectedFamily?.id}/${type}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -306,15 +306,6 @@ export default function Family() {
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
             <Heading as='h3' size='xl' id='Parents' >Familias</Heading>
             <ButtonGroup>
-                <Button size='sm' variant={'ghost'}>
-                    Button #4
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #3
-                </Button>
-                <Button size='sm' variant={'ghost'}>
-                    Button #2
-                </Button>
                 <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                     Nueva Familia
                 </Button>

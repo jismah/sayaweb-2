@@ -69,7 +69,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             setLoading(false);
         }else{
             try{
-                const res = await fetch(`http://localhost:3000/api/objetives?page=${currentPage}&pageSize=${pageSize}`, {
+                const res = await fetch(`https://sayaserver.onrender.com/api/objetives?page=${currentPage}&pageSize=${pageSize}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             handleUpdateData()
             onClose()
         }else{
-            const res = await fetch('http://localhost:3000/api/objetives/', {
+            const res = await fetch('https://sayaserver.onrender.com/api/objetives/', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
     };
 
     const handleUpdateData = async () =>{
-        const res = await fetch(`http://localhost:3000/api/objetives/${dataObjective.id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/objetives/${dataObjective.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
     // DELETE DATA
     const handleDeleteData = async (id: string) => {
-        const res = await fetch(`http://localhost:3000/api/objetives/${id}`, {
+        const res = await fetch(`https://sayaserver.onrender.com/api/objetives/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -238,7 +238,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         setLoading(true);
         try {
 
-            const responseEvaluations = await fetch(`http://localhost:3000/api/evaluations/${dataObjective.idEvaluation}`, {
+            const responseEvaluations = await fetch(`https://sayaserver.onrender.com/api/evaluations/${dataObjective.idEvaluation}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -250,7 +250,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             setDataEvaluations(jsonEvaluations.response); 
 
 
-            const responsePrograms = await fetch(`http://localhost:3000/api/programs/`, {
+            const responsePrograms = await fetch(`https://sayaserver.onrender.com/api/programs/`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",

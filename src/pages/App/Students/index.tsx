@@ -9,6 +9,10 @@ import Students from '../../../../components/Students/Students/Students';
 import { Student } from '../../../../components/Students/Students/Students';
 import { Family } from '../../../../components/FamilyManagement/Family/Family';
 import { User } from '../../../../components/FamilyManagement/User/Users';
+import Tutors from '../../../../components/Students/Tutors/Tutor';
+import EmergencyContacts from '../../../../components/Students/EmergencyContacts/EmergencyContacts';
+import Cities from '../../../../components/Students/Cities/Cities';
+import Pediatrician from '../../../../components/Students/Pediatricians/Pediatricians';
 
 const Student: NextPage = () => {
 
@@ -29,7 +33,11 @@ const Student: NextPage = () => {
             <Students familyStudents={familySiblings} dataFamily={dataFamily} familyMode={false} enableEditing={true} programMode={false}/>
             {/* <Students dataFamily={dataFamily} familyMode={false} enableEditing={true}/> */}
                 
-            
+            <Tutors/>
+            <EmergencyContacts/>
+            <Pediatrician/>
+            <Cities/>
+
         </>
     )
 };
