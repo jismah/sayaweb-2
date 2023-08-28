@@ -118,11 +118,45 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
         e.preventDefault();
     
         const requestBody = {
-            student: dataStudentLocal,
-            pediatrician: dataPediatrician,
-            parents: parentList,
-            emergencyContacts: emergencyContactList,
-            tutors: tutorList,
+            student: {
+                name: dataStudentLocal.name.toString(),
+                lastName1: dataStudentLocal.lastName1.toString(),
+                lastName2: dataStudentLocal?.lastName2?.toString(),
+                dateBirth: dataStudentLocal.dateBirth.toString(),
+                housePhone: dataStudentLocal.housePhone.toString(),
+                address: dataStudentLocal.address.toString(),
+                status: dataStudentLocal.status.toString(),
+                commentary: dataStudentLocal?.commentary?.toString(),
+                medicalCondition: dataStudentLocal.medicalCondition?.toString(),
+                progressDesired: dataStudentLocal.progressDesired?.toString(),
+                allowedPictures: dataStudentLocal.allowedPictures.toString(),
+                idCity: selectedCityId?.toString(),
+                idProgram: selectedProgramId?.toString(),
+            },
+            pediatrician: {
+                name: dataPediatrician.name.toString(),
+                medicalInstitution: dataPediatrician.medicalInstitution.toString(),
+                officeNumber: dataPediatrician.officeNumber.toString(),
+                phone: dataPediatrician.phone.toString(),
+            },
+            parents: parentList.map(parent => ({
+                identityCard: parent.identityCard.toString(),
+                name: parent.name.toString(),
+                lastName1: parent.lastName1.toString(),
+                lastName2: parent.lastName2?.toString(),
+                telephone: parent.telephone.toString(),
+                email: parent.email.toString(),
+                occupation: parent.occupation?.toString(),
+            })),
+            emergencyContacts: emergencyContactList.map(contact => ({
+                name: contact.name.toString(),
+                phone: contact.phone.toString(),
+            })),
+            tutors: tutorList.map(tutor => ({
+                name: tutor.name.toString(),
+                occupation: tutor.occupation?.toString(),
+                phone: tutor.phone.toString(),
+            })),
         };
     
         console.log('Request Body:', JSON.stringify(requestBody));

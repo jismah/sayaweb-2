@@ -306,8 +306,11 @@ export default function Family() {
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
             <Heading as='h3' size='xl' id='Parents' >Familias</Heading>
             <ButtonGroup>
-                <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
+                {/* <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                     Nueva Familia
+                </Button> */}
+                <Button size={'sm'}  leftIcon={<AddIcon />} variant={'outline'} color={'teal'} >
+                  <a href="http://localhost:3001/Inscriptions/NewStudentForm"  target="_blank">Nueva Familia</a>
                 </Button>
             </ButtonGroup>
           </Flex>
