@@ -33,6 +33,16 @@ interface MonthlyData {
   };
 }
 
+interface Totals {
+  salary: number | null;
+  overtimePay: number | null;
+  sfs: number | null;
+  afp: number | null;
+  loans: number | null;
+  other: number | null;
+  total: number | null;
+}
+
 export default function ListNomina({ displayYear, setDisplayYear, setSearchId, remoteDoc }: {
     displayYear: string,
     setDisplayYear: (arg0: string) => void, 
@@ -167,10 +177,13 @@ export default function ListNomina({ displayYear, setDisplayYear, setSearchId, r
     });
     
     for (const key in columnTotals) {
-      columnTotals[key] = parseFloat(columnTotals[key].toFixed(2));
+      if (Object.prototype.hasOwnProperty.call(columnTotals, key)) {
+        columnTotals[key as keyof typeof columnTotals] = parseFloat(columnTotals[key as keyof typeof columnTotals].toFixed(2));
+      }
     }
     return columnTotals;
   }
+  
 
   useEffect(() => {
     setColumnTotals(calculateTotals(dataNomina));
@@ -227,21 +240,21 @@ export default function ListNomina({ displayYear, setDisplayYear, setSearchId, r
   };
 
   function tranformToMonthly(data: NominaData[]): Array<MonthlyData> {
-    const transformedData: any[] = [];
+    const transformedData: MonthlyData[] = [];
   
     data.forEach(({ id, date, type, totals }) => {
       const month = DateTime.fromISO(date)
         .setLocale('es')
         .toFormat('MMMM yyyy')
         .replace(/^\w/, firstChar => firstChar.toUpperCase());
-
+  
       const existingEntryIndex = transformedData.findIndex(entry => entry.month === month);
   
       if (existingEntryIndex !== -1) {
         const existingEntry = transformedData[existingEntryIndex];
         Object.keys(existingEntry.totals).forEach(key => {
-          if (totals[key] !== null) {
-            existingEntry.totals[key] = (existingEntry.totals[key] || 0) + totals[key];
+          if (totals[key as keyof Totals] !== null) {
+            existingEntry.totals[key as keyof Totals] = (existingEntry.totals[key as keyof Totals] || 0) + (totals[key as keyof Totals] || 0);
           }
         });
       } else {
@@ -255,6 +268,7 @@ export default function ListNomina({ displayYear, setDisplayYear, setSearchId, r
   
     return transformedData;
   }
+  
   
   return (
       <>
