@@ -2,7 +2,7 @@ import { Shift } from "../Shifts/Shifts";
 import { Student } from "../../Students/Students/Students";
 import { Staff } from "../../StaffAdministrator/Staff/Staff";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, Heading, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select, SelectItem } from "@tremor/react";
@@ -84,32 +84,6 @@ export default function Groups(){
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
 
-    
-
-    //Iniciar listado de Estudiantes, Profesores y de la tanda(Shift)
-    // const [selectedStudents, setSelectedStudents] = useState<StudentOnGroup[]>([]);
-    // const [selectedProfessors, setSelectedProfessors] = useState<Professor[]>([]);
-    // const [selectedShift, setSelectedShift] = useState<Shift>(initialShiftData);
-
-    // Lógica para manejar la selección de estudiantes y profesores
-    // const [selectedProfessors, setSelectedProfessors] = useState<string[]>([]);
-    // const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-    // const [selectedShift, setSelectedShift] = useState<string>("");
-
-    // const handleProfessorsSelect = (selectedItems: Professor[]) => {
-    //     setSelectedProfessors(selectedItems);
-    // };
-
-    // const handleStudentSelect = (selectedItems: Student[]) => {
-    //     setSelectedStudents(selectedItems);
-    // };
-
-    // const handleShiftSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setSelectedShift(event.target.value);
-    // };
-      
-    
-      
 
     // Lógica para crear el grupo (enviar los datos al servidor, etc.)
 
@@ -146,101 +120,40 @@ export default function Groups(){
         setEditMode(false);
         setShowMode(false);
 
-        loadGroupInformation();
-
         onOpen();
     };
 
     const handleCreateData = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if(editMode){
-            handleUpdateData()
-            onClose()
-        }else{
-            const resGroups = await fetch('http://localhost:3000/api/groups/', {
+        e.preventDefault();
+        if (editMode) {
+            handleUpdateData();
+            onClose();
+        } else {
+            console.log(valueProfessors);
+            console.log(valueStudents);
+            console.log(valueShift);
+
+            const requestBody = {
+                maxStudents: dataGroup.maxStudents.toString(),
+                idShift: valueShift.toString(),
+                professors: valueProfessors.map(id => ({ id })),
+                students: valueStudents.map(id => ({ id })),
+                camps: [],
+            };
+    
+            console.log(requestBody);
+            const resGroupsBulk = await fetch('http://localhost:3000/api/groups/bulk', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                     "x-api-key": "123456",
                 },
-                body: JSON.stringify({
-                    id: dataGroup.id,
-                    maxStudents: dataGroup.maxStudents,
-                    idShift: valueShift,
-                })
+                body: JSON.stringify(requestBody),
             });
-            const jsonGroups = await resGroups.json();
-            console.log(jsonGroups);
-            toast({
-                title: 'Registro Creado!',
-                description: "Se creo el registro correctamente.",
-                status: 'success',
-                position: 'bottom-right',
-                duration: 4000,
-                isClosable: true,
-            });
-
-
-            const resStudents = await fetch('http://localhost:3000/api/studentOnGroup/', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": "123456",
-                },
-                body: JSON.stringify({
-                    id: dataGroup.id,
-                    maxStudents: dataGroup.maxStudents,
-                    idShift: valueShift,
-                })
-            });
-            const jsonStudents = await resStudents.json();
-            console.log(jsonStudents);
-            toast({
-                title: 'Registro Creado!',
-                description: "Se creo el registro correctamente.",
-                status: 'success',
-                position: 'bottom-right',
-                duration: 4000,
-                isClosable: true,
-            });
-
-
-            const resProfessor = await fetch('http://localhost:3000/api/professorsForGroup/', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": "123456",
-                },
-                body: JSON.stringify({
-                    idProfessor: dataGroup
-                })
-            });
-            const jsonProfessor = await resProfessor.json();
-            console.log(jsonProfessor);
-            toast({
-                title: 'Registro Creado!',
-                description: "Se creo el registro correctamente.",
-                status: 'success',
-                position: 'bottom-right',
-                duration: 4000,
-                isClosable: true,
-            });
-
             
-            const resCamps = await fetch('http://localhost:3000/api/groupOnCamp/', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": "123456",
-                },
-                body: JSON.stringify({
-                    id: dataGroup.id,
-                    maxStudents: dataGroup.maxStudents,
-                    idShift: valueShift,
-                })
-            });
-            const jsonCamp = await resCamps.json();
-            console.log(jsonCamp);
+            const jsonGroupsBulk = await resGroupsBulk.json();
+            console.log(jsonGroupsBulk);
+    
             toast({
                 title: 'Registro Creado!',
                 description: "Se creo el registro correctamente.",
@@ -250,12 +163,14 @@ export default function Groups(){
                 isClosable: true,
             });
         }
-
+    
         setShowMode(false);
         setEditMode(false);
-
+    
         fetchData();
     };
+    
+    
 
     // EDIT DATA
     const handleEditData = async (group: Group) => {
@@ -263,8 +178,7 @@ export default function Groups(){
         
         setDataGroup(selectedGroup);
         onOpen();
-
-        loadGroupInformation();
+  
         
         setEditMode(true);
     };
@@ -319,8 +233,6 @@ export default function Groups(){
         setDataGroup(selectedGroup);
         setShowMode(true); // Cambiar a modo "mostrar"
         onOpen();
-
-        loadGroupInformation();
     };
 
     //Cargar lista de estudiantes, profesores y tandas
@@ -363,6 +275,13 @@ export default function Groups(){
         fetchData();
     }, [currentPage]);
 
+
+    useEffect(() => {
+        loadGroupInformation();
+    }, []);
+
+
+    
     
 
 
@@ -412,6 +331,22 @@ export default function Groups(){
                                         </Box>
                                     ) : (
                                         <Box pt={4}>
+                                            <FormControl>
+                                                <FormLabel>Máximo de estudiantes</FormLabel>
+                                                <NumberInput min={1} max={64} isReadOnly={showMode}
+                                                value={dataGroup.maxStudents || 0}
+                                                onChange={(valueString) =>
+                                                    setDataGroup({ ...dataGroup, maxStudents: parseInt(valueString) })
+                                                }>
+                                                    <NumberInputField/>
+                                                    <NumberInputStepper>
+                                                        <NumberIncrementStepper />
+                                                        <NumberDecrementStepper />
+                                                    </NumberInputStepper>
+                                                </NumberInput>
+                                            </FormControl>
+
+
                                             <SimpleGrid columns={2} spacing={10} mb={3}>
                                                 <Box>
                                                     {/* Multiselect profesores */}
@@ -452,13 +387,7 @@ export default function Groups(){
                                                 </Box>
                                             </SimpleGrid>
 
-                                            
-
-
-
-                                           
-                                            
-
+                                    
                                         </Box>
                                     )}
 
@@ -499,6 +428,7 @@ export default function Groups(){
                                             <Th>ID</Th>
                                             <Th>Número de grupo</Th>
                                             <Th>Máximo de estudiantes</Th>
+                                            <Th>Tanda</Th>
                                             <Th>Acciones</Th>
                                         </Tr>
                                     </Thead>
@@ -509,6 +439,11 @@ export default function Groups(){
                                                     <Td>{group.id}</Td>
                                                     <Td>Grupo #{group.id}</Td>
                                                     <Td>{group.maxStudents}</Td>
+                                                    <Td>
+                                                        {dataShifts.find(shift => shift.id === group.idShift)?.initialHour} {" "}
+                                                        - 
+                                                        {dataShifts.find(shift => shift.id === group.idShift)?.finishHour} {" "}
+                                                    </Td>
                                                     <Td>
                                                         <ButtonGroup variant='ghost' spacing='1'>
                                                             <IconButton onClick={() => handleShowData(group)}

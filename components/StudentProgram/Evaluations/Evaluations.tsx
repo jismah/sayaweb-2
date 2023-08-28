@@ -268,15 +268,6 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
                     <Heading as='h3' size='xl' id='evaluations' >Evaluaciones</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nueva evaluación
                             </Button>

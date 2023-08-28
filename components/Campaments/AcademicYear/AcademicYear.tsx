@@ -202,15 +202,6 @@ export default function AcademicYears(){
                     <Heading as='h3' size='xl' id='Parents' >Año académico</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nuevo año académico
                             </Button>
@@ -277,6 +268,7 @@ export default function AcademicYears(){
                                             <Th>ID</Th>
                                             <Th>Fecha inicial</Th>
                                             <Th>Fecha final</Th>
+                                            <Th>Acciones</Th>
                                         </Tr>
                                     </Thead>
                                     <Tbody>
