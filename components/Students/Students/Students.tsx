@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
+import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon } from '@chakra-ui/icons';
 import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 import { User } from '@supabase/supabase-js';
@@ -8,7 +8,7 @@ import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 
 
-export interface Student{
+export interface Student {
   id: string;
   name: string;
   lastName1: string;
@@ -36,11 +36,13 @@ import { EmergencyContact } from '../EmergencyContacts/EmergencyContacts';
 import StudentForm from '../../Inscriptions/StudentForm/StudentForm';
 import { Evaluation } from '../../StudentProgram/Evaluations/Evaluations';
 import { Program } from '../../StudentProgram/Programs/Programs';
+import router from 'next/router';
+import { useUser } from '@supabase/auth-helpers-react';
 
 
-export default function Students({familyStudents, dataFamily, familyMode, programMode, enableEditing} : {familyStudents : Student[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean; programMode: boolean}) {
-  
-  
+export default function Students({ familyStudents, dataFamily, familyMode, programMode, enableEditing }: { familyStudents: Student[]; dataFamily: Family; familyMode: boolean; enableEditing: boolean; programMode: boolean }) {
+
+
   const getInitialStudentData = () => {
     const initialData: Student = {
       id: "",
@@ -65,7 +67,8 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
   };
 
   const initialStudentData = getInitialStudentData();
-  
+  const user = useUser();
+
   const [dataStudents, setDataStudents] = useState<Student[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
@@ -94,9 +97,9 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
 
   // GET DATA TO LOAD ARRAY
   const fetchData = async () => {
-    setLoading(true); 
-    
-    if (familyMode || programMode){
+    setLoading(true);
+
+    if (familyMode || programMode) {
       setDataStudents(familyStudents);
       setLoading(false);
     } else {
@@ -106,27 +109,27 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
           headers: {
             "Content-Type": "application/json",
             "x-api-key": "123456",
-        },
+          },
         });
         const json = await studentsResponse.json();
         console.log(json);
-    
+
         setDataStudents(json.response); // ACTUALIZAR EL ESTADO
         setTotalRecords(json.total); // Establecer el total de registros
         setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
-    
-        
+
+
       } catch (error) {
         console.error(error);
-          // MANEJO DE ERRORES
-        } finally {
-          setLoading(false); 
-        }
-      
+        // MANEJO DE ERRORES
+      } finally {
+        setLoading(false);
+      }
+
     }
   }
 
-  
+
 
   // CREATE DATA
   const handleOpenCreateModal = () => {
@@ -135,7 +138,7 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
     console.log(dataStudent);
     setEditMode(false);
     setShowMode(false);
-    if(familyMode){
+    if (familyMode) {
       setFamilyHeaders(dataFamily.parents);
       console.log('Al abrir create - Datos de los padres');
       console.log(dataFamily.parents);
@@ -181,24 +184,24 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
         duration: 4000,
         isClosable: true,
       });
-      
+
     }
-    
+
     setShowMode(false)
     setEditMode(false)
-   
+
     fetchData();
   }
 
   // EDIT DATA
   const handleEditData = async (student: Student) => {
     const selectedStudent = dataStudents.find(s => s.id === student.id)!;
-    
+
     setDataStudent(selectedStudent);
     onOpen();
 
     loadParentsAndSiblings(selectedStudent);
-    
+
     setEditMode(true);
   }
 
@@ -260,13 +263,13 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
     setDataStudent(selectedStudent);
     setShowMode(true); // Cambiar a modo "mostrar"
     onOpen();
-    
+
     loadParentsAndSiblings(selectedStudent);
-    
+
   }
 
-  const loadParentsAndSiblings = async (selectedStudent : Student) => {
-    setLoading(true); 
+  const loadParentsAndSiblings = async (selectedStudent: Student) => {
+    setLoading(true);
 
     //Petición para obtener los demás cabeceras de la familia
     try {
@@ -275,7 +278,7 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
         headers: {
           "Content-Type": "application/json",
           "x-api-key": "123456",
-      },
+        },
       });
       const json = await response.json();
       setFamilyHeaders(json.response);
@@ -283,8 +286,8 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
       console.log(json.response);
     } catch (error) {
       console.error(error);
-    }  finally {
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
 
     //Petición para obtener los estudiantes (hermanos)
@@ -294,14 +297,14 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
         headers: {
           "Content-Type": "application/json",
           "x-api-key": "123456",
-      },
+        },
       });
       const json = await response.json();
       setFamilySiblings(json.response);
     } catch (error) {
       console.error(error);
-    }  finally {
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
 
   }
@@ -317,411 +320,415 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
     console.log("Changing page to:", newPage);
     setCurrentPage(prevPage => newPage);
   };
-  
+
 
   useEffect(() => {
+    if (user) {
+      router.push('/Auth/Login');
+    }
+    
     fetchData();
   }, [currentPage]);
 
   return (
-      <>
-          <Box px={3} py={3}>
-          <Flex justifyContent={'space-between'} alignItems={'center'}>
-            <Heading as='h3' size='xl' id='Parents' >Estudiantes</Heading>
-              <Box display={enableEditing ? 'block' : 'none'}>
-                <ButtonGroup>
-                    <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
-                        Nuevo Estudiante
-                    </Button>
-                </ButtonGroup>
-              </Box>
-          </Flex> 
+    <>
+      <Box px={3} py={3}>
+        <Flex justifyContent={'space-between'} alignItems={'center'}>
+          <Heading as='h3' size='xl' id='Parents' >Estudiantes</Heading>
+          <Box display={enableEditing ? 'block' : 'none'}>
+            <ButtonGroup>
+              <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
+                Nuevo Estudiante
+              </Button>
+            </ButtonGroup>
+          </Box>
+        </Flex>
 
-            <Modal onClose={() => { setShowMode(false); onClose();}} size={'full'} isOpen={isOpen}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{editMode ? "Editar" : (showMode ? "Detalle" : "Crear") }</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Box px={3} py={3}>
-                        <form onSubmit={handleCreateData}>
-                            <Stack spacing={4}>                     
-                              
-                              {!showMode && (
-                                <StudentForm  dataParents={dataFamily.parents} dataStudent={dataStudent} editingMode={(editMode ? true : false)} createStudentWithFamily={true} />
-                              )}
-                              
+        <Modal onClose={() => { setShowMode(false); onClose(); }} size={'full'} isOpen={isOpen}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{editMode ? "Editar" : (showMode ? "Detalle" : "Crear")}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Box px={3} py={3}>
+                <form onSubmit={handleCreateData}>
+                  <Stack spacing={4}>
 
-                              {/*Tablas pertenecientes para las relaciones */}
-
-                              {/* Tabla los padres */}
-                              {showMode && (
-                              loading ? (
-                                  <Box pt={4}>
-                                  <Card variant={'outline'}>
-                                      <CardBody>
-                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                              <Spinner color='teal' size='xl' thickness='3px' />
-                                          </Box>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              ) : (
-                                  <Box pt={4}>
-                                  <FormLabel>Cabeceras de la familia</FormLabel>
-                                  <Card variant={'outline'}>
-                                      <CardBody p={0}>
-                                      <TableContainer>
-                                          <Table variant='striped'>
-                                          <Thead>
-                                              <Tr>
-                                                  <Th>ID</Th>
-                                                  <Th>Nombre Completo</Th>
-                                                  <Th>Cedula</Th>
-                                                  <Th>Telefono</Th>
-                                                  <Th>Email</Th>
-                                                  <Th>Ocupación</Th>
-                                              </Tr>
-                                          </Thead>
-                                          <Tbody>
-                                              {familyHeaders.map((parent: Parent) => {
-                                                  return (
-                                                      <Tr key={parent.id}>
-                                                      <Td>{parent.id}</Td>
-                                                      <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                      <Td>{parent.identityCard}</Td>
-                                                      <Td>{parent.telephone}</Td>
-                                                      <Td>{parent.email}</Td>
-                                                      <Td>{parent.occupation}</Td>
-                                                      </Tr>
-                                                  )
-                                              })
-                                              }
-                                          </Tbody>
-                                          </Table>
-                                      </TableContainer>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              )
-                              )}
+                    {!showMode && (
+                      <StudentForm dataParents={dataFamily.parents} dataStudent={dataStudent} editingMode={(editMode ? true : false)} createStudentWithFamily={true} />
+                    )}
 
 
-                              {/* Tabla estudiantes(hermanos) */}
-                              {showMode && (
-                              loading ? (
-                                  <Box pt={4}>
-                                  <Card variant={'outline'}>
-                                      <CardBody>
-                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                              <Spinner color='teal' size='xl' thickness='3px' />
-                                          </Box>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              ) : (
-                                  <Box pt={4}>
-                                  <FormLabel>Hermanos</FormLabel>
-                                  <Card variant={'outline'}>
-                                      <CardBody p={0}>
-                                      <TableContainer>
-                                          <Table variant='striped'>
-                                          <Thead>
-                                              <Tr>
-                                                  <Th>ID</Th>
-                                                  <Th>Nombre Completo</Th>
-                                                  <Th>Telefono</Th>
-                                                  <Th>Dirección</Th>
-                                                  <Th>Fecha de nacimiento</Th>
-                                              </Tr>
-                                          </Thead>
-                                          <Tbody>
-                                              {familySiblings.map((student: Student) => {
-                                                  return (
-                                                      <Tr key={student.id}>
-                                                      <Td>{student.id}</Td>
-                                                      <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                      <Td>{student.housePhone}</Td>
-                                                      <Td>{student.address}</Td>
-                                                      <Td>{student.dateBirth}</Td>
-                                                      </Tr>
-                                                  )
-                                              })
-                                              }
-                                          </Tbody>
-                                          </Table>
-                                      </TableContainer>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              )
-                              )}
+                    {/*Tablas pertenecientes para las relaciones */}
 
-                              {/* Tabla tutores */}
-                              {/* {showMode && (
-                              loading ? (
-                                  <Box pt={4}>
-                                  <Card variant={'outline'}>
-                                      <CardBody>
-                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                              <Spinner color='teal' size='xl' thickness='3px' />
-                                          </Box>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              ) : (
-                                  <Box pt={4}>
-                                  <FormLabel>Hermanos</FormLabel>
-                                  <Card variant={'outline'}>
-                                      <CardBody p={0}>
-                                      <TableContainer>
-                                          <Table variant='striped'>
-                                          <Thead>
-                                              <Tr>
-                                                  <Th>ID</Th>
-                                                  <Th>Nombre Completo</Th>
-                                                  <Th>Telefono</Th>
-                                                  <Th>Dirección</Th>
-                                                  <Th>Fecha de nacimiento</Th>
-                                              </Tr>
-                                          </Thead>
-                                          <Tbody>
-                                              {familySiblings.map((student: Student) => {
-                                                  return (
-                                                      <Tr key={student.id}>
-                                                      <Td>{student.id}</Td>
-                                                      <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                      <Td>{student.housePhone}</Td>
-                                                      <Td>{student.address}</Td>
-                                                      <Td>{student.dateBirth}</Td>
-                                                      </Tr>
-                                                  )
-                                              })
-                                              }
-                                          </Tbody>
-                                          </Table>
-                                      </TableContainer>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              )
-                              )} */}
-
-                              {/* Tabla contactos de emergencia */}
-                              {/* {showMode && (
-                              loading ? (
-                                  <Box pt={4}>
-                                  <Card variant={'outline'}>
-                                      <CardBody>
-                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                              <Spinner color='teal' size='xl' thickness='3px' />
-                                          </Box>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              ) : (
-                                  <Box pt={4}>
-                                  <FormLabel>Hermanos</FormLabel>
-                                  <Card variant={'outline'}>
-                                      <CardBody p={0}>
-                                      <TableContainer>
-                                          <Table variant='striped'>
-                                          <Thead>
-                                              <Tr>
-                                                  <Th>ID</Th>
-                                                  <Th>Nombre Completo</Th>
-                                                  <Th>Telefono</Th>
-                                                  <Th>Dirección</Th>
-                                                  <Th>Fecha de nacimiento</Th>
-                                              </Tr>
-                                          </Thead>
-                                          <Tbody>
-                                              {familySiblings.map((student: Student) => {
-                                                  return (
-                                                      <Tr key={student.id}>
-                                                      <Td>{student.id}</Td>
-                                                      <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                      <Td>{student.housePhone}</Td>
-                                                      <Td>{student.address}</Td>
-                                                      <Td>{student.dateBirth}</Td>
-                                                      </Tr>
-                                                  )
-                                              })
-                                              }
-                                          </Tbody>
-                                          </Table>
-                                      </TableContainer>
-                                      </CardBody>
-                                  </Card>
-                                  </Box>
-                              )
-                              )} */}
-
-
-
-
-                            <Button type='submit' colorScheme='teal' mr={3}>
-                                        {showMode ? "Cerrar" : "Agregar"}
-                                    </Button>
-                            <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>
-
-                            </Stack>
-                        </form>
+                    {/* Tabla los padres */}
+                    {showMode && (
+                      loading ? (
+                        <Box pt={4}>
+                          <Card variant={'outline'}>
+                            <CardBody>
+                              <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                <Spinner color='teal' size='xl' thickness='3px' />
+                              </Box>
+                            </CardBody>
+                          </Card>
                         </Box>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button onClick={onClose}>Close</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>   
-
-
-
-            {loading ?
-              <Box pt={4}>
-                <Card variant={'outline'}>
-                    <CardBody>
-                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                            <Spinner color='teal' size='xl' thickness='3px' />
-                        </Box>
-                    </CardBody>
-                </Card>
-              </Box>
-              : <Box pt={4}>
-                  <Card variant={'outline'}>
-                      <CardBody p={0}>
-                          <TableContainer>
-                              <Table variant='striped'>
+                      ) : (
+                        <Box pt={4}>
+                          <FormLabel>Cabeceras de la familia</FormLabel>
+                          <Card variant={'outline'}>
+                            <CardBody p={0}>
+                              <TableContainer>
+                                <Table variant='striped'>
                                   <Thead>
-                                      <Tr>
-                                        <Th>ID</Th>
-                                        <Th>Nombre Completo</Th>
-                                        <Th>Telefono</Th>
-                                        <Th>Dirección</Th>
-                                        <Th>Estado</Th>
-                                        <Th>Fecha de nacimiento</Th>
-                                        <Th>Condición médica</Th>
-                                        <Th>Progreso deseado</Th>
-                                        <Th>Permiso para fotos</Th>
-                                        <Th>Acciones</Th>
-                                      </Tr>
+                                    <Tr>
+                                      <Th>ID</Th>
+                                      <Th>Nombre Completo</Th>
+                                      <Th>Cedula</Th>
+                                      <Th>Telefono</Th>
+                                      <Th>Email</Th>
+                                      <Th>Ocupación</Th>
+                                    </Tr>
                                   </Thead>
                                   <Tbody>
-                                      {dataStudents.map(student => {
-                                          return (
-                                              <Tr key={student.id}>
-                                                <Td>{student.id}</Td>
-                                                <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                <Td>{student.housePhone}</Td>
-                                                <Td>{student.address}</Td>
-                                                <Td>{student.status}</Td>
-                                                <Td>{student.dateBirth}</Td>
-                                                <Td>{student.medicalCondition}</Td>
-                                                <Td>{student.progressDesired}</Td>
-                                                <Td>{student.allowedPictures ? "Permitido" : "No permitido"}</Td>
-                                                <Td>
-                                                    <ButtonGroup variant='ghost' spacing='1'>
-                                                        <IconButton onClick={() => handleShowData(student)}
-                                                        colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
-
-                                                        <IconButton onClick={() => handleEditData(student)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
-
-                                                        <IconButton onClick={() => handleDeleteData(student.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
-                                                    </ButtonGroup>
-                                                </Td>
-                                              </Tr>
-                                          )
-                                      })
-                                      }
+                                    {familyHeaders.map((parent: Parent) => {
+                                      return (
+                                        <Tr key={parent.id}>
+                                          <Td>{parent.id}</Td>
+                                          <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
+                                          <Td>{parent.identityCard}</Td>
+                                          <Td>{parent.telephone}</Td>
+                                          <Td>{parent.email}</Td>
+                                          <Td>{parent.occupation}</Td>
+                                        </Tr>
+                                      )
+                                    })
+                                    }
                                   </Tbody>
+                                </Table>
+                              </TableContainer>
+                            </CardBody>
+                          </Card>
+                        </Box>
+                      )
+                    )}
 
-                              </Table>
-                          </TableContainer>
-                      </CardBody>
-                  </Card>
+
+                    {/* Tabla estudiantes(hermanos) */}
+                    {showMode && (
+                      loading ? (
+                        <Box pt={4}>
+                          <Card variant={'outline'}>
+                            <CardBody>
+                              <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                <Spinner color='teal' size='xl' thickness='3px' />
+                              </Box>
+                            </CardBody>
+                          </Card>
+                        </Box>
+                      ) : (
+                        <Box pt={4}>
+                          <FormLabel>Hermanos</FormLabel>
+                          <Card variant={'outline'}>
+                            <CardBody p={0}>
+                              <TableContainer>
+                                <Table variant='striped'>
+                                  <Thead>
+                                    <Tr>
+                                      <Th>ID</Th>
+                                      <Th>Nombre Completo</Th>
+                                      <Th>Telefono</Th>
+                                      <Th>Dirección</Th>
+                                      <Th>Fecha de nacimiento</Th>
+                                    </Tr>
+                                  </Thead>
+                                  <Tbody>
+                                    {familySiblings.map((student: Student) => {
+                                      return (
+                                        <Tr key={student.id}>
+                                          <Td>{student.id}</Td>
+                                          <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
+                                          <Td>{student.housePhone}</Td>
+                                          <Td>{student.address}</Td>
+                                          <Td>{student.dateBirth}</Td>
+                                        </Tr>
+                                      )
+                                    })
+                                    }
+                                  </Tbody>
+                                </Table>
+                              </TableContainer>
+                            </CardBody>
+                          </Card>
+                        </Box>
+                      )
+                    )}
+
+                    {/* Tabla tutores */}
+                    {/* {showMode && (
+                              loading ? (
+                                  <Box pt={4}>
+                                  <Card variant={'outline'}>
+                                      <CardBody>
+                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                              <Spinner color='teal' size='xl' thickness='3px' />
+                                          </Box>
+                                      </CardBody>
+                                  </Card>
+                                  </Box>
+                              ) : (
+                                  <Box pt={4}>
+                                  <FormLabel>Hermanos</FormLabel>
+                                  <Card variant={'outline'}>
+                                      <CardBody p={0}>
+                                      <TableContainer>
+                                          <Table variant='striped'>
+                                          <Thead>
+                                              <Tr>
+                                                  <Th>ID</Th>
+                                                  <Th>Nombre Completo</Th>
+                                                  <Th>Telefono</Th>
+                                                  <Th>Dirección</Th>
+                                                  <Th>Fecha de nacimiento</Th>
+                                              </Tr>
+                                          </Thead>
+                                          <Tbody>
+                                              {familySiblings.map((student: Student) => {
+                                                  return (
+                                                      <Tr key={student.id}>
+                                                      <Td>{student.id}</Td>
+                                                      <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
+                                                      <Td>{student.housePhone}</Td>
+                                                      <Td>{student.address}</Td>
+                                                      <Td>{student.dateBirth}</Td>
+                                                      </Tr>
+                                                  )
+                                              })
+                                              }
+                                          </Tbody>
+                                          </Table>
+                                      </TableContainer>
+                                      </CardBody>
+                                  </Card>
+                                  </Box>
+                              )
+                              )} */}
+
+                    {/* Tabla contactos de emergencia */}
+                    {/* {showMode && (
+                              loading ? (
+                                  <Box pt={4}>
+                                  <Card variant={'outline'}>
+                                      <CardBody>
+                                          <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                              <Spinner color='teal' size='xl' thickness='3px' />
+                                          </Box>
+                                      </CardBody>
+                                  </Card>
+                                  </Box>
+                              ) : (
+                                  <Box pt={4}>
+                                  <FormLabel>Hermanos</FormLabel>
+                                  <Card variant={'outline'}>
+                                      <CardBody p={0}>
+                                      <TableContainer>
+                                          <Table variant='striped'>
+                                          <Thead>
+                                              <Tr>
+                                                  <Th>ID</Th>
+                                                  <Th>Nombre Completo</Th>
+                                                  <Th>Telefono</Th>
+                                                  <Th>Dirección</Th>
+                                                  <Th>Fecha de nacimiento</Th>
+                                              </Tr>
+                                          </Thead>
+                                          <Tbody>
+                                              {familySiblings.map((student: Student) => {
+                                                  return (
+                                                      <Tr key={student.id}>
+                                                      <Td>{student.id}</Td>
+                                                      <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
+                                                      <Td>{student.housePhone}</Td>
+                                                      <Td>{student.address}</Td>
+                                                      <Td>{student.dateBirth}</Td>
+                                                      </Tr>
+                                                  )
+                                              })
+                                              }
+                                          </Tbody>
+                                          </Table>
+                                      </TableContainer>
+                                      </CardBody>
+                                  </Card>
+                                  </Box>
+                              )
+                              )} */}
+
+
+
+
+                    <Button type='submit' colorScheme='teal' mr={3}>
+                      {showMode ? "Cerrar" : "Agregar"}
+                    </Button>
+                    <Button variant={'ghost'} onClick={onClose}>Cancelar</Button>
+
+                  </Stack>
+                </form>
               </Box>
-                      
-            }
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={onClose}>Close</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
 
-              <ButtonGroup mt={3} justifyContent='center'>
-                <Button
-                    onClick={() => handlePageChange(1)}
-                    colorScheme={currentPage === 1 ? 'teal' : 'gray'}
-                >
-                    {'<<'}
-                </Button>
-                <Button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    colorScheme={currentPage === 1 ? 'gray' : 'teal'}
-                    isDisabled={currentPage === 1}
-                >
-                    {'<'}
-                </Button>
 
-                {/* Botones de números de paginación */}
-                {totalPages <= 10
-                  ? Array.from({ length: totalPages }, (_, index) => (
-                      <Button
-                        key={index + 1}
-                        onClick={() => handlePageChange(index + 1)}
-                        colorScheme={currentPage === index + 1 ? 'teal' : 'gray'}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : currentPage <= 5
-                  ? Array.from({ length: 10 }, (_, index) => (
-                      <Button
-                        key={index + 1}
-                        onClick={() => handlePageChange(index + 1)}
-                        colorScheme={currentPage === index + 1 ? 'teal' : 'gray'}
-                      >
-                        {index + 1}
-                      </Button>
-                    ))
-                  : currentPage >= totalPages - 4
-                  ? Array.from({ length: 10 }, (_, index) => (
-                      <Button
-                        key={totalPages - 9 + index}
-                        onClick={() => handlePageChange(totalPages - 9 + index)}
-                        colorScheme={currentPage === totalPages - 9 + index ? 'teal' : 'gray'}
-                      >
-                        {totalPages - 9 + index}
-                      </Button>
-                    ))
-                  : Array.from({ length: 10 }, (_, index) => (
-                      <Button
-                        key={currentPage - 5 + index}
-                        onClick={() => handlePageChange(currentPage - 5 + index)}
-                        colorScheme={currentPage === currentPage - 5 + index ? 'teal' : 'gray'}
-                      >
-                        {currentPage - 5 + index}
-                      </Button>
-                    ))}
-
-
-                <Button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    colorScheme={currentPage === totalPages ? 'gray' : 'teal'}
-                    isDisabled={currentPage === totalPages}
-                >
-                    {'>'}
-                </Button>
-                
-
-                <Button
-                    onClick={() => handlePageChange(totalPages)}
-                    colorScheme={currentPage === totalPages ? 'teal' : 'gray'}
-                >
-                    {'>>'}
-                </Button>
-              </ButtonGroup>
+        {loading ?
+          <Box pt={4}>
+            <Card variant={'outline'}>
+              <CardBody>
+                <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                  <Spinner color='teal' size='xl' thickness='3px' />
+                </Box>
+              </CardBody>
+            </Card>
           </Box>
-         
-          
-          
-      </>
+          : <Box pt={4}>
+            <Card variant={'outline'}>
+              <CardBody p={0}>
+                <TableContainer>
+                  <Table variant='striped'>
+                    <Thead>
+                      <Tr>
+                        <Th>ID</Th>
+                        <Th>Nombre Completo</Th>
+                        <Th>Telefono</Th>
+                        <Th>Dirección</Th>
+                        <Th>Estado</Th>
+                        <Th>Fecha de nacimiento</Th>
+                        <Th>Condición médica</Th>
+                        <Th>Progreso deseado</Th>
+                        <Th>Permiso para fotos</Th>
+                        <Th>Acciones</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {dataStudents.map(student => {
+                        return (
+                          <Tr key={student.id}>
+                            <Td>{student.id}</Td>
+                            <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
+                            <Td>{student.housePhone}</Td>
+                            <Td>{student.address}</Td>
+                            <Td>{student.status}</Td>
+                            <Td>{student.dateBirth}</Td>
+                            <Td>{student.medicalCondition}</Td>
+                            <Td>{student.progressDesired}</Td>
+                            <Td>{student.allowedPictures ? "Permitido" : "No permitido"}</Td>
+                            <Td>
+                              <ButtonGroup variant='ghost' spacing='1'>
+                                <IconButton onClick={() => handleShowData(student)}
+                                  colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+
+                                <IconButton onClick={() => handleEditData(student)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
+
+                                <IconButton onClick={() => handleDeleteData(student.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
+                              </ButtonGroup>
+                            </Td>
+                          </Tr>
+                        )
+                      })
+                      }
+                    </Tbody>
+
+                  </Table>
+                </TableContainer>
+              </CardBody>
+            </Card>
+          </Box>
+
+        }
+
+
+        <ButtonGroup mt={3} justifyContent='center'>
+          <Button
+            onClick={() => handlePageChange(1)}
+            colorScheme={currentPage === 1 ? 'teal' : 'gray'}
+          >
+            {'<<'}
+          </Button>
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            colorScheme={currentPage === 1 ? 'gray' : 'teal'}
+            isDisabled={currentPage === 1}
+          >
+            {'<'}
+          </Button>
+
+          {/* Botones de números de paginación */}
+          {totalPages <= 10
+            ? Array.from({ length: totalPages }, (_, index) => (
+              <Button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                colorScheme={currentPage === index + 1 ? 'teal' : 'gray'}
+              >
+                {index + 1}
+              </Button>
+            ))
+            : currentPage <= 5
+              ? Array.from({ length: 10 }, (_, index) => (
+                <Button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  colorScheme={currentPage === index + 1 ? 'teal' : 'gray'}
+                >
+                  {index + 1}
+                </Button>
+              ))
+              : currentPage >= totalPages - 4
+                ? Array.from({ length: 10 }, (_, index) => (
+                  <Button
+                    key={totalPages - 9 + index}
+                    onClick={() => handlePageChange(totalPages - 9 + index)}
+                    colorScheme={currentPage === totalPages - 9 + index ? 'teal' : 'gray'}
+                  >
+                    {totalPages - 9 + index}
+                  </Button>
+                ))
+                : Array.from({ length: 10 }, (_, index) => (
+                  <Button
+                    key={currentPage - 5 + index}
+                    onClick={() => handlePageChange(currentPage - 5 + index)}
+                    colorScheme={currentPage === currentPage - 5 + index ? 'teal' : 'gray'}
+                  >
+                    {currentPage - 5 + index}
+                  </Button>
+                ))}
+
+
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            colorScheme={currentPage === totalPages ? 'gray' : 'teal'}
+            isDisabled={currentPage === totalPages}
+          >
+            {'>'}
+          </Button>
+
+
+          <Button
+            onClick={() => handlePageChange(totalPages)}
+            colorScheme={currentPage === totalPages ? 'teal' : 'gray'}
+          >
+            {'>>'}
+          </Button>
+        </ButtonGroup>
+      </Box>
+
+
+
+    </>
   )
 };
 

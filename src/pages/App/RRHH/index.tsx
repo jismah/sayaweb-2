@@ -1,7 +1,9 @@
 import { Box, Heading } from "@chakra-ui/react";
+import { useUser } from "@supabase/auth-helpers-react";
 import { Card, Title, Table, Grid, Col, DeltaType, BadgeDelta, MultiSelect, MultiSelectItem, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Button } from "@tremor/react";
 import { NextPage } from "next";
-import { useState } from "react";
+import router from "next/router";
+import { useEffect, useState } from "react";
 
 type Staff = {
     id: number;
@@ -16,63 +18,48 @@ type Staff = {
     status: boolean;
 };
 
-const listStaffs: Staff[] = [
-    {
-        id: 1,
-        name: "John",
-        lastName1: "Smith",
-        lastName2: "Rodriguez",
-        phone: "8490990000",
-        salary: 80000,
-        position: "Director Web Asociado",
-        email: "johnsmith@gmail.com",
-        identityNumber: "40200000000",
-        status: true,
-    },
-    {
-        id: 2,
-        name: "Jean",
-        lastName1: "Smith",
-        lastName2: "Rodriguez",
-        phone: "8490990000",
-        salary: 80000,
-        position: "Director Web Asociado",
-        email: "johnsmith@gmail.com",
-        identityNumber: "40200000000",
-        status: true,
-    },
-    {
-        id: 3,
-        name: "Misael",
-        lastName1: "Smith",
-        lastName2: "Rodriguez",
-        phone: "8490990000",
-        salary: 80000,
-        position: "Director Web Asociado",
-        email: "johnsmith@gmail.com",
-        identityNumber: "40200000000",
-        status: true,
-    },
-];
-
 const RRHH: NextPage = () => {
+    const user = useUser();
 
     const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const [listStaff, setListStaff] = useState<Staff[]>([]);
 
     const isSalesPersonSelected = (staff: Staff) =>
         selectedNames.includes(staff.name) || selectedNames.length === 0;
 
+    /* FETCH PARA LISTAR EMPLEADOS*/
+    const fetchListStaff = async () => {
+        await fetch('https://sayaserver.onrender.com/api/staff', {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "123456",
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                setListStaff(data.response);
+            });
+    }
+
+    useEffect(() => {
+        if (user) {
+            router.push('/Auth/Login');
+        }
+        fetchListStaff();
+    });
+
     return (
         <>
             <Box p={4} width={'100%'}>
-                <Title>Gestión de Empleados</Title>
+                <Heading size={"md"}>Gestión de Empleados</Heading>
                 <Card className="h-full mt-6">
                     <MultiSelect
                         onValueChange={setSelectedNames}
                         placeholder="Buscar..."
                         className="max-w-xs"
                     >
-                        {listStaffs.map((item) => (
+                        {listStaff.map((item) => (
                             <MultiSelectItem key={item.name} value={item.name}>
                                 {item.name}
                             </MultiSelectItem>
@@ -81,27 +68,29 @@ const RRHH: NextPage = () => {
                     <Table className="mt-6">
                         <TableHead>
                             <TableRow>
-                                <TableHeaderCell>Name</TableHeaderCell>
-                                <TableHeaderCell>Leads</TableHeaderCell>
-                                <TableHeaderCell>Sales ($)</TableHeaderCell>
-                                <TableHeaderCell>Quota ($)</TableHeaderCell>
-                                <TableHeaderCell>Variance</TableHeaderCell>
-                                <TableHeaderCell>Region</TableHeaderCell>
-                                <TableHeaderCell></TableHeaderCell>
+                                <TableHeaderCell>ID</TableHeaderCell>
+                                <TableHeaderCell>Cédula</TableHeaderCell>
+                                <TableHeaderCell>Nombre</TableHeaderCell>
+                                <TableHeaderCell>Correo</TableHeaderCell>
+                                <TableHeaderCell>Posición</TableHeaderCell>
+                                <TableHeaderCell>Salario</TableHeaderCell>
+                                <TableHeaderCell>Contacto</TableHeaderCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {listStaffs
+                            {listStaff
                                 .filter((item) => isSalesPersonSelected(item))
                                 .map((item) => (
-                                    <TableRow key={item.name}>
+                                    <TableRow key={item.id}>
+                                        <TableCell>#{item.id}</TableCell>
                                         <TableCell>{item.name}</TableCell>
+                                        <TableCell>{item.identityNumber}</TableCell>
                                         <TableCell>{item.email}</TableCell>
                                         <TableCell>{item.position}</TableCell>
-                                        <TableCell>{item.salary}</TableCell>
+                                        <TableCell>RD$ {item.salary}</TableCell>
                                         <TableCell>{item.phone}</TableCell>
-                                        <TableCell>{item.identityNumber}</TableCell>
+                                        
                                         <TableCell className="text-right">
                                             <Button size="xs" variant="secondary" color="teal">
                                                 Ver Detalles
