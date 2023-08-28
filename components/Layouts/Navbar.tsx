@@ -72,11 +72,10 @@ const Navbar: React.FC = () => {
                                         Gestión Administrativa
                                     </MenuButton>
                                     <MenuList>
-                                        <MenuItem as={NextLink} href='/'>Empleados</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/RRHH'>Empleados</MenuItem>
                                         <MenuItem as={NextLink} href='/App/FinancialManager'>Gestor Financiero</MenuItem>
                                     </MenuList>
                                 </Menu>
-
                             </HStack>
                         </Flex>
                     </Box>
