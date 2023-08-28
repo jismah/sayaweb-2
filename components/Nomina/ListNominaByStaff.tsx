@@ -110,7 +110,7 @@ export default function ListNomina({ idStaff, reload, reloadYear, setters }: {
     setFound(false);
 
     try {
-      const staff = await fetch(`http://localhost:3000/api/staff/${idStaff}`, {
+      const staff = await fetch(`https://sayaserver.onrender.com/api/staff/${idStaff}`, {
         method: 'GET',
         headers: {
           "Content-Type": 'application/json',
@@ -142,7 +142,7 @@ export default function ListNomina({ idStaff, reload, reloadYear, setters }: {
     setConnected(false);
 
     try {
-      const res = await fetch(`http://localhost:3000/api/nomina/staff/${idStaff}?year=${year}`, {
+      const res = await fetch(`https://sayaserver.onrender.com/api/nomina/staff/${idStaff}?year=${year}`, {
         method: 'GET',
         headers: {
           "Content-Type": 'application/json',

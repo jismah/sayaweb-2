@@ -103,7 +103,7 @@ export default function ListNomina({ displayYear, setDisplayYear, setSearchId, r
     setConnected(false);
 
     try {
-      const res = await fetch(`http://localhost:3000/api/nomina/quincenal?year=${year}`, {
+      const res = await fetch(`https://sayaserver.onrender.com/api/nomina/quincenal?year=${year}`, {
         method: 'GET',
         headers: {
           "Content-Type": 'application/json',

@@ -55,7 +55,7 @@ export default function CreateNomina({ isOpen, onClose, idNomina}: CreateNominaP
         } else {
 
             try {
-                const res = await fetch('http://localhost:3000/api/nomina/doc', {
+                const res = await fetch('https://sayaserver.onrender.com/api/nomina/doc', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",

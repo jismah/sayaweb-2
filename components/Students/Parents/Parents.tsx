@@ -81,6 +81,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
         setTotalRecords(json.total); // Establecer el total de registros
         setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
     
+        setDataParent(initialParentData);
         
       } catch (error) {
         console.error(error);

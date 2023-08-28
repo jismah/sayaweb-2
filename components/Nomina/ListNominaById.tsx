@@ -79,7 +79,7 @@ export default function ListNomina({ idNomina, reload, setters }: {
     setFound(false)
 
     try {
-      const res = await fetch(`http://localhost:3000/api/detailNomina/${idNomina}`, {
+      const res = await fetch(`https://sayaserver.onrender.com/api/detailNomina/${idNomina}`, {
         method: 'GET',
         headers: {
           "Content-Type": 'application/json',

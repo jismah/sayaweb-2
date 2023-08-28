@@ -97,7 +97,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
         setConnected(false);
     
         try {
-          const res = await fetch(`http://localhost:3000/api/detailNomina/new`, {
+          const res = await fetch(`https://sayaserver.onrender.com/api/detailNomina/new`, {
             method: 'GET',
             headers: {
               "Content-Type": 'application/json',
@@ -270,7 +270,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
 
             if (!editMode) {
                 try {
-                    const validate = await fetch(`http://localhost:3000/api/detailNomina/validate/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
+                    const validate = await fetch(`https://sayaserver.onrender.com/api/detailNomina/validate/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
@@ -323,7 +323,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
 
             if (!editMode && !exists && !deleted) {
                 try {
-                    const res = await fetch('http://localhost:3000/api/detailNomina', {
+                    const res = await fetch('https://sayaserver.onrender.com/api/detailNomina', {
                         method: 'POST',
                         headers: {
                             "Content-Type": "application/json",
@@ -381,7 +381,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
 
             } else if (editMode || (exists && deleted) ) {
                 try {
-                    const res = await fetch(`http://localhost:3000/api/detailNomina/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
+                    const res = await fetch(`https://sayaserver.onrender.com/api/detailNomina/${stringifiedData.idNomina}/${stringifiedData.idStaff}`, {
                         method: 'PUT',
                         headers: {
                             "Content-Type": "application/json",
@@ -465,7 +465,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     const handleDelete = async () => {
         setProcessing(true);
         try {
-            const res = await fetch(`http://localhost:3000/api/detailNomina/${data.idNomina}/${data.idStaff}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/detailNomina/${data.idNomina}/${data.idStaff}`, {
                 method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json",

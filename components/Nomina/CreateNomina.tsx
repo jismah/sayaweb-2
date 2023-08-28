@@ -35,7 +35,7 @@ export default function CreateNomina({ isOpen, onClose, editMode, data, setters}
     const handleDelete = async () => {
         setProcessing(true);
         try {
-            const res = await fetch(`http://localhost:3000/api/nomina/${data.idNomina}`, {
+            const res = await fetch(`https://sayaserver.onrender.com/api/nomina/${data.idNomina}`, {
                 method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function CreateNomina({ isOpen, onClose, editMode, data, setters}
         } else if (!editMode) {
 
             try {
-                const res = await fetch('http://localhost:3000/api/nomina', {
+                const res = await fetch('https://sayaserver.onrender.com/api/nomina', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export default function CreateNomina({ isOpen, onClose, editMode, data, setters}
         } else if (editMode) {
 
             try {
-                const res = await fetch(`http://localhost:3000/api/nomina/${data.idNomina}`, {
+                const res = await fetch(`https://sayaserver.onrender.com/api/nomina/${data.idNomina}`, {
                     method: 'PUT',
                     headers: {
                         "Content-Type": "application/json",

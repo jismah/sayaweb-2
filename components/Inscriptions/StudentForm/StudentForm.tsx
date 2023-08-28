@@ -116,6 +116,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
     
         const requestBody = {
             student: {
@@ -309,18 +310,20 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
     //Manejo de listado de padres
         const handleAddParent = () => {
-            if(editingParentIndex !== null){
-                const updatedParentList = [...parentList];
-                updatedParentList[editingParentIndex] = dataParentLocal;
-                setParentList(updatedParentList);
-                setEditingParentIndex(null); //Finalizar la edición
-            }else{
-                //Agregar padre a la lista
-                setParentList([...parentList, dataParentLocal]);
+            // Agregar padre a la lista sin limpiar los campos del form
+            setParentList([...parentList, dataParentLocal]);
+        }
+        
+        const handleAddParentAndClear = () => {
+            const isDuplicate = parentList.some(parent => parent.identityCard === dataParentLocal.identityCard);
+        
+            if (isDuplicate) {
+                console.log("Este padre ya ha sido agregado.");
+            } else {
+                // Agregar padre a la lista y limpiar los campos del form
+                handleAddParent();
+                setDataParentLocal(initialParentData);
             }
-
-            //Limpiar los campos del form:
-            setDataParentLocal(initialParentData);
         }
 
         const handleEditParent = (index: number) => {
@@ -335,20 +338,26 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
             setParentList(updatedList);
         };
 
+
+
+    
+
     //Manejo de listado de tutores
         const handleAddTutor = () => {
-            if(editingTutorIndex !== null){
-                const updatedTutorList = [...tutorList];
-                updatedTutorList[editingTutorIndex] = dataTutor;
-                setTutorList(updatedTutorList);
-                setEditingTutorIndex(null); //Finalizar la edición
-            }else{
-                //Agregar padre a la lista
-                setTutorList([...tutorList, dataTutor]);
+            // Agregar tutor a la lista sin limpiar los campos del form
+            setTutorList([...tutorList, dataTutor]);
+        }
+        
+        const handleAddTutorAndClear = () => {
+            const isDuplicate = tutorList.some(tutor => tutor.idStudent === dataTutor.idStudent);
+        
+            if (isDuplicate) {
+                console.log("Este tutor ya ha sido agregado.");
+            } else {
+                // Agregar tutor a la lista y limpiar los campos del form
+                handleAddTutor();
+                setDataTutor(initialTutorData);
             }
-
-            //Limpiar los campos del form:
-            setDataTutor(initialTutorData);
         }
 
         const handleEditTutor = (index: number) => {
@@ -365,18 +374,20 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
     //Manejo de listado de contactos de emergencia
         const handleAddEmergencyContact = () => {
-            if(editingEmergencyContactIndex !== null){
-                const updatedEmergencyContactList = [...emergencyContactList];
-                updatedEmergencyContactList[editingEmergencyContactIndex] = dataEmergencyContact;
-                setEmergencyContactList(updatedEmergencyContactList);
-                setEditingEmergencyContactIndex(null); //Finalizar la edición
-            }else{
-                //Agregar padre a la lista
-                setEmergencyContactList([...emergencyContactList, dataEmergencyContact]);
+            // Agregar contacto de emergencia a la lista sin limpiar los campos del form
+            setEmergencyContactList([...emergencyContactList, dataEmergencyContact]);
+        }
+        
+        const handleAddEmergencyContactAndClear = () => {
+            const isDuplicate = emergencyContactList.some(contact => contact.idStudent === dataEmergencyContact.idStudent);
+        
+            if (isDuplicate) {
+                console.log("Este contacto de emergencia ya ha sido agregado.");
+            } else {
+                // Agregar contacto de emergencia a la lista y limpiar los campos del form
+                handleAddEmergencyContact();
+                setDataEmergencyContact(initialEmergencyContactData);
             }
-
-            //Limpiar los campos del form:
-            setDataEmergencyContact(initialEmergencyContactData);
         }
 
         const handleEditEmergencyContact = (index: number) => {
@@ -520,8 +531,13 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
                                                     </FormControl>
                                                 </SimpleGrid>
 
-                                                <Button onClick={handleAddParent} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                
+                                                <Button onClick={handleAddParent} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3} mr={3}>
                                                     Agregar Padre
+                                                </Button>
+
+                                                <Button onClick={handleAddParentAndClear} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                    Entrar nuevo padre
                                                 </Button>
 
                                                 <Box pt={4}>
@@ -595,8 +611,12 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
                                                 </FormControl>
 
 
-                                                <Button onClick={handleAddTutor} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                <Button onClick={handleAddTutor} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3} mr={3}>
                                                     Agregar Tutor
+                                                </Button>
+
+                                                <Button onClick={handleAddTutorAndClear} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3} >
+                                                    Entrar nuevo tutor
                                                 </Button>
 
                                                 <Box pt={4}>
@@ -656,8 +676,12 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
                                                     <Input type="tel" placeholder='(000)-000-0000' value={dataEmergencyContact.phone || ""} onChange={(e) => setDataEmergencyContact({ ...dataEmergencyContact, phone: e.target.value })} />
                                                 </FormControl>
 
-                                                <Button onClick={handleAddEmergencyContact} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                <Button onClick={handleAddEmergencyContact} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3} mr={3}>
                                                     Agregar Contacto de Emergencia
+                                                </Button>
+
+                                                <Button onClick={handleAddEmergencyContactAndClear} size='sm' leftIcon={<AddIcon />} variant={'solid'} color={'teal'} mt={3}>
+                                                    Entrar nuevo Contacto de Emergencia
                                                 </Button>
 
                                                 <Box pt={4}>
