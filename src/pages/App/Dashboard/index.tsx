@@ -79,7 +79,7 @@ const Dashboard: NextPage = () => {
 
     /* FETCH PARA CHART ESTUDIANTES POR PROGRAMAS */
     const fetchStudentsPerPrograms = async () => {
-        await fetch('https://sayaserver.onrender.com/api/graphs/studentPrograms?cant=3', {
+        await fetch('https://sayaserver.onrender.com/api/graphs/studentPrograms?cant=2', {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
