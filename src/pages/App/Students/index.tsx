@@ -33,10 +33,10 @@ const Student: NextPage = () => {
             <Students familyStudents={familySiblings} dataFamily={dataFamily} familyMode={false} enableEditing={true} programMode={false}/>
             {/* <Students dataFamily={dataFamily} familyMode={false} enableEditing={true}/> */}
                 
-            <Tutors/>
+            {/* <Tutors/>
             <EmergencyContacts/>
             <Pediatrician/>
-            <Cities/>
+            <Cities/> */}
 
         </>
     )

@@ -51,9 +51,18 @@ const Navbar: React.FC = () => {
 
 
                             <HStack as="nav" spacing="1">
-                                <Button as={NextLink} colorScheme='teal' variant='ghost' href='/App/Students' size={'sm'}>
-                                    Estudiantes
-                                </Button>
+                                <Menu>
+                                    <MenuButton as={Button} color={'teal'} variant='ghost' size={'sm'} rightIcon={<ChevronDownIcon />}>
+                                        Gestión Estudiantil
+                                    </MenuButton>
+                                    <MenuList>
+                                        <MenuItem as={NextLink} href='/App/Students'>Estudiantes</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Tutors'>Tutores</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/EmergencyContacts'>Contactos</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Pediatricians'>Pediatras</MenuItem>
+                                    </MenuList>
+                                </Menu>
+
 
                                 <Menu>
                                     <MenuButton as={Button} color={'teal'} variant='ghost' size={'sm'} rightIcon={<ChevronDownIcon />}>
@@ -73,7 +82,8 @@ const Navbar: React.FC = () => {
                                     </MenuButton>
                                     <MenuList>
                                         <MenuItem as={NextLink} href='/App/RRHH'>Empleados</MenuItem>
-                                        <MenuItem as={NextLink} href='/App/FinancialManager'>Gestor Financiero</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Nomina'>Gestor Financiero y Nómina</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Users'>Usuarios</MenuItem>
                                     </MenuList>
                                 </Menu>
                             </HStack>
@@ -82,10 +92,6 @@ const Navbar: React.FC = () => {
 
                     <Flex alignItems={'center'}>
                         <Stack direction={'row'} spacing={4}>
-
-                            {/* <Button variant={'ghost'} onClick={toggleColorMode}>
-                                {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-                            </Button> */}
                             <Menu>
                                 <MenuButton
                                     as={Button}
@@ -99,6 +105,7 @@ const Navbar: React.FC = () => {
                                     />
                                 </MenuButton>
                                 <MenuList alignItems={'center'}>
+                                    <MenuItem>Configuración</MenuItem>
                                     <MenuItem onClick={() => handleSignOut()}>Cerrar Sesión</MenuItem>
                                 </MenuList>
                             </Menu>
