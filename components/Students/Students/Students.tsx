@@ -38,7 +38,7 @@ import { Evaluation } from '../../StudentProgram/Evaluations/Evaluations';
 import { Program } from '../../StudentProgram/Programs/Programs';
 
 
-export default function Students({familyStudents, dataFamily, familyMode, enableEditing} : {familyStudents : Student[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean}) {
+export default function Students({familyStudents, dataFamily, familyMode, programMode, enableEditing} : {familyStudents : Student[]; dataFamily : Family; familyMode: boolean; enableEditing : boolean; programMode: boolean}) {
   
   
   const getInitialStudentData = () => {
@@ -96,7 +96,7 @@ export default function Students({familyStudents, dataFamily, familyMode, enable
   const fetchData = async () => {
     setLoading(true); 
     
-    if (familyMode){
+    if (familyMode || programMode){
       setDataStudents(familyStudents);
       setLoading(false);
     } else {

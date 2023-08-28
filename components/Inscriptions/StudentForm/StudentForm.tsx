@@ -555,6 +555,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
                                                     <FormControl isRequired>
                                                         <FormLabel>Título de la familia</FormLabel>
                                                         <Input type="text" placeholder="Título de la familia" ></Input>
+                                                        <Input placeholder='Nombre'  />
                                                     </FormControl>
                                                     <FormControl isRequired>
                                                         <FormLabel>Correo electrónico</FormLabel>
@@ -707,10 +708,10 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
                                                 <FormControl>
                                                     <FormLabel>Institución médica</FormLabel>
-                                                    <Input type="text" list="lista-medical-institution" placeholder="Escriba la institución médica"
+                                                    <Input type="text" list="list-medical-institution" placeholder="Escriba la institución médica"
                                                     value={dataPediatrician?.medicalInstitution || ""}
                                                     onChange={(e) => setDataPediatrician({ ...dataPediatrician, medicalInstitution: e.target.value })} />
-                                                    <datalist id="lista-medical-institution">
+                                                    <datalist id="list-medical-institution">
                                                         <option value="HOMS"></option>
                                                         <option value="Unión Médica"></option>
                                                         <option value="Instituto Materno Infantil"></option>

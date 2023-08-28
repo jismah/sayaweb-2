@@ -40,44 +40,9 @@ export default function Shifts(){
     const [dataShift, setDataShift] = useState<Shift>(initialShiftData);
     const [dataShifts, setDataShifts] = useState<Shift[]>([]);
 
-    const initialAcademicYearData : AcademicYear = {
-        id: "",
-        startTime: "",
-        endTime: "",
-    };
-    const [dataAcademicYear, setDataAcademicYear] = useState<AcademicYear>(initialAcademicYearData);
+    //Relaciones con otras tablas: 
     const [dataAcademicYears, setDataAcademicYears] = useState<AcademicYear[]>([]);
-
-    const initialWeekDayData : WeekDay = {
-        id: "",
-        name: "",
-    };
-    const [dataWeekDay, setDataWeekDay] = useState<WeekDay>(initialWeekDayData);
-    const [dataWeekDays, setDataWeekDays] = useState<WeekDay[]>([]);
-
-    
-    const initialStaffData : Staff = {
-        id: "",
-        name: "",
-        lastName1: "",
-        lastName2: "",
-        phone: "",
-        salary: 0,
-        position: "",
-        address: "",
-        email: "",
-        dateBirth: "",
-        dateStart: "",
-        dateFinish: "",
-        status: false,
-        cedula: "",
-        bankAccount: "",
-        AccountType: "",
-        currency: "",
-        bankRoute: "",
-        idCity: "",
-    };
-    const [dataStaff, setDataStaff] = useState<Staff>(initialStaffData);
+    const [dataWeekDays, setDataWeekDays] = useState<WeekDay[]>([]);    
     const [dataStaffs, setDataStaffs] = useState<Staff[]>([]);
 
     const [selectedWeekDayId, setSelectedWeekDayId] = useState<string | undefined>(dataShift.idWeekDay);

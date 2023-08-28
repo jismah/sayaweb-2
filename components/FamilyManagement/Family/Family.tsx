@@ -428,7 +428,7 @@ export default function Family() {
                             <Box pt={4}>
 
                               {/* <Students familyStudents={dataFamily.students} familyMode={true} enableEditing={enableEditing}/> */}
-                              <Students familyStudents={dataFamily.students} dataFamily={dataFamily} familyMode={true} enableEditing={enableEditing}/>
+                              <Students familyStudents={dataFamily.students} dataFamily={dataFamily} familyMode={true} enableEditing={enableEditing} programMode={false}/>
 
                             </Box>
                           )
