@@ -125,13 +125,14 @@ const Dashboard: NextPage = () => {
 
     useEffect(() => {
         if (user) {
+            fetchKPIs();
+            fetchStudentsPerPrograms();
+            fetchNomina();
+            fetchListInscriptions();
+        } else {
             router.push('/Auth/Login');
         }
-
-        fetchKPIs();
-        fetchStudentsPerPrograms();
-        fetchNomina();
-        fetchListInscriptions();
+       
     }, [user]);
 
     return (

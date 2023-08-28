@@ -44,9 +44,11 @@ const RRHH: NextPage = () => {
 
     useEffect(() => {
         if (user) {
+            fetchListStaff();
+        } else {
             router.push('/Auth/Login');
         }
-        fetchListStaff();
+
     });
 
     return (
@@ -90,7 +92,7 @@ const RRHH: NextPage = () => {
                                         <TableCell>{item.position}</TableCell>
                                         <TableCell>RD$ {item.salary}</TableCell>
                                         <TableCell>{item.phone}</TableCell>
-                                        
+
                                         <TableCell className="text-right">
                                             <Button size="xs" variant="secondary" color="teal">
                                                 Ver Detalles

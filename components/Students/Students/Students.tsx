@@ -324,10 +324,10 @@ export default function Students({ familyStudents, dataFamily, familyMode, progr
 
   useEffect(() => {
     if (user) {
+      fetchData();
+    } else {
       router.push('/Auth/Login');
     }
-    
-    fetchData();
   }, [currentPage]);
 
   return (
