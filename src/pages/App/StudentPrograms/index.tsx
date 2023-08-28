@@ -8,6 +8,7 @@ import { useState } from 'react';
 const Program: NextPage = () => {
     const [dataObjectives, setDataObjectives] = useState<Objective[]>([]);
     const [dataEvaluations, setDataEvaluations] = useState<Evaluation[]>([]);
+    const [dataProgamId, setDataProgramId] = useState<string>("");
     
     return (
         <>

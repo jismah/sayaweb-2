@@ -126,6 +126,8 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
       });
       const json = await res.json();
 
+      setDataParent(initialParentData);
+
       toast({
         title: 'Registro Creado!',
         description: "Se creo el registro correctamente.",

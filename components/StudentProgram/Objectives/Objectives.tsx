@@ -24,19 +24,14 @@ import { Program } from "../Programs/Programs";
   
 export default function Objectives({dataObjectives, programMode} : {dataObjectives: Objective[], programMode : boolean}){
 
-    const getInitialObjective = () => {
-        const initialData: Objective = {
-            id: "",
-            title: "",
-            mark: "",
-            idProgram: "", // Initialize idFamily conditionally
-            idEvaluation: "",
-        };
-        return initialData;
-      };
 
-    const initialObjectiveData = getInitialObjective();
-
+    const initialObjectiveData : Objective = {
+        id: "",
+        title: "",
+        mark: "",
+        idProgram: "", // Initialize idFamily conditionally
+        idEvaluation: "",
+    };
 
     const [dataObjective, setDataObjective] = useState<Objective>(initialObjectiveData);
     const [dataObjectivesLocal, setDataObjectivesLocal] = useState<Objective[]>([]);
@@ -73,27 +68,27 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             setDataObjectivesLocal(dataObjectives);
             setLoading(false);
         }else{
-         try{
-            const res = await fetch(`http://localhost:3000/api/objetives?page=${currentPage}&pageSize=${pageSize}`, {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": "123456",
-            },
-            });
-            const json = await res.json();
-            console.log(json);
-        
-            setDataObjectivesLocal(json.response); // ACTUALIZAR EL ESTADO
-            setTotalRecords(json.total); // Establecer el total de registros
-            setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
+            try{
+                const res = await fetch(`http://localhost:3000/api/objetives?page=${currentPage}&pageSize=${pageSize}`, {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "123456",
+                },
+                });
+                const json = await res.json();
+                console.log(json);
             
-        } catch (error) {
-            console.error(error);
-            // MANEJO DE ERRORES
-            } finally {
-            setLoading(false); 
-            }
+                setDataObjectivesLocal(json.response); // ACTUALIZAR EL ESTADO
+                setTotalRecords(json.total); // Establecer el total de registros
+                setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas
+                
+            } catch (error) {
+                console.error(error);
+                // MANEJO DE ERRORES
+                } finally {
+                setLoading(false); 
+                }
         }
     };
 
@@ -104,7 +99,6 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         setEditMode(false);
         setShowMode(false);
 
-        fetchRelations();
 
         onOpen();
     };
@@ -115,9 +109,6 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             handleUpdateData()
             onClose()
         }else{
-            console.log('Crear objetivo:')
-            console.log(dataObjective)
-            console.log(selectedEvaluationId)
             const res = await fetch('http://localhost:3000/api/objetives/', {
                 method: 'POST',
                 headers: {
@@ -125,14 +116,17 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
                     "x-api-key": "123456",
                 },
                 body: JSON.stringify({
-                    title: dataObjective.title, 
-                    mark: dataObjective.mark,
-                    idProgram: programMode ? selectedProgramId : dataObjective.idProgram,
-                    idEvaluation: selectedEvaluationId,
+                    title: dataObjective.title.toString(), 
+                    mark: dataObjective.mark.toString(),
+                    idProgram: selectedProgramId?.toString(),
+                    idEvaluation: selectedEvaluationId?.toString(),
                 })
             });
             const json = await res.json();
             console.log(json);
+
+            setDataObjective(initialObjectiveData);
+            
 
             toast({
                 title: 'Registro Creado!',
@@ -152,13 +146,10 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
     // EDIT DATA
     const handleEditData = async (objectives: Objective) => {
-        const selectedObjective = dataObjectives.find(o => o.id === objectives.id)!;
+        const selectedObjective = dataObjectivesLocal.find(o => o.id === objectives.id)!;
         
         setDataObjective(selectedObjective);
         onOpen();
-
-        fetchRelations();
-
         
         setEditMode(true);
     };
@@ -171,11 +162,11 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
             "x-api-key": "123456",
         },
         body: JSON.stringify({
-            id: dataObjective.id,
-            title: dataObjective.title, 
-            mark: dataObjective.mark,
-            idProgram: dataObjective.idProgram,
-            idEvaluation: dataObjective.idEvaluation,
+            id: dataObjective.id.toString(),
+            title: dataObjective.title.toString(), 
+            mark: dataObjective.mark.toString(),
+            idProgram: dataObjective.idProgram.toString(),
+            idEvaluation: dataObjective.idEvaluation.toString(),
         })
         });
         const json = await res.json();
@@ -210,15 +201,11 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
     // SHOW DATA
     const handleShowData = async (objectives: Objective) => {
-        const selectedObjective = dataObjectives.find(o => o.id === objectives.id)!;
+        const selectedObjective = dataObjectivesLocal.find(o => o.id === objectives.id)!;
 
         setDataObjective(selectedObjective);
         setShowMode(true); // Cambiar a modo "mostrar"
-
-        fetchRelations();
         onOpen();
-
-        
     };
 
 
@@ -233,9 +220,24 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         fetchData();
     }, [currentPage]);
 
+    useEffect(() => {
+
+        fetchRelations();
+        
+    }, []);
+
+    useEffect(() => {
+
+        setSelectedEvaluationId(dataObjective.idEvaluation);
+        setSelectedProgramId(dataObjective.idProgram);
+        
+    }, [dataObjective.idEvaluation, dataObjective.idProgram]);
+
+
     const fetchRelations = async () => {
         setLoading(true);
         try {
+
             const responseEvaluations = await fetch(`http://localhost:3000/api/evaluations/${dataObjective.idEvaluation}`, {
                 method: 'GET',
                 headers: {
@@ -266,6 +268,7 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         }finally{
             setLoading(false);
         }
+        
     };
 
 
@@ -276,18 +279,9 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
                     <Heading as='h3' size='xl' id='Parents' >Objetivos</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
-                            <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
+                            {!programMode && <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nuevo objetivo
-                            </Button>
+                            </Button>}
                         </ButtonGroup>
                     </Box>
                 </Flex> 
@@ -348,18 +342,23 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
                                                 </FormControl>
 
 
-                                                {!programMode && (
-                                                    <FormControl isRequired>
+
+                                                <FormControl isRequired>
                                                     <FormLabel>Programa</FormLabel>
-                                                        <Select value={selectedProgramId} onChange={(e) => setSelectedProgramId(e.target.value)} placeholder='Seleccionar programa'>
-                                                            {dataPrograms.map(program => (
-                                                                <option key={program.id} value={program.id}>
-                                                                    {program.description}
-                                                                </option>
-                                                            ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                )}
+                                                    <Select
+                                                        value={selectedProgramId}
+                                                        onChange={(e) => setSelectedProgramId(e.target.value)}
+                                                        placeholder='Seleccionar programa'
+                                                    >
+                                                        {dataPrograms.map(program => (
+                                                            <option key={program.id} value={program.id}>
+                                                                {program.description}
+                                                            </option>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+
+                                                
                                                 
                                             </SimpleGrid>
                                             
@@ -403,6 +402,8 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
                                             <Th>ID</Th>
                                             <Th>Título</Th>
                                             <Th>Nota</Th>
+                                            <Th>Evaluación</Th>
+                                            <Th>Programa</Th>
                                             <Td>Acciones</Td>
                                         </Tr>
                                     </Thead>
@@ -414,13 +415,24 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
                                                     <Td>{objective.title}</Td>
                                                     <Td>{objective.mark}</Td>
                                                     <Td>
+                                                        {dataEvaluations.find(evaluation => evaluation.id === objective.idEvaluation)?.commment} {" "}
+                                                    </Td>
+                                                    <Td>
+                                                        {dataPrograms.find(program => program.id === objective.idProgram)?.description} {" "}
+                                                    </Td>
+                                                    <Td>
                                                         <ButtonGroup variant='ghost' spacing='1'>
                                                             <IconButton onClick={() => handleShowData(objective)}
                                                             colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleEditData(objective)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                            {!programMode && (
+                                                                <Box>
+                                                                    <IconButton onClick={() => handleEditData(objective)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(objective.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                                    <IconButton onClick={() => handleDeleteData(objective.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                                </Box>
+                                                            )}
+                                                            
                                                         </ButtonGroup>
                                                     </Td>
                                                 </Tr>

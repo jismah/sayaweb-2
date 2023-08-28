@@ -99,8 +99,6 @@ export default function Shifts(){
         setEditMode(false);
         setShowMode(false);
 
-        fetchSelects();
-
         onOpen();
     };
 
@@ -269,6 +267,20 @@ export default function Shifts(){
         fetchData();
     }, [currentPage]);
 
+    useEffect(() => {
+
+        fetchSelects();
+        
+    }, []);
+
+    
+    useEffect(() => {
+
+        setSelectedAcademicYearId(dataShift.idAcademicYear);
+        setSelectedStaffId(dataShift.idStaff);
+        setSelectedWeekDayId(dataShift.idWeekDay);
+        
+    }, [dataShift.idAcademicYear, dataShift.idStaff, dataShift.idWeekDay]);
 
     return (
         <>
@@ -277,15 +289,6 @@ export default function Shifts(){
                     <Heading as='h3' size='xl' id='Parents' >Tandas</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nueva tanda
                             </Button>
@@ -412,8 +415,10 @@ export default function Shifts(){
                                     <Thead>
                                         <Tr>
                                             <Th>ID</Th>
-                                            <Th>Hora inicial</Th>
-                                            <Th>Hora final</Th>
+                                            <Th>Horario</Th>
+                                            <Th>Día de la semana</Th>
+                                            <Th>Empleado</Th>
+                                            <Th>Año académico</Th>
                                         </Tr>
                                     </Thead>
                                     <Tbody>
@@ -421,8 +426,20 @@ export default function Shifts(){
                                             return (
                                                 <Tr key={shift.id}>
                                                     <Td>{shift.id}</Td>
-                                                    <Td>{shift.initialHour}</Td>
-                                                    <Td>{shift.finishHour}</Td>
+                                                    <Td>{shift.initialHour} - {shift.finishHour}</Td>
+                                                    <Td>
+                                                        {dataWeekDays.find(day => day.id === shift.idWeekDay)?.name} {" "}
+                                                    </Td>
+                                                    <Td>
+                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.name} {" "}
+                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName1} {" "}
+                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName2} {" "}
+                                                    </Td>
+                                                    <Td>
+                                                        {dataAcademicYears.find(year => year.id === shift.idAcademicYear)?.startTime} {" "}
+                                                        -
+                                                        {dataAcademicYears.find(year => year.id === shift.idAcademicYear)?.startTime} {" "}
+                                                    </Td>
                                                     <Td>
                                                         <ButtonGroup variant='ghost' spacing='1'>
                                                             <IconButton onClick={() => handleShowData(shift)}

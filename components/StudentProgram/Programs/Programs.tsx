@@ -65,8 +65,6 @@ export default function Programs(){
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
-
-
       
 
     // Lógica para crear el grupo (enviar los datos al servidor, etc.)
@@ -124,7 +122,7 @@ export default function Programs(){
                     "x-api-key": "123456",
                 },
                 body: JSON.stringify({
-                    description:  dataProgram.description,
+                    description:  dataProgram.description.toString(),
                     maxStudents: dataProgram.maxStudents.toString(),
                     inscription: dataProgram.inscription.toString(),
                     monthlyAmount: dataProgram.monthlyAmount.toString(),
@@ -170,8 +168,8 @@ export default function Programs(){
             "x-api-key": "123456",
         },
         body: JSON.stringify({
-            id: dataProgram.id,
-            description:  dataProgram.description,
+            id: dataProgram.id.toString(),
+            description:  dataProgram.description.toString(),
             maxStudents: dataProgram.maxStudents.toString(),
             inscription: dataProgram.inscription.toString(),
             monthlyAmount: dataProgram.monthlyAmount.toString(),
@@ -234,16 +232,9 @@ export default function Programs(){
         if (dataProgram.id) {
             fetchRelations(); 
         }
-    }, [dataProgram.id]);
+    }, [dataProgram]);
 
     const fetchRelations = async () => {
-        console.log("fetchRelations - dataProgram.id:", dataProgram.id);
-        
-        if(!dataProgram.id){
-            console.log("fetchRelations - No dataProgram.id, returning...");
-            return;
-        }
-
         setLoading(true);
         try {
             const response = await fetch(`http://localhost:3000/api/programs/info/${dataProgram.id}`, {
@@ -259,14 +250,8 @@ export default function Programs(){
             if(json.response){
                 const {students, objectives} = json.response;
 
-                //Asignar el id del programa actual a los objetos
-                const objectivesWithIdProgram = objectives.map((objective : Objective) => ({
-                    ...objective,
-                    idProgram: dataProgram.id,
-                }));
-
                 setDataStudents(students); 
-                setDataObjectives(objectivesWithIdProgram);
+                setDataObjectives(objectives);
             }
 
         } catch (error) {
@@ -278,7 +263,7 @@ export default function Programs(){
     };
 
     console.log("dataProgram.id:", dataProgram.id);
-    console.log("dataObjectives:", dataObjectives);
+    //console.log("dataObjectives:", dataObjectives);
 
     return (
         <>
@@ -388,7 +373,7 @@ export default function Programs(){
 
 
                                             {/* Listado de objetivos */}
-                                            {dataProgram.id && <Objectives dataObjectives={dataObjectives} programMode={true} />}
+                                            {dataProgram.id && <Objectives dataObjectives={dataObjectives}  programMode={true} />}
                                         </Box>
                                     )}
 

@@ -609,7 +609,6 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
                                         <Th>Dirección</Th>
                                         <Th>Estado</Th>
                                         <Th>Fecha de nacimiento</Th>
-                                        <Th>Comentario</Th>
                                         <Th>Condición médica</Th>
                                         <Th>Progreso deseado</Th>
                                         <Th>Permiso para fotos</Th>
@@ -626,7 +625,6 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
                                                 <Td>{student.address}</Td>
                                                 <Td>{student.status}</Td>
                                                 <Td>{student.dateBirth}</Td>
-                                                <Td>{student.commentary}</Td>
                                                 <Td>{student.medicalCondition}</Td>
                                                 <Td>{student.progressDesired}</Td>
                                                 <Td>{student.allowedPictures ? "Permitido" : "No permitido"}</Td>

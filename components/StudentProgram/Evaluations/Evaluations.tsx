@@ -102,8 +102,6 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
         setEditMode(false);
         setShowMode(false);
 
-        fetchRelations();
-
         onOpen();
     };
 
@@ -147,12 +145,12 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
     // EDIT DATA
     const handleEditData = async (evaluation: Evaluation) => {
-        const selectedEvaluation = dataEvaluations.find(e => e.id === evaluation.id)!;
+        const selectedEvaluation = dataEvaluationsLocal.find(e => e.id === evaluation.id)!;
         
         setDataEvaluation(selectedEvaluation);
+        
         onOpen();
 
-        fetchRelations();
         
         setEditMode(true);
     };
@@ -203,13 +201,14 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
     // SHOW DATA
     const handleShowData = async (evaluation: Evaluation) => {
-        const selectedEvaluation = dataEvaluations.find(e => e.id === evaluation.id)!;
+        const selectedEvaluation = dataEvaluationsLocal.find(e => e.id === evaluation.id)!;
 
         setDataEvaluation(selectedEvaluation);
         setShowMode(true); // Cambiar a modo "mostrar"
+        
+        
         onOpen();
 
-        fetchRelations();
     };
 
 
@@ -223,6 +222,18 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
     useEffect(() => {
         fetchData();
     }, [currentPage]);
+
+    useEffect(() => {
+
+        fetchRelations();
+        
+    }, []);
+
+    useEffect(() => {
+
+        setSelectedStudentId(dataEvaluation.idStudent)
+        
+    }, [dataEvaluation.idStudent]);
 
     const fetchRelations = async () => {
         setLoading(true);
@@ -373,7 +384,13 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
                                                     <Td>{evaluation.id}</Td>
                                                     <Td>{evaluation.commment}</Td>
                                                     <Td>{evaluation.date}</Td>
-                                                    <Td>{evaluation.idStudent}</Td>
+                                                    <Td>
+                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.name} {" "}
+                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName1} {" "}
+                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName2} {" "}
+                                                    </Td>
+
+
                                                     <Td>
                                                         <ButtonGroup variant='ghost' spacing='1'>
                                                             <IconButton onClick={() => handleShowData(evaluation)}
