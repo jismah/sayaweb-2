@@ -14,7 +14,7 @@ type Staff = {
     salary: number;
     position: string;
     email: string;
-    identityNumber: string;
+    cedula: string;
     status: boolean;
 };
 
@@ -86,11 +86,11 @@ const RRHH: NextPage = () => {
                                 .map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>#{item.id}</TableCell>
-                                        <TableCell>{item.name}</TableCell>
-                                        <TableCell>{item.identityNumber}</TableCell>
+                                        <TableCell>{item.cedula}</TableCell>
+                                        <TableCell>{item.name} {item.lastName1}</TableCell>
                                         <TableCell>{item.email}</TableCell>
                                         <TableCell>{item.position}</TableCell>
-                                        <TableCell>RD$ {item.salary}</TableCell>
+                                        <TableCell>RD${item.salary.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                                         <TableCell>{item.phone}</TableCell>
 
                                         <TableCell className="text-right">
