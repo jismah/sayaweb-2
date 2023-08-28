@@ -326,7 +326,7 @@ export default function Students({familyStudents, dataFamily, familyMode, progra
   return (
       <>
           <Box px={3} py={3}>
-          <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
+          <Flex justifyContent={'space-between'} alignItems={'center'}>
             <Heading as='h3' size='xl' id='Parents' >Estudiantes</Heading>
               <Box display={enableEditing ? 'block' : 'none'}>
                 <ButtonGroup>

@@ -86,8 +86,6 @@ const Navbar: React.FC = () => {
                             {/* <Button variant={'ghost'} onClick={toggleColorMode}>
                                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
                             </Button> */}
-
-
                             <Menu>
                                 <MenuButton
                                     as={Button}
@@ -101,15 +99,9 @@ const Navbar: React.FC = () => {
                                     />
                                 </MenuButton>
                                 <MenuList alignItems={'center'}>
-                                    <MenuItem>Mi Cuenta</MenuItem>
                                     <MenuItem onClick={() => handleSignOut()}>Cerrar Sesión</MenuItem>
                                 </MenuList>
                             </Menu>
-
-
-                            {/* <Show breakpoint='(max-width: 860px)'>
-                                <MobileDrawer />
-                            </Show> */}
                         </Stack>
                     </Flex>
                 </Flex>
