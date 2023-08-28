@@ -28,16 +28,16 @@ interface Staff {
 }
 
 interface DetailData {
-  idNomina: number,
-  idStaff: number,
+  idNomina: string,
+  idStaff: string,
   date: string,
-  salary: number,
-  extraDays: number,
-  overtimePay: number,
-  sfs: number,
-  afp: number,
-  loans: number,
-  other: number,
+  salary: string,
+  extraDays: string,
+  overtimePay: string,
+  sfs: string,
+  afp: string,
+  loans: string,
+  other: string,
   total: number,
 }
 
@@ -354,16 +354,16 @@ export default function ListNomina({ idStaff, reload, reloadYear, setters }: {
                                                                 <IconButton colorScheme="blue" icon={<EditIcon />} aria-label="Editar"
                                                                 onClick={() => {
                                                                   setters.setDetailEditData({
-                                                                    idNomina: Number(idNomina),
-                                                                    idStaff: Number(idStaff),
+                                                                    idNomina: idNomina.toString(),
+                                                                    idStaff: idStaff.toString(),
                                                                     date: "",
-                                                                    salary: salary,
-                                                                    extraDays: extraDays,
-                                                                    overtimePay: overtimePay,
-                                                                    sfs: sfs,
-                                                                    afp: afp,
-                                                                    loans: loans,
-                                                                    other: other,
+                                                                    salary: salary.toString(),
+                                                                    extraDays: extraDays.toString(),
+                                                                    overtimePay: overtimePay.toString(),
+                                                                    sfs: sfs.toString(),
+                                                                    afp: afp.toString(),
+                                                                    loans: loans.toString(),
+                                                                    other: other.toString(),
                                                                     total: total,
                                                                   });
 

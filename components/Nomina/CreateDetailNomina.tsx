@@ -5,24 +5,24 @@ import { DateTime } from 'luxon';
 import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
 
 interface Data {
-    idNomina: number,
-    idStaff: number,
+    idNomina: string,
+    idStaff: string,
     date: string,
-    salary: number,
-    extraDays: number,
-    overtimePay: number,
-    sfs: number,
-    afp: number,
-    loans: number,
-    other: number,
+    salary: string,
+    extraDays: string,
+    overtimePay: string,
+    sfs: string,
+    afp: string,
+    loans: string,
+    other: string,
     total: number,
 }
 
 interface CreateNominaProps {
     isOpen: boolean;
     onClose: () => void;
-    id?: number;
-    staffId?: number;
+    id?: string;
+    staffId?: string;
     editMode: boolean;
     editData: Data;
     setters: {
@@ -62,33 +62,33 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     const [staffButtonDisable, setButtonDisable] = useState(false);
 
     const [data, setData] = useState({
-        idNomina: 0,
-        idStaff: 0,
+        idNomina: '0',
+        idStaff: '0',
         date: "",
-        salary: 0,
-        extraDays: 0,
-        overtimePay: 0,
-        sfs: 0,
-        afp: 0,
-        loans: 0,
-        other: 0,
+        salary: '0',
+        extraDays: '0',
+        overtimePay: '0',
+        sfs: '0',
+        afp: '0',
+        loans: '0',
+        other: '0',
         total: 0,
     });
 
     const handleLoadStaffData = () => {
-        const foundStaff = staff.find(staffMember => Number(staffMember.id) === data.idStaff);
+        const foundStaff = staff.find(staffMember => staffMember.id.toString() === data.idStaff);
         const salary = foundStaff?.salary;
 
-        setData(prevData => ({ ...prevData, salary: Number(salary) }))
+        setData(prevData => ({ ...prevData, salary: salary ? salary.toString() : '0' }))
     };
 
     const getStaffName = () => {
-        const foundStaff = staff.find(staffMember => Number(staffMember.id) === data.idStaff);
+        const foundStaff = staff.find(staffMember => staffMember.id.toString() === data.idStaff);
         return foundStaff?.name + " " + foundStaff?.lastName1
     };
 
     const getDate = () => {
-        const found = nominas.find(nomina => Number(nomina.id) === data.idNomina);
+        const found = nominas.find(nomina => nomina.id.toString() === data.idNomina);
         return found?.date ? found?.date : "";
     }
 
@@ -142,16 +142,16 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     useEffect(() => {
         if (!isOpen) {
             setData({
-                idNomina: 0,
-                idStaff: 0,
+                idNomina: '0',
+                idStaff: '0',
                 date: "",
-                salary: 0,
-                extraDays: 0,
-                overtimePay: 0,
-                sfs: 0,
-                afp: 0,
-                loans: 0,
-                other: 0,
+                salary: '0',
+                extraDays: '0',
+                overtimePay: '0',
+                sfs: '0',
+                afp: '0',
+                loans: '0',
+                other: '0',
                 total: 0,
             });
             setError('');
@@ -166,39 +166,41 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
                 setResetOnChange(false)
                 setData(editData);
             } else {
-                setData(prevData => ({ ...prevData, idNomina: Number(id), idStaff: Number(staffId) }));
+                setData(prevData => ({ ...prevData, idNomina: id ? id : '0', idStaff: staffId ? staffId : '0' }));
             }
         }
     }, [isOpen]);
 
     const checkLocking = () => {
-        const sfs = parseFloat((editData.salary * (3.04 / 100)).toFixed(2));
-        const afp = parseFloat((editData.salary * (2.78 / 100)).toFixed(2));
-        const overtimePay = parseFloat(((editData.salary / 23.83) * editData.extraDays).toFixed(2));
+        const sfs = parseFloat((parseFloat(editData.salary) * (3.04 / 100)).toFixed(2));
+        const afp = parseFloat((parseFloat(editData.salary) * (2.78 / 100)).toFixed(2));
+        const overtimePay = parseFloat(((parseFloat(editData.salary) / 23.83) * Number(editData.extraDays)).toFixed(2));
 
-        if (editData.sfs != sfs) {
+        
+        if (parseFloat(editData.sfs) != sfs) {
             return false
         }
-        if (editData.afp != afp) {
+        if (parseFloat(editData.afp) != afp) {
             return false
         }
-        if (editData.overtimePay != overtimePay) {
+        if (parseFloat(editData.overtimePay) != overtimePay) {
             return false
         }
+        
         return true;
     }
 
     useEffect(() => {
-        setButtonDisable((Number.isNaN(data.idStaff) || data.idStaff === 0));
+        setButtonDisable((Number.isNaN(data.idStaff) || Number(data.idStaff) === 0));
         if (resetOnChange) {
             setData(prevData => ({ ...prevData,
-                salary: 0,
-                extraDays: 0,
-                overtimePay: 0,
-                sfs: 0,
-                afp: 0,
-                loans: 0,
-                other: 0,
+                salary: '0',
+                extraDays: '0',
+                overtimePay: '0',
+                sfs: '0',
+                afp: '0',
+                loans: '0',
+                other: '0',
             }))
         } else {
             setResetOnChange(true);
@@ -212,8 +214,9 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     }, [data.salary, data.extraDays]);
 
     useEffect(() => {
+        const total = calculateTotal();
         setData(prevData => ({ ...prevData, 
-            total: calculateTotal()
+            total: Number.isNaN(total) ? 0 : total
         }))
     }, [data.salary, data.overtimePay, data.sfs, data.afp, data.loans, data.other]);
 
@@ -223,10 +226,12 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     };
 
     const updateLockedData = () => {
+        const salary = Number.isNaN(parseFloat(data.salary)) ? 0 : parseFloat(data.salary)
+        const extraDays = Number.isNaN(Number(data.extraDays)) ? 0 : Number(data.extraDays)
         setData(prevData => ({ ...prevData, 
-            sfs: parseFloat((data.salary * (3.04 / 100)).toFixed(2)),
-            afp: parseFloat((data.salary * (2.78 / 100)).toFixed(2)),
-            overtimePay: parseFloat(((data.salary / 23.83) * data.extraDays).toFixed(2)) 
+            sfs: (salary * (3.04 / 100)).toFixed(2),
+            afp: (salary * (2.78 / 100)).toFixed(2),
+            overtimePay: ((salary / 23.83) * extraDays).toFixed(2) 
         }))
     }
   
@@ -235,14 +240,14 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
         setError('');
         setProcessing(true)
 
-        if (Number.isNaN(data.idNomina) || data.idNomina === 0) {
+        if (Number.isNaN(data.idNomina) || Number(data.idNomina) === 0) {
             setError("Debe seleccionar una nomina para continuar");
-        } else if (Number.isNaN(data.idStaff) || data.idStaff === 0) {
+        } else if (Number.isNaN(data.idStaff) || Number(data.idStaff) === 0) {
             setError("Debe seleccionar una empleado para continuar");
         } else if (data.total < 0) {
             setError("El total no puede ser negativo");
         } else {
-            const found = nominas.find(nomina => Number(nomina.id) === data.idNomina);
+            const found = nominas.find(nomina => nomina.id.toString() === data.idNomina);
             const dateFound = found?.date ? found?.date : "";
 
             const stringifiedData = {
@@ -439,16 +444,16 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
     const handleExit = () => {
         setters.setEditMode(false);
         setters.setEditData({
-            idNomina: 0,
-            idStaff: 0,
+            idNomina: '0',
+            idStaff: '0',
             date: "",
-            salary: 0,
-            extraDays: 0,
-            overtimePay: 0,
-            sfs: 0,
-            afp: 0,
-            loans: 0,
-            other: 0,
+            salary: '0',
+            extraDays: '0',
+            overtimePay: '0',
+            sfs: '0',
+            afp: '0',
+            loans: '0',
+            other: '0',
             total: 0,
         })
     };
@@ -536,9 +541,11 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
                             <FormControl isDisabled={editMode}>
                                 <FormLabel>Nomina</FormLabel>
                                 <SearchSelect disabled={editMode} placeholder='Selecciona una nomina' value={data.idNomina}
-                                    onChange={(value) => setData(prevData => ({ ...prevData, idNomina: Number(value) }))}>
+                                    onChange={(value) => 
+                                        setData(prevData => ({ ...prevData, idNomina: value.toString() }))
+                                    }>
                                     {nominas.map(item => (
-                                        <SearchSelectItem key={item.id} value={item.id} >
+                                        <SearchSelectItem key={item.id.toString()} value={item.id.toString()} >
                                             <Box position={'relative'}>
                                                 <Text pl={'50px'}>{DateTime.fromISO(item.date)
                                                     .setLocale('es')
@@ -555,9 +562,9 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
                             <FormControl isDisabled={editMode}>
                                 <FormLabel>Empleado</FormLabel>
                                 <SearchSelect disabled={editMode} placeholder='Selecciona una empleado' value={data.idStaff}
-                                    onChange={(value) => setData(prevData => ({ ...prevData, idStaff: Number(value) }))}>
+                                    onChange={(value) => setData(prevData => ({ ...prevData, idStaff: value.toString() }))}>
                                     {staff.map(item => (
-                                        <SearchSelectItem key={item.id} value={item.id} >
+                                        <SearchSelectItem key={item.id.toString()} value={item.id.toString()}>
                                             <Box position={'relative'}>
                                                 <Text pl={'50px'}>{item.name} {item.lastName1} {item.lastName2}</Text>
                                                 <Text color={'#38b2ac'} fontSize='xs' position={'absolute'} left={0} top={0.4}>   ID: {item.id}</Text>
@@ -639,7 +646,8 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
                                 <FormControl>
                                     <FormLabel>Pago por horas extras</FormLabel>
                                     <NumberInput isReadOnly={locked} color={'#38b2ac'} min={0} precision={2} step={1} defaultValue={0}
-                                    value={data.overtimePay} onChange={(value) => setData({ ...data, overtimePay: value })}>
+                                    value={data.overtimePay} 
+                                    onChange={(value) => setData({ ...data, overtimePay: value })}>
                                         <NumberInputField />
                                         <NumberInputStepper display={locked ? 'none': 'flex'}>
                                             <NumberIncrementStepper color={'#38b2ac'} />
@@ -684,7 +692,7 @@ export default function CreateNomina({ isOpen, onClose, id, staffId, editMode, e
                         
                         {/* Submit and Delete Buttons */}
                         <Box display={'flex'} flexDirection={'row'} gap={3} mt={4} alignItems={'center'}>
-                        
+
                         <Button isDisabled={loading || !connected || processing } type="submit" colorScheme="teal">{editMode ? 'Editar' : 'Crear'}</Button>
                        
                         {editMode && (

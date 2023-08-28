@@ -23,17 +23,17 @@ const Nominas: NextPage = () => {
 
     const [detailEditMode, setDetailEditMode] = useState(false);
     const [detailEditData, setDetailEditData] = useState({
-        idNomina: 1,
-        idStaff: 2,
+        idNomina: '0',
+        idStaff: '0',
         date: "",
-        salary: 3,
-        extraDays: 4,
-        overtimePay: 5,
-        sfs: 6,
-        afp: 7,
-        loans: 8,
-        other: 9,
-        total: 10,
+        salary: '0',
+        extraDays: '0',
+        overtimePay: '0',
+        sfs: '0',
+        afp: '0',
+        loans: '0',
+        other: '0',
+        total: 0,
     });
 
     const [reloadComponents, setReloadComponents] = useState(false);
@@ -175,7 +175,7 @@ const Nominas: NextPage = () => {
 
                     {/* Create New Detail Nomina Modal */}
                     <CreateDetailNomina isOpen={isDetailOpen} onClose={closeDetail}  
-                    id={byId ? Number(displayId) : undefined} staffId={byStaff ? Number(displayStaff) : undefined}
+                    id={byId ? displayId.toString() : undefined} staffId={byStaff ? displayStaff.toString() : undefined}
                     editMode={detailEditMode} editData={detailEditData}
                     setters={{
                         reloadData: setReloadComponents,
