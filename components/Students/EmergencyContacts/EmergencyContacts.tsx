@@ -1,11 +1,4 @@
 
-export interface EmergencyContact{
-    id: string;
-    name: string;
-    phone: string;
-
-    idStudent: string;
-}
 
 
 import { Student } from "../../Students/Students/Students";
@@ -19,6 +12,14 @@ import { Select } from "@chakra-ui/react";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
+
+export interface EmergencyContact{
+    id: string;
+    name: string;
+    phone: string;
+
+    idStudent: string;
+}
   
   
 export default function EmergencyContacts(){

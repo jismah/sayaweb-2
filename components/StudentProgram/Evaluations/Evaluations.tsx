@@ -1,6 +1,3 @@
-import { Objective } from "../Objectives/Objectives";
-import { User } from "../../FamilyManagement/User/Users";
-import { Family } from "../../FamilyManagement/Family/Family";
 
 export interface Evaluation{
     id: string;
@@ -11,15 +8,13 @@ export interface Evaluation{
 }
 
 
-import Students, { Student } from "../../Students/Students/Students";
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
+import { Student } from "../../Students/Students/Students";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select } from "@chakra-ui/react";
 //MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
   
@@ -37,15 +32,6 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
     const [dataStudents, setDataStudents] = useState<Student[]>([]);
     const [selectedStudentId, setSelectedStudentId] = useState<string | undefined>(dataEvaluation.idStudent);
-
-    const [dataFamily, setDataFamily] = useState<Family>({
-        id: "",
-        name: "",
-        students: [],
-        parents: [],
-        user: {} as User,
-    });
-
 
     const [editMode, setEditMode] = useState(false);
     const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
@@ -221,13 +207,11 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
     useEffect(() => {
         fetchData();
-    }, [currentPage]);
-
-    useEffect(() => {
 
         fetchRelations();
+
         
-    }, []);
+    }, [currentPage]);
 
     useEffect(() => {
 

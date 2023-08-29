@@ -2,10 +2,7 @@
 
 import { AcademicYear } from "../../Campaments/AcademicYear/AcademicYear";
 
-export interface City{
-    id: string;
-    name: string;
-}
+
 
 
 import { Student } from "../../Students/Students/Students";
@@ -19,7 +16,11 @@ import { Select, SelectItem } from "@tremor/react";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
-  
+
+export interface City{
+    id: string;
+    name: string;
+}
   
 export default function Cities(){
 

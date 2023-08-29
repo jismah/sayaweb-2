@@ -1,9 +1,7 @@
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
-import { Student } from "../Students/Students";
-
-
-
-import { AcademicYear } from "../../Campaments/AcademicYear/AcademicYear";
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
 export interface Pediatrician{
     id: string;
@@ -12,18 +10,6 @@ export interface Pediatrician{
     officeNumber: string;
     phone: string;
 }
-
-
-
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select } from "@chakra-ui/react";
-//MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
   
   
@@ -52,8 +38,6 @@ export default function Pediatrician(){
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0); // Nuevo estado para el total de registros
 
-
-      
 
     // Lógica para crear el grupo (enviar los datos al servidor, etc.)
 

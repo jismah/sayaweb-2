@@ -1,6 +1,16 @@
 import { AcademicYear } from "../../Campaments/AcademicYear/AcademicYear";
 import { WeekDay } from "../WeekDays/WeekDays";
 
+import { Staff } from "../../StaffAdministrator/Staff/Staff";
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+
+//Select
+import { Select } from "@chakra-ui/react";
+//MultiSelect
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+
 export interface Shift{
     id: string;
     initialHour: string;
@@ -12,18 +22,6 @@ export interface Shift{
 
     idWeekDay: string;
 }
-
-
-import { Student } from "../../Students/Students/Students";
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select } from "@chakra-ui/react";
-//MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
   
   
@@ -265,13 +263,10 @@ export default function Shifts(){
 
     useEffect(() => {
         fetchData();
-    }, [currentPage]);
 
-    useEffect(() => {
-
-        fetchSelects();
         
-    }, []);
+        fetchSelects();
+    }, [currentPage]);
 
     
     useEffect(() => {

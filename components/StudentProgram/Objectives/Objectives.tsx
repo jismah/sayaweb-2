@@ -1,5 +1,18 @@
-import Evaluations, { Evaluation } from "../Evaluations/Evaluations";
+import { Evaluation } from "../Evaluations/Evaluations";
 
+
+
+
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+
+//Select
+import { Select } from "@chakra-ui/react";
+//MultiSelect
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { Program } from "../Programs/Programs";
+
+  
 export interface Objective{
     id: string;
     title: string;
@@ -8,19 +21,6 @@ export interface Objective{
     idProgram: string;
     idEvaluation: string;
 }
-
-
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select } from "@chakra-ui/react";
-//MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
-import { Program } from "../Programs/Programs";
-
-  
   
 export default function Objectives({dataObjectives, programMode} : {dataObjectives: Objective[], programMode : boolean}){
 
@@ -98,7 +98,6 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         setDataObjective(initialObjectiveData);
         setEditMode(false);
         setShowMode(false);
-
 
         onOpen();
     };
@@ -218,13 +217,10 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
     useEffect(() => {
         fetchData();
-    }, [currentPage]);
-
-    useEffect(() => {
 
         fetchRelations();
-        
-    }, []);
+    }, [currentPage]);
+
 
     useEffect(() => {
 

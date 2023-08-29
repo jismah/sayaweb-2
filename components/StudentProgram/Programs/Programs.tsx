@@ -1,10 +1,16 @@
 import Objectives, { Objective } from "../Objectives/Objectives";
 import { Family } from "../../FamilyManagement/Family/Family";
-import { Parent } from "../../Students/Parents/Parents";
 import { User } from "../../FamilyManagement/User/Users";
 
-import { AcademicYear } from "../../Campaments/AcademicYear/AcademicYear";
+import Students, { Student } from "../../Students/Students/Students";
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
+//Select
+//MultiSelect
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+  
 export interface Program{
     id: string;
     description: string;
@@ -14,20 +20,6 @@ export interface Program{
     status: boolean;
 }
 
-
-import Students, { Student } from "../../Students/Students/Students";
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select, SelectItem } from "@tremor/react";
-//MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
-
-  
-  
 export default function Programs(){
 
     const initialProgram : Program = {
@@ -226,13 +218,11 @@ export default function Programs(){
 
     useEffect(() => {
         fetchData();
-    }, [currentPage]);
 
-    useEffect(() => {
         if (dataProgram.id) {
             fetchRelations(); 
         }
-    }, [dataProgram]);
+    }, [currentPage, dataProgram]);
 
     const fetchRelations = async () => {
         setLoading(true);
@@ -347,7 +337,7 @@ export default function Programs(){
                                     </SimpleGrid>
 
                                     
-                                    {loading ? (
+                                    {editMode && loading ? (
                                         <Box pt={4}>
                                             <Card variant={'outline'}>
                                                 <CardBody>

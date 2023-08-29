@@ -1,7 +1,13 @@
 
+import { Student } from "../../Students/Students/Students";
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
+//Select
+import { Select } from "@chakra-ui/react";
+//MultiSelect
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
-import { AcademicYear } from "../../Campaments/AcademicYear/AcademicYear";
 
 export interface Tutor{
     id: string;
@@ -11,19 +17,6 @@ export interface Tutor{
 
     idStudent: string;
 }
-
-
-import { Student } from "../../Students/Students/Students";
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select } from "@chakra-ui/react";
-//MultiSelect
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
-
   
   
 export default function Tutors(){
@@ -214,13 +207,11 @@ export default function Tutors(){
 
     useEffect(() => {
         fetchData();
+
+        
+        fetchRelations();
     }, [currentPage]);
 
-    useEffect(() => {
-
-        fetchRelations();
-        
-    }, []);
 
     useEffect(() => {
 

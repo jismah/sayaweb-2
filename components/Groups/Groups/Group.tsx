@@ -142,7 +142,7 @@ export default function Groups(){
             };
     
             console.log(requestBody);
-            const resGroupsBulk = await fetch('https://sayaserver.onrender.com//api/groups/bulk', {
+            const resGroupsBulk = await fetch('https://sayaserver.onrender.com/api/groups/bulk', {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export default function Groups(){
 
         //Petición para obtener los demás cabeceras de la familia
         try{
-        const response = await fetch(`https://sayaserver.onrender.com//api/groups/info`, {
+        const response = await fetch(`https://sayaserver.onrender.com/api/groups/info`, {
             method: 'GET',
             headers: {
             "Content-Type": "application/json",
@@ -273,13 +273,9 @@ export default function Groups(){
 
     useEffect(() => {
         fetchData();
-    }, [currentPage]);
 
-
-    useEffect(() => {
         loadGroupInformation();
-    }, []);
-
+    }, [currentPage]);
     
 
 
@@ -290,15 +286,6 @@ export default function Groups(){
                     <Heading as='h3' size='xl' id='Parents' >Grupos</Heading>
                     <Box>
                         <ButtonGroup>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #4
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #3
-                            </Button>
-                            <Button size='sm' variant={'ghost'}>
-                                Button #2
-                            </Button>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
                                 Nuevo Grupo
                             </Button>
@@ -351,9 +338,9 @@ export default function Groups(){
                                                     <Heading as='h3' size='md' id='professors' >Profesores</Heading>
                                                     <MultiSelect value={valueProfessors} onValueChange={setValueProfessors}>
                                                     {dataProfessors.map((professor) => (
-                                                        <SelectItem key={professor.id} value={professor.id}>
+                                                        <MultiSelectItem key={professor.id} value={professor.id}>
                                                         {professor.staff.name} {professor.staff.lastName1} {professor.staff.lastName2}
-                                                        </SelectItem>
+                                                        </MultiSelectItem>
                                                     ))}
                                                     </MultiSelect>
                                                 </Box>
@@ -363,9 +350,9 @@ export default function Groups(){
                                                     <Heading as='h3' size='md' id='students'>Estudiantes</Heading>
                                                     <MultiSelect value={valueStudents} onValueChange={setValueStudents}  >
                                                     {dataStudents.map((student) => (
-                                                        <SelectItem key={student.id} value={student.id}  >
+                                                        <MultiSelectItem key={student.id} value={student.id}  >
                                                         {student.name} {student.lastName1} {student.lastName2}
-                                                        </SelectItem>
+                                                        </MultiSelectItem>
                                                     ))}
                                                     </MultiSelect>
                                                 </Box>

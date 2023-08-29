@@ -1,9 +1,6 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon } from '@chakra-ui/icons';
-import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid, Container } from '@chakra-ui/react';
-import { FaceSmileIcon } from '@heroicons/react/24/solid';
+import { AddIcon, DeleteIcon, ViewIcon, EditIcon } from '@chakra-ui/icons';
+import { TableContainer, Table, Thead, Tr, Th, Tbody, Td, Box, Button, Flex, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, SimpleGrid } from '@chakra-ui/react';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
-import { NextPage } from 'next';
-import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import Parents from '../../Students/Parents/Parents';
 import _ from 'lodash';
@@ -62,17 +59,6 @@ export default function Family() {
     idFamily: "",
   };
 
-  const initialParentData: Parent = {
-    id: "",
-    identityCard: "",
-    name: "",
-    lastName1: "",
-    lastName2: "",
-    telephone: "",
-    email: "",
-    occupation: "",
-    idFamily: "",
-  };
 
   const initialFamilyData: Family = {
     id: "",
@@ -91,14 +77,6 @@ export default function Family() {
   const [enableEditing, setEnableEditing] = useState(false);
   const [showMode, setShowMode] = useState(false); // Estado para controlar el modo "mostrar"
   const [loading, setLoading] = useState(false);
-
-  //const [dataParent, setDataParent] = useState<Parent>(initialParentData);
-  //const [dataStudent, setDataStudent] = useState<Student>(initialStudentData);
-
-
-  //const [familyUser, setFamilyUser] = useState<User>(initialUserData);
-  //const [familyStudents, setFamilyStudents] = useState<Student[]>([]);
-  //const [familyParents, setFamilyParents] = useState<Parent[]>([]);
 
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -328,8 +306,6 @@ export default function Family() {
                   <Stack spacing={4}>
                     {
                       !(showMode || editMode) && (
-                        // <StudentForm dataParents={familyParents} dataStudent={dataStudent} editingMode={false}/>
-                        // <StudentForm dataFamilies={dataFamilies} editingMode={false}/>
                         <StudentForm dataParents={dataFamily.parents} dataStudent={initialStudentData} editingMode={false} createStudentWithFamily={false} />
                       )
                     }
@@ -420,8 +396,7 @@ export default function Family() {
                         </Box>
                       ) : (
                         <Box pt={4}>
-
-                          {/* <Students familyStudents={dataFamily.students} familyMode={true} enableEditing={enableEditing}/> */}
+                          
                           <Students familyStudents={dataFamily.students} dataFamily={dataFamily} familyMode={true} enableEditing={enableEditing} programMode={false} />
 
                         </Box>

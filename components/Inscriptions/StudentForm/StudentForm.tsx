@@ -7,8 +7,6 @@ import { Student } from '../../Students/Students/Students';
   
 import { Parent } from '../../Students/Parents/Parents';
 
-import { Family } from "../../FamilyManagement/Family/Family";
-
 import { Pediatrician } from "../../Students/Pediatricians/Pediatricians";
 import { EmergencyContact } from "../../Students/EmergencyContacts/EmergencyContacts";
 import { Tutor } from "../../Students/Tutors/Tutor";
@@ -106,7 +104,6 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
     const [dataParentLocal, setDataParentLocal] = useState<Parent>(initialParentData);
     const [dataEmergencyContact, setDataEmergencyContact] = useState<EmergencyContact>(initialEmergencyContactData);
     const [dataTutor, setDataTutor] = useState<Tutor>(initialTutorData);
-    const [dataCity, setDataCity] = useState<City>(initialCityData);
     const [dataPediatrician, setDataPediatrician] = useState<Pediatrician>(initialPediatricianData);
     
 
@@ -268,12 +265,7 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
             fetchStudentsRelations();
         }
         fetchSelects();
-        
-    }, [editingMode]);
-    
-    //Llenar las listas locales de las relaciones del estudiante seleccionado 
-    useEffect(() => {
-        
+
         if(editingMode){
             if (dataParents.length > 0) {
                 setDataParentLocal(dataParents[0]);
@@ -304,8 +296,8 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
             }
         }
         
-    }, [dataParents, dataTutors, dataEmergencyContacts, dataStudentLocal.idCity, dataStudentLocal.idProgram]);
-    
+        
+    }, [editingMode, dataParents, dataTutors, dataEmergencyContacts, dataStudentLocal.idCity, dataStudentLocal.idProgram]);
    
 
     //Manejo de listado de padres
