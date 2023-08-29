@@ -281,7 +281,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
   return (
       <>
           <Box px={3} py={3}>
-          <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
+          <Flex justifyContent={'space-between'} alignItems={'center'}>
             <Box display={enableEditing ? 'block' : 'none'}>
               <ButtonGroup>
                   <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>

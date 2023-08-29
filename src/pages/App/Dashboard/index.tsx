@@ -1,11 +1,12 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { Grid, Card, Metric, Icon, Text, Button, Title, BarChart, AreaChart, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } from '@tremor/react';
 import { NextPage } from 'next';
-import { AcademicCapIcon, MapIcon, UserGroupIcon, ArrowRightCircleIcon, EyeIcon } from "@heroicons/react/24/solid";
+import { AcademicCapIcon, MapIcon, UserGroupIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from 'react';
 import router from 'next/router';
 import { useUser } from '@supabase/auth-helpers-react'
 import Link from 'next/link';
+import { DateTime } from 'luxon';
 
 
 interface ChartDataNomina {
@@ -132,7 +133,7 @@ const Dashboard: NextPage = () => {
         } else {
             router.push('/Auth/Login');
         }
-       
+
     }, [user]);
 
     return (
@@ -222,7 +223,12 @@ const Dashboard: NextPage = () => {
                                             <Text>{item.name} {item.lastname1} {item.lastname2}</Text>
                                         </TableCell>
                                         <TableCell>
-                                            <Text>{item.dateBirth}</Text>
+                                            <Text>
+                                                {DateTime.fromISO(item.dateBirth)
+                                                    .setLocale('es')
+                                                    .toFormat('MMMM dd, yyyy')
+                                                    .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                            </Text>
                                         </TableCell>
                                         <TableCell>
                                             <Text>{item.address}</Text>

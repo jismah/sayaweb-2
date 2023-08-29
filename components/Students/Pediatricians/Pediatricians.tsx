@@ -207,7 +207,7 @@ export default function Pediatrician(){
     return (
         <>
             <Box px={3} py={3}>
-                <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
+                <Flex justifyContent={'space-between'} alignItems={'center'}>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>

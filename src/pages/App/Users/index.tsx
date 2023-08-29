@@ -1,9 +1,7 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { PlusIcon } from "@heroicons/react/20/solid";
-import { useUser } from "@supabase/auth-helpers-react";
-import { Card, Title, Table, Grid, Col, DeltaType, BadgeDelta, MultiSelect, MultiSelectItem, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Button } from "@tremor/react";
+import { Card, Table, MultiSelect, MultiSelectItem, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Button } from "@tremor/react";
 import { NextPage } from "next";
-import router from "next/router";
 import { useEffect, useState } from "react";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 

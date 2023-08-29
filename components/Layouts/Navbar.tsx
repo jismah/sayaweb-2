@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack, Show, Hide } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack } from "@chakra-ui/react";
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import Image from 'next/image'
 
