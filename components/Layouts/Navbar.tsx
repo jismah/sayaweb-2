@@ -85,6 +85,7 @@ const Navbar: React.FC = () => {
                                         <MenuItem as={NextLink} href='/App/RRHH'>Empleados</MenuItem>
                                         <MenuItem as={NextLink} href='/App/Nomina'>Gestor Financiero y Nómina</MenuItem>
                                         <MenuItem as={NextLink} href='/App/Users'>Usuarios</MenuItem>
+                                        <MenuItem as={NextLink} href='/App/Recibos'>Recibos</MenuItem>
                                     </MenuList>
                                 </Menu>
                             </HStack>
