@@ -128,6 +128,8 @@ export default function Programs(){
             const json = await res.json();
             console.log(json);
 
+            setDataProgram(initialProgram);
+
             toast({
                 title: 'Registro Creado!',
                 description: "Se creo el registro correctamente.",

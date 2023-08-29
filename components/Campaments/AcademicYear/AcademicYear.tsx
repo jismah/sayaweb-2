@@ -104,6 +104,8 @@ export default function AcademicYears(){
             const json = await res.json();
             console.log(json);
 
+            setDataAcademicYear(initialAcademicYearData);
+
             toast({
                 title: 'Registro Creado!',
                 description: "Se creo el registro correctamente.",

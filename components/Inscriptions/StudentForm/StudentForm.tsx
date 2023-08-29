@@ -302,16 +302,19 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
     //Manejo de listado de padres
         const handleAddParent = () => {
-            // Agregar padre a la lista sin limpiar los campos del form
-            setParentList([...parentList, dataParentLocal]);
+            if (dataParentLocal.identityCard && dataParentLocal.name && dataParentLocal.telephone) {
+                const isDuplicate = parentList.some(parent => parent.identityCard === dataParentLocal.identityCard);
+        
+                if (!isDuplicate) {
+                    // Agregar padre a la lista sin limpiar los campos del form
+                    setParentList([...parentList, dataParentLocal]);
+                }
+                
+            } 
         }
         
         const handleAddParentAndClear = () => {
-            const isDuplicate = parentList.some(parent => parent.identityCard === dataParentLocal.identityCard);
-        
-            if (isDuplicate) {
-                console.log("Este padre ya ha sido agregado.");
-            } else {
+            if (dataParentLocal.identityCard && dataParentLocal.name && dataParentLocal.telephone) {
                 // Agregar padre a la lista y limpiar los campos del form
                 handleAddParent();
                 setDataParentLocal(initialParentData);
@@ -332,24 +335,24 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
 
 
-    
-
     //Manejo de listado de tutores
         const handleAddTutor = () => {
-            // Agregar tutor a la lista sin limpiar los campos del form
-            setTutorList([...tutorList, dataTutor]);
+            if (dataTutor.name && dataTutor.phone) {
+                const isDuplicate = tutorList.some(tutor => tutor.idStudent === dataTutor.idStudent);
+                // Agregar tutor a la lista sin limpiar los campos del form
+                if (!isDuplicate) {
+                    setTutorList([...tutorList, dataTutor]);
+                }
+            }
         }
         
         const handleAddTutorAndClear = () => {
-            const isDuplicate = tutorList.some(tutor => tutor.idStudent === dataTutor.idStudent);
-        
-            if (isDuplicate) {
-                console.log("Este tutor ya ha sido agregado.");
-            } else {
-                // Agregar tutor a la lista y limpiar los campos del form
+            if (dataTutor.name && dataTutor.phone) {
+                
                 handleAddTutor();
                 setDataTutor(initialTutorData);
-            }
+                
+            } 
         }
 
         const handleEditTutor = (index: number) => {
@@ -366,20 +369,22 @@ export default function StudentForm({dataParents, dataStudent, editingMode, crea
 
     //Manejo de listado de contactos de emergencia
         const handleAddEmergencyContact = () => {
-            // Agregar contacto de emergencia a la lista sin limpiar los campos del form
-            setEmergencyContactList([...emergencyContactList, dataEmergencyContact]);
+            if (dataEmergencyContact.name && dataEmergencyContact.phone) {
+                const isDuplicate = emergencyContactList.some(contact => contact.idStudent === dataEmergencyContact.idStudent);
+                // Agregar contacto de emergencia a la lista sin limpiar los campos del form
+                if (!isDuplicate) {
+                    setEmergencyContactList([...emergencyContactList, dataEmergencyContact]);
+                } 
+               
+            } 
         }
         
         const handleAddEmergencyContactAndClear = () => {
-            const isDuplicate = emergencyContactList.some(contact => contact.idStudent === dataEmergencyContact.idStudent);
-        
-            if (isDuplicate) {
-                console.log("Este contacto de emergencia ya ha sido agregado.");
-            } else {
+            if (dataEmergencyContact.name && dataEmergencyContact.phone) {
                 // Agregar contacto de emergencia a la lista y limpiar los campos del form
                 handleAddEmergencyContact();
                 setDataEmergencyContact(initialEmergencyContactData);
-            }
+            } 
         }
 
         const handleEditEmergencyContact = (index: number) => {

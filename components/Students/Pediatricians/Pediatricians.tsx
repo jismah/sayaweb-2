@@ -59,7 +59,7 @@ export default function Pediatrician(){
             });
             const json = await res.json();
             console.log(json);
-        
+
             setDataPediatricians(json.response); // ACTUALIZAR EL ESTADO
             setTotalRecords(json.total); // Establecer el total de registros
             setTotalPages(Math.ceil(json.total / pageSize)); // Calcular y establecer el total de páginas

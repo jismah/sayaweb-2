@@ -118,6 +118,9 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
             const json = await res.json();
             console.log(json);
 
+            setDataEvaluation(initialEvaluation);
+            setSelectedStudentId("");
+
             toast({
                 title: 'Registro Creado!',
                 description: "Se creo el registro correctamente.",
