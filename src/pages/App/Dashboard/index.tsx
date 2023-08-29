@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, useToast } from '@chakra-ui/react';
 import { Grid, Card, Metric, Icon, Text, Button, Title, BarChart, AreaChart, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } from '@tremor/react';
 import { NextPage } from 'next';
 import { AcademicCapIcon, MapIcon, UserGroupIcon, EyeIcon } from "@heroicons/react/24/solid";
@@ -59,6 +59,10 @@ const Dashboard: NextPage = () => {
     const [chartStudentsPerProgram, setChartStudentsPerProgram] = useState([]);
     const [chartNomina, setChartNomina] = useState<ChartDataNomina[]>([]);
     const [listInscriptions, setListInscriptions] = useState<newRegistrations[]>([]);
+    const [loadingData, setLoadingData] = useState(true);
+
+    const toast = useToast();
+    const idToast = 'toast-loader';
 
 
     /* FETCH PARA KPI's */
@@ -130,11 +134,26 @@ const Dashboard: NextPage = () => {
             fetchStudentsPerPrograms();
             fetchNomina();
             fetchListInscriptions();
+
+
+
         } else {
             router.push('/Auth/Login');
         }
 
     }, [user]);
+
+    useEffect(() => {
+        if (!toast.isActive(idToast)) {
+            toast({
+                id: idToast,
+                title: 'Cargando...',
+                status: 'loading',
+                duration: 5000,
+                colorScheme: 'teal',
+            })
+        }
+    }, []);
 
     return (
         <>

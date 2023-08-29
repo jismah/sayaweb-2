@@ -1,4 +1,4 @@
-import { Box, Text, Flex, FormControl, Code, FormLabel, Heading, Input, Stack, CardHeader, useToast, CircularProgress, Checkbox, Container, Divider, HStack, Link, Center } from "@chakra-ui/react";
+import { Box, Text, FormControl, FormLabel, Heading, Input, Stack, useToast, CircularProgress, Checkbox, Container, HStack, Center } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useUser } from '@supabase/auth-helpers-react'
 import { Button } from "@tremor/react";
@@ -14,8 +14,8 @@ export default function Login() {
     const supabase = createClientComponentClient()
 
     const [loading, setLoading] = useState(false);
-    const user = useUser()
-    const toast = useToast()
+    const user = useUser();
+    const toast = useToast();
 
     const handleSignIn = async () => {
 
@@ -42,6 +42,13 @@ export default function Login() {
                 setLoading(false);
             }, 4000)
         } else {
+            toast({
+                title: 'Iniciaste Sesión!',
+                description: "Todo listo para empezar a trabajar",
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            })
             router.push('/App/Dashboard');
         }
 

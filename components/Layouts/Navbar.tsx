@@ -2,7 +2,7 @@ import React from "react";
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack } from "@chakra-ui/react";
+import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack, useToast } from "@chakra-ui/react";
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import Image from 'next/image'
 
@@ -11,12 +11,20 @@ const Navbar: React.FC = () => {
     // CHAKRA UI
     const { colorMode, toggleColorMode } = useColorMode();
     const supabaseClient = useSupabaseClient()
-    const user = useUser()
-    const router = useRouter()
+    const user = useUser();
+    const router = useRouter();
+    const toast = useToast();
 
 
     const handleSignOut = async () => {
         await supabaseClient.auth.signOut()
+        toast({
+            title: 'Saliste de Sesión!',
+            description: "Haz cerrado tu cuenta correctamente",
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+        })
         router.push('/Auth/Login');
     }
 
