@@ -1,16 +1,14 @@
-
-
-
 import { Student } from "../../Students/Students/Students";
-import { Professor, Staff } from "../../StaffAdministrator/Staff/Staff";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select } from "@chakra-ui/react";
 //MultiSelect
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text  } from '@tremor/react';
 
 
 export interface EmergencyContact{
@@ -42,6 +40,10 @@ export default function EmergencyContacts(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isEmergencyContactSelected = (emergencyContact: EmergencyContact) =>
+    selectedNames.includes(emergencyContact.name) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -249,7 +251,6 @@ export default function EmergencyContacts(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Contactos de emergencia</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -282,12 +283,10 @@ export default function EmergencyContacts(){
 
                                         {loading ? (
                                             <Box pt={4}>
-                                            <Card variant={'outline'}>
-                                                <CardBody>
-                                                    <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                        <Spinner color='teal' size='xl' thickness='3px' />
-                                                    </Box>
-                                                </CardBody>
+                                            <Card>
+                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                                </Box>
                                             </Card>
                                         </Box>
                                         ): (
@@ -326,57 +325,74 @@ export default function EmergencyContacts(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card>
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Teléfono</Th>
-                                            <Th>Niño asignado</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                    {dataEmergencyContacts.map((emergencyContact, index) => {
-                                            return (
-                                                <Tr key={emergencyContact.id}>
-                                                    <Td>{emergencyContact.name}</Td>
-                                                    <Td>{emergencyContact.phone}</Td>
-                                                    <Td>
-                                                        {dataStudents.find(student => student.id === emergencyContact.idStudent)?.name} {" "}
-                                                        {dataStudents.find(student => student.id === emergencyContact.idStudent)?.lastName1} {" "}
-                                                        {dataStudents.find(student => student.id === emergencyContact.idStudent)?.lastName2} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(emergencyContact)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Contactos de Emergencia</Heading>
+                                <Badge color="gray">{dataEmergencyContacts.length}</Badge>
+                            </Flex>
+                            <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataEmergencyContacts.map((emergencyContact) => (
+                                    <MultiSelectItem key={emergencyContact.id} value={emergencyContact.name}>
+                                        {emergencyContact.name}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                            </Box>
+                        </Flex>
+                        <Text className="mt-2">Lista de Contactos de Emergencia Registrados</Text>
+                        
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                                    <TableHeaderCell>Teléfono</TableHeaderCell>
+                                    <TableHeaderCell>Niño asignado</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {dataEmergencyContacts
+                            .filter((emergencyContact) => isEmergencyContactSelected(emergencyContact))
+                            .map(emergencyContact => {
+                                    return (
+                                        <TableRow key={emergencyContact.id}>
+                                            <TableCell>{emergencyContact.name}</TableCell>
+                                            <TableCell>{emergencyContact.phone}</TableCell>
+                                            <TableCell>
+                                                {dataStudents.find(student => student.id === emergencyContact.idStudent)?.name} {" "}
+                                                {dataStudents.find(student => student.id === emergencyContact.idStudent)?.lastName1} {" "}
+                                                {dataStudents.find(student => student.id === emergencyContact.idStudent)?.lastName2} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(emergencyContact)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleEditData(emergencyContact)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                    <IconButton onClick={() => handleEditData(emergencyContact)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(emergencyContact.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleDeleteData(emergencyContact.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                        </Table>
                     </Card>
                 </Box>
                         

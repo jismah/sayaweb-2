@@ -1,7 +1,9 @@
 
 import { Student } from "../../Students/Students/Students";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, useDisclosure, useToast } from "@chakra-ui/react";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
 //Select
 import { Select } from "@chakra-ui/react";
@@ -41,6 +43,10 @@ export default function Tutors(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isTutorSelected = (tutor: Tutor) =>
+    selectedNames.includes(tutor.name) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -248,8 +254,7 @@ export default function Tutors(){
     return (
         <>
             <Box px={3} py={3}>
-                <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Tutores</Heading>
+                <Flex justifyContent={'space-between'} alignItems={'center'}>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -270,47 +275,45 @@ export default function Tutors(){
                             <form onSubmit={handleCreateData}>
                                 <Stack spacing={4}>    
 
-                                        <FormControl isRequired>
-                                            <FormLabel>Nombre completo</FormLabel>
-                                            <Input placeholder='Nombre' value={dataTutor.name || ""} onChange={(e) => setDataTutor({ ...dataTutor, name: e.target.value })} />
-                                        </FormControl>
+                                    <FormControl isRequired>
+                                        <FormLabel>Nombre completo</FormLabel>
+                                        <Input placeholder='Nombre' value={dataTutor.name || ""} onChange={(e) => setDataTutor({ ...dataTutor, name: e.target.value })} />
+                                    </FormControl>
 
-                                        <FormControl>
-                                            <FormLabel>Ocupación</FormLabel>
-                                            <Input placeholder='Ocupación' value={dataTutor.occupation || ""} onChange={(e) => setDataTutor({ ...dataTutor, occupation: e.target.value })} />
-                                        </FormControl>
+                                    <FormControl>
+                                        <FormLabel>Ocupación</FormLabel>
+                                        <Input placeholder='Ocupación' value={dataTutor.occupation || ""} onChange={(e) => setDataTutor({ ...dataTutor, occupation: e.target.value })} />
+                                    </FormControl>
 
-                                        <FormControl isRequired>
-                                            <FormLabel>Número de teléfono</FormLabel>
-                                            <Input type="tel" placeholder='(000)-000-0000' value={dataTutor.phone || ""} onChange={(e) => setDataTutor({ ...dataTutor, phone: e.target.value })} />
-                                        </FormControl>
+                                    <FormControl isRequired>
+                                        <FormLabel>Número de teléfono</FormLabel>
+                                        <Input type="tel" placeholder='(000)-000-0000' value={dataTutor.phone || ""} onChange={(e) => setDataTutor({ ...dataTutor, phone: e.target.value })} />
+                                    </FormControl>
 
-                                        {loading ? (
-                                            <Box pt={4}>
-                                            <Card variant={'outline'}>
-                                                <CardBody>
-                                                    <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                        <Spinner color='teal' size='xl' thickness='3px' />
-                                                    </Box>
-                                                </CardBody>
+                                    {loading ? (
+                                        <Box pt={4}>
+                                            <Card>
+                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                <Spinner color='teal' size='xl' thickness='3px' />
+                                                </Box>
                                             </Card>
                                         </Box>
-                                        ): (
-                                            <Box>
-                                                <SimpleGrid columns={2} spacing={10}>
-                                                    <FormControl isRequired>
-                                                        <FormLabel>Estudiante</FormLabel>
-                                                        <Select value={selectedStudentId} onChange={(e) => setSelectedStudentId(e.target.value)} placeholder='Seleccionar estudiante'>
-                                                            {dataStudents.map(student => (
-                                                                <option key={student.id} value={student.id}>
-                                                                    {student.name} {student.lastName1} {student.lastName2}
-                                                                </option>
-                                                            ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                </SimpleGrid>
-                                            </Box>
-                                        )}
+                                    ): (
+                                        <Box>
+                                            <SimpleGrid columns={2} spacing={10}>
+                                                <FormControl isRequired>
+                                                    <FormLabel>Estudiante</FormLabel>
+                                                    <Select value={selectedStudentId} onChange={(e) => setSelectedStudentId(e.target.value)} placeholder='Seleccionar estudiante'>
+                                                        {dataStudents.map(student => (
+                                                            <option key={student.id} value={student.id}>
+                                                                {student.name} {student.lastName1} {student.lastName2}
+                                                            </option>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </SimpleGrid>
+                                        </Box>
+                                    )}
 
 
 
@@ -330,60 +333,78 @@ export default function Tutors(){
                 </Modal>        
 
                 {loading ?
-                <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
+                    <Box pt={4}>
+                        <Card>
                             <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                             </Box>
-                        </CardBody>
-                    </Card>
-                </Box>
+                        </Card>
+                    </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Teléfono</Th>
-                                            <Th>Ocupación</Th>
-                                            <Th>Niño asignado</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                    {dataTutors.map((tutor, index) => {
-                                            return (
-                                                <Tr key={tutor.id}>
-                                                    <Td>{tutor.name}</Td>
-                                                    <Td>{tutor.phone}</Td>
-                                                    <Td>{tutor.occupation}</Td>
-                                                    <Td>
-                                                        {dataStudents.find(student => student.id === tutor.idStudent)?.name} {" "}
-                                                        {dataStudents.find(student => student.id === tutor.idStudent)?.lastName1} {" "}
-                                                        {dataStudents.find(student => student.id === tutor.idStudent)?.lastName2} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(tutor)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Tutores</Heading>
+                                <Badge color="gray">{dataTutors.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataTutors.map((tutor) => (
+                                    <MultiSelectItem key={tutor.id} value={tutor.name}>
+                                        {tutor.name}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Tutores Registrados</Text>
+                            
+                        <Table className="mt-6">
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                                    <TableHeaderCell>Teléfono</TableHeaderCell>
+                                    <TableHeaderCell>Ocupación</TableHeaderCell>
+                                    <TableHeaderCell>Niño asignado</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {dataTutors
+                                .filter((tutor) => isTutorSelected(tutor))
+                                .map(tutor => {
+                                    return (
+                                        <TableRow key={tutor.id}>
+                                            <TableCell>{tutor.name}</TableCell>
+                                            <TableCell>{tutor.phone}</TableCell>
+                                            <TableCell>{tutor.occupation}</TableCell>
+                                            <TableCell>
+                                                {dataStudents.find(student => student.id === tutor.idStudent)?.name} {" "}
+                                                {dataStudents.find(student => student.id === tutor.idStudent)?.lastName1} {" "}
+                                                {dataStudents.find(student => student.id === tutor.idStudent)?.lastName2} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(tutor)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleEditData(tutor)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                    <IconButton onClick={() => handleEditData(tutor)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(tutor.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleDeleteData(tutor.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                        </Table>
+                            
                     </Card>
                 </Box>
                         

@@ -1,9 +1,11 @@
 
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
+import { DateTime } from "luxon";
 
 export interface AcademicYear{
     id: string;
@@ -28,6 +30,11 @@ export default function AcademicYears(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isAcademiYearSelected = (academicYear: AcademicYear) =>
+    selectedNames.includes(academicYear.id) || selectedNames.length === 0;
+    
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -194,7 +201,6 @@ export default function AcademicYears(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Año académico</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -245,53 +251,80 @@ export default function AcademicYears(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card>
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Fecha inicial</Th>
-                                            <Th>Fecha final</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataAcademicYears.map(academicYear => {
-                                            return (
-                                                <Tr key={academicYear.id}>
-                                                    <Td>{academicYear.id}</Td>
-                                                    <Td>{academicYear.startTime}</Td>
-                                                    <Td>{academicYear.endTime}</Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(academicYear)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card >
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Años Académicos</Heading>
+                                <Badge color="gray">{dataAcademicYears.length}</Badge>
+                            </Flex>
+                            <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataAcademicYears.map((academicYear) => (
+                                    <MultiSelectItem key={academicYear.id} value={academicYear.id}>
+                                        {academicYear.startTime} - {academicYear.endTime}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                            </Box>
+                        </Flex>
+                        <Text className="mt-2">Lista de Años Académicos Registrados</Text>
 
-                                                            <IconButton onClick={() => handleEditData(academicYear)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Fecha inicial</TableHeaderCell>
+                                    <TableHeaderCell>Fecha final</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataAcademicYears
+                                .filter((academicYear) => isAcademiYearSelected(academicYear))
+                                .map(academicYear => {
+                                    return (
+                                        <TableRow key={academicYear.id}>
+                                            <TableCell>{academicYear.id}</TableCell>
+                                            <TableCell>
+                                                {DateTime.fromISO(academicYear.startTime)
+                                                .setLocale('es')
+                                                .toFormat('MMMM dd, yyyy')
+                                                .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                            </TableCell>
+                                            <TableCell>
+                                                {DateTime.fromISO(academicYear.endTime)
+                                                .setLocale('es')
+                                                .toFormat('MMMM dd, yyyy')
+                                                .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(academicYear)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(academicYear.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleEditData(academicYear)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                                                    <IconButton onClick={() => handleDeleteData(academicYear.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
+
+                        </Table>
                     </Card>
                 </Box>
                         

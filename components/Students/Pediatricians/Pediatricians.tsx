@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spinner, Stack, useDisclosure, useToast } from "@chakra-ui/react";
 
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
 export interface Pediatrician{
     id: string;
@@ -11,8 +13,7 @@ export interface Pediatrician{
     phone: string;
 }
 
-  
-  
+
 export default function Pediatrician(){
 
     const initialPediatrician : Pediatrician = {
@@ -32,6 +33,10 @@ export default function Pediatrician(){
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isPediatricianSelected = (pediatrician: Pediatrician) =>
+    selectedNames.includes(pediatrician.name) || selectedNames.length === 0;
+    
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
     const [currentPage, setCurrentPage] = useState(1);
@@ -203,7 +208,6 @@ export default function Pediatrician(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Pediatras</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -289,55 +293,74 @@ export default function Pediatrician(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card>
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
+      
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Institución médica</Th>
-                                            <Th>Número de oficina</Th>
-                                            <Th>Número de teléfono</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                    {dataPediatricians.map((pediatrician, index) => {
-                                            return (
-                                                <Tr key={pediatrician.id}>
-                                                    <Td>{pediatrician.name}</Td>
-                                                    <Td>{pediatrician.medicalInstitution}</Td>
-                                                    <Td>{pediatrician.officeNumber}</Td>
-                                                    <Td>{pediatrician.phone}</Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(pediatrician)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Pediatras</Heading>
+                                <Badge color="gray">{dataPediatricians.length}</Badge>
+                            </Flex>
+                            <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataPediatricians.map((pediatrician) => (
+                                    <MultiSelectItem key={pediatrician.id} value={pediatrician.name}>
+                                        {pediatrician.name}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                            </Box>
+                        </Flex>
+                        <Text className="mt-2">Lista de Pediatras Registrados</Text>
 
-                                                            <IconButton onClick={() => handleEditData(pediatrician)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                                    <TableHeaderCell>Institución médica</TableHeaderCell>
+                                    <TableHeaderCell>Número de oficina</TableHeaderCell>
+                                    <TableHeaderCell>Número de teléfono</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            {dataPediatricians
+                                .filter((pediatrician) => isPediatricianSelected(pediatrician))
+                                .map(pediatrician => {
+                                    return (
+                                        <TableRow key={pediatrician.id}>
+                                            <TableCell>{pediatrician.name}</TableCell>
+                                            <TableCell>{pediatrician.medicalInstitution}</TableCell>
+                                            <TableCell>{pediatrician.officeNumber}</TableCell>
+                                            <TableCell>{pediatrician.phone}</TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(pediatrician)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(pediatrician.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleEditData(pediatrician)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                                                    <IconButton onClick={() => handleDeleteData(pediatrician.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
+
+                        </Table>
+
                     </Card>
                 </Box>
                         

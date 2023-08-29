@@ -4,10 +4,10 @@ import { User } from "../../FamilyManagement/User/Users";
 
 import Students, { Student } from "../../Students/Students/Students";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
-//Select
-//MultiSelect
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
+
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
   
@@ -51,6 +51,10 @@ export default function Programs(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isProgramSelected = (program: Program) =>
+    selectedNames.includes(program.description) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -259,7 +263,6 @@ export default function Programs(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Programas</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -339,12 +342,10 @@ export default function Programs(){
                                     
                                     {editMode && loading ? (
                                         <Box pt={4}>
-                                            <Card variant={'outline'}>
-                                                <CardBody>
-                                                    <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                        <Spinner color='teal' size='xl' thickness='3px' />
-                                                    </Box>
-                                                </CardBody>
+                                            <Card>    
+                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                                </Box>
                                             </Card>
                                         </Box>
                                     ) : (
@@ -359,7 +360,6 @@ export default function Programs(){
                                     )}
 
                                     
-
                                     {!showMode && (
                                         <Button type="submit" colorScheme="teal" mr={3}>Agregar </Button>
                                     )}
@@ -377,57 +377,77 @@ export default function Programs(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
+                    <Card>
+                       
                             <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                             </Box>
-                        </CardBody>
+        
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Descripción</Th>
-                                            <Th>Máximo de estudiantes</Th>
-                                            <Th>Costo inscripción</Th>
-                                            <Th>Monto mensual</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataPrograms.map(program => {
-                                            return (
-                                                <Tr key={program.id}>
-                                                    <Td>{program.id}</Td>
-                                                    <Td>{program.description}</Td>
-                                                    <Td>{program.maxStudents}</Td>
-                                                    <Td>{program.inscription}</Td>
-                                                    <Td>{program.monthlyAmount}</Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(program)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card >
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Programas</Heading>
+                                <Badge color="gray">{dataPrograms.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataPrograms.map((program) => (
+                                    <MultiSelectItem key={program.id} value={program.description}>
+                                        {program.description}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Programas Registrados</Text>
+                       
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Descripción</TableHeaderCell>
+                                    <TableHeaderCell>Máximo de estudiantes</TableHeaderCell>
+                                    <TableHeaderCell>Costo inscripción</TableHeaderCell>
+                                    <TableHeaderCell>Monto mensual</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataPrograms
+                                .filter((program) => isProgramSelected(program))
+                                .map(program => {
+                                    return (
+                                        <TableRow key={program.id}>
+                                            <TableCell>{program.id}</TableCell>
+                                            <TableCell>{program.description}</TableCell>
+                                            <TableCell>{program.maxStudents}</TableCell>
+                                            <TableCell>{program.inscription}</TableCell>
+                                            <TableCell>{program.monthlyAmount}</TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(program)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleEditData(program)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                    <IconButton onClick={() => handleEditData(program)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(program.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleDeleteData(program.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                        </Table>
+    
                     </Card>
                 </Box>
                         

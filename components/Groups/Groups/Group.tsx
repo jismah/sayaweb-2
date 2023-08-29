@@ -2,13 +2,15 @@ import { Shift } from "../Shifts/Shifts";
 import { Student } from "../../Students/Students/Students";
 import { Staff } from "../../StaffAdministrator/Staff/Staff";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, CardBody, Checkbox, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select, SelectItem } from "@tremor/react";
 //MultiSelect
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text } from '@tremor/react';
 
 
 export interface Group {
@@ -77,6 +79,11 @@ export default function Groups(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isGroupSelected = (group: Group) =>
+    selectedNames.includes(group.id) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -283,7 +290,6 @@ export default function Groups(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Grupos</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -306,12 +312,10 @@ export default function Groups(){
 
                                     {loading ? (
                                         <Box pt={4}>
-                                        <Card variant={'outline'}>
-                                            <CardBody>
-                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                    <Spinner color='teal' size='xl' thickness='3px' />
-                                                </Box>
-                                            </CardBody>
+                                        <Card>
+                                            <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                <Spinner color='teal' size='xl' thickness='3px' />
+                                            </Box>
                                         </Card>
                                         </Box>
                                     ) : (
@@ -395,59 +399,76 @@ export default function Groups(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card >
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Número de grupo</Th>
-                                            <Th>Máximo de estudiantes</Th>
-                                            <Th>Tanda</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataGroups.map(group => {
-                                            return (
-                                                <Tr key={group.id}>
-                                                    <Td>{group.id}</Td>
-                                                    <Td>Grupo #{group.id}</Td>
-                                                    <Td>{group.maxStudents}</Td>
-                                                    <Td>
-                                                        {dataShifts.find(shift => shift.id === group.idShift)?.initialHour} {" "}
-                                                        - 
-                                                        {dataShifts.find(shift => shift.id === group.idShift)?.finishHour} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(group)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Grupos</Heading>
+                                <Badge color="gray">{dataGroups.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataGroups.map((group) => (
+                                    <MultiSelectItem key={group.id} value={group.id}>
+                                        Grupo #{group.id}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Grupos Registrados</Text>
 
-                                                            <IconButton onClick={() => handleEditData(group)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Número de grupo</TableHeaderCell>
+                                    <TableHeaderCell>Máximo de estudiantes</TableHeaderCell>
+                                    <TableHeaderCell>Tanda</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataGroups
+                                .filter((group) => isGroupSelected(group))
+                                .map(group => {
+                                    return (
+                                        <TableRow key={group.id}>
+                                            <TableCell>{group.id}</TableCell>
+                                            <TableCell>Grupo #{group.id}</TableCell>
+                                            <TableCell>{group.maxStudents}</TableCell>
+                                            <TableCell>
+                                                {dataShifts.find(shift => shift.id === group.idShift)?.initialHour} {" "}
+                                                - 
+                                                {dataShifts.find(shift => shift.id === group.idShift)?.finishHour} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(group)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(group.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleEditData(group)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                                                    <IconButton onClick={() => handleDeleteData(group.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
+
+                        </Table>
                     </Card>
                 </Box>
                         
