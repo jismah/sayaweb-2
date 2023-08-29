@@ -44,7 +44,6 @@ export default function Login() {
         } else {
             toast({
                 title: 'Iniciaste Sesión!',
-                description: "Todo listo para empezar a trabajar",
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
