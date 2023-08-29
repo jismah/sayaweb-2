@@ -1,5 +1,5 @@
 import { AddIcon, DeleteIcon, ViewIcon, EditIcon } from '@chakra-ui/icons';
-import { TableContainer, Table, Thead, Tr, Th, Tbody, Td, Box, Button, Flex, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, SimpleGrid } from '@chakra-ui/react';
+import { TableContainer, Thead, Tr, Th, Tbody, Td, Box, Button, Flex, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, CardBody, Stack, SimpleGrid } from '@chakra-ui/react';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
 import React, { useState, useEffect } from 'react';
 import Parents from '../../Students/Parents/Parents';
@@ -14,6 +14,8 @@ import { Parent } from '../../Students/Parents/Parents';
 
 import { User } from '../User/Users';
 import Link from 'next/link';
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
 export interface Family {
   id: string;
@@ -81,6 +83,11 @@ export default function Family() {
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  
+  const [selectedFamilies, setSelectedFamilies] = useState<string[]>([]);
+  const isFamilySelected = (family: Family) =>
+  selectedFamilies.includes(family.id) || selectedFamilies.length === 0;
 
   // GET DATA TO LOAD ARRAY
   const fetchFamilyData = async () => {
@@ -283,7 +290,6 @@ export default function Family() {
     <>
       <Box px={3} py={3}>
         <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-          <Heading as='h3' size='xl' id='Parents' >Familias</Heading>
           <ButtonGroup>
             <Link href="/Inscriptions/NewStudentForm" target="_blank">
               <Button size={'sm'} leftIcon={<AddIcon />} variant={'outline'} color={'teal'} >
@@ -313,17 +319,14 @@ export default function Family() {
                     {(showMode || editMode) && (
                       loading ? (
                         <Box pt={4}>
-                          <Card variant={'outline'}>
-                            <CardBody>
+                          <Card>
                               <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                               </Box>
-                            </CardBody>
                           </Card>
                         </Box>
                       ) : (
-                        <Card variant={'outline'}>
-                          <CardBody>
+                        <Card>
                             <Heading as='h3' size='lg' id='Parents' mb={6} >Usuario familiar</Heading>
 
                             <SimpleGrid columns={2} spacing={10} mb={3}>
@@ -351,8 +354,6 @@ export default function Family() {
                               </FormControl>
                             </SimpleGrid>
 
-
-                          </CardBody>
                         </Card>
                       )
 
@@ -364,12 +365,10 @@ export default function Family() {
                     {(showMode || editMode) && (
                       loading ? (
                         <Box pt={4}>
-                          <Card variant={'outline'}>
-                            <CardBody>
+                          <Card >
                               <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                               </Box>
-                            </CardBody>
                           </Card>
                         </Box>
                       ) : (
@@ -386,12 +385,10 @@ export default function Family() {
                     {(showMode || editMode) && (
                       loading ? (
                         <Box pt={4}>
-                          <Card variant={'outline'}>
-                            <CardBody>
+                          <Card >
                               <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                               </Box>
-                            </CardBody>
                           </Card>
                         </Box>
                       ) : (
@@ -424,53 +421,70 @@ export default function Family() {
 
         {loading ?
           <Box pt={4}>
-            <Card variant={'outline'}>
-              <CardBody>
+            <Card>
                 <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                   <Spinner color='teal' size='xl' thickness='3px' />
                 </Box>
-              </CardBody>
             </Card>
           </Box>
           : <Box pt={4}>
-            <Card variant={'outline'}>
-              <CardBody p={0}>
-                <TableContainer>
-                  <Table variant='striped'>
-                    <Thead>
-                      <Tr>
-                        <Th>ID</Th>
-                        <Th>Titulo</Th>
-                        <Th>Nombre de usuario</Th>
-                        <Th>Acciones</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {dataFamilies.map(family => {
-                        return (
-                          <Tr key={family.id}>
-                            <Td>{family.id}</Td>
-                            <Td>{family.user ? `${family.user.lastName1} ${family.user.lastName2}` : "N/A"}</Td>
-                            <Td>{family.user ? `${family.user.username}` : "N/A"} </Td>
-                            <Td>
-                              <ButtonGroup variant='ghost' spacing='1'>
-                                <IconButton onClick={() => handleShowData(family)}
-                                  colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+            <Card>
+              <Flex justifyContent={'space-between'} alignItems={'center'}>
+                      <Flex justifyContent="start" className="space-x-2">
+                          <Heading size='md' id='familys'>Familias</Heading>
+                          <Badge color="gray">{dataFamilies.length}</Badge>
+                      </Flex>
+                      <Box>
+                          <MultiSelect
+                              onValueChange={setSelectedFamilies}
+                              placeholder="Buscar..."
+                              className="max-w-lg"
+                          >
+                              {dataFamilies.map((family) => (
+                              <MultiSelectItem key={family.id} value={family.id}>
+                                  {family.name}
+                              </MultiSelectItem>
+                              ))}
+                          </MultiSelect>
+                      </Box>
+              </Flex>
+              <Text className="mt-2">Lista de Familias Registrados</Text>
 
-                                <IconButton onClick={() => handleEditData(family)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+              <Table className='mt-6'>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>ID</TableHeaderCell>
+                    <TableHeaderCell>Titulo</TableHeaderCell>
+                    <TableHeaderCell>Nombre de usuario</TableHeaderCell>
+                    <TableHeaderCell>Acciones</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {dataFamilies
+                  .filter((family) => isFamilySelected(family))
+                  .map(family => {
+                    return (
+                      <TableRow key={family.id}>
+                        <TableCell>{family.id}</TableCell>
+                        <TableCell>{family.name}</TableCell>
+                        <TableCell>{family.user ? `${family.user.username}` : "N/A"} </TableCell>
+                        <TableCell>
+                          <ButtonGroup variant='ghost' spacing='1'>
+                            <IconButton onClick={() => handleShowData(family)}
+                              colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                <IconButton onClick={() => handleDeleteData(family.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                              </ButtonGroup>
-                            </Td>
-                          </Tr>
-                        )
-                      })
-                      }
-                    </Tbody>
+                            <IconButton onClick={() => handleEditData(family)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                  </Table>
-                </TableContainer>
-              </CardBody>
+                            <IconButton onClick={() => handleDeleteData(family.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                          </ButtonGroup>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                  }
+                </TableBody>
+
+              </Table>
             </Card>
           </Box>
 
