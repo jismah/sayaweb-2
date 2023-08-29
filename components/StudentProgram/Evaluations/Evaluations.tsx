@@ -1,4 +1,16 @@
 
+
+import { Student } from "../../Students/Students/Students";
+import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+
+//Select
+import { Select } from "@chakra-ui/react";
+//MultiSelect
+import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
+  
 export interface Evaluation{
     id: string;
     date: string;
@@ -7,17 +19,6 @@ export interface Evaluation{
     idStudent: string;
 }
 
-
-import { Student } from "../../Students/Students/Students";
-import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-
-//Select
-import { Select } from "@chakra-ui/react";
-//MultiSelect
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
-
-  
   
 export default function Evaluations({dataEvaluations, objectivesMode} : {dataEvaluations : Evaluation[], objectivesMode: boolean}){
 
@@ -38,6 +39,10 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isEvaluationSelected = (evaluation: Evaluation) =>
+    selectedNames.includes(evaluation.date) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -249,7 +254,6 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='evaluations' >Evaluaciones</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -270,8 +274,6 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
                             <form onSubmit={handleCreateData}>
                                 <Stack spacing={4}>    
 
-                                   
-
                                     <SimpleGrid columns={2} spacing={10}>
                                         <FormControl isRequired>
                                             <FormLabel>Comentario</FormLabel>
@@ -286,12 +288,12 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
                                     {loading ? (
                                         <Box pt={4}>
-                                        <Card variant={'outline'}>
-                                            <CardBody>
-                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                    <Spinner color='teal' size='xl' thickness='3px' />
-                                                </Box>
-                                            </CardBody>
+                                        <Card>
+                                            
+                                            <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                <Spinner color='teal' size='xl' thickness='3px' />
+                                            </Box>
+                                            
                                         </Card>
                                     </Box>
                                     ): (
@@ -330,61 +332,81 @@ export default function Evaluations({dataEvaluations, objectivesMode} : {dataEva
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card >
+                       
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
+                        
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Comentario</Th>
-                                            <Th>Fecha</Th>
-                                            <Th>Estudiante</Th>
-                                            <Th>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataEvaluationsLocal.map(evaluation => {
-                                            return (
-                                                <Tr key={evaluation.id}>
-                                                    <Td>{evaluation.id}</Td>
-                                                    <Td>{evaluation.commment}</Td>
-                                                    <Td>{evaluation.date}</Td>
-                                                    <Td>
-                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.name} {" "}
-                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName1} {" "}
-                                                    {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName2} {" "}
-                                                    </Td>
+                    <Card >
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Evaluaciones</Heading>
+                                <Badge color="gray">{dataEvaluationsLocal.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataEvaluationsLocal.map((evaluation) => (
+                                    <MultiSelectItem key={evaluation.id} value={evaluation.date}>
+                                        {evaluation.date} - {evaluation.commment}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Evaluaciones Registradas</Text>
+
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Comentario</TableHeaderCell>
+                                    <TableHeaderCell>Fecha</TableHeaderCell>
+                                    <TableHeaderCell>Estudiante</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataEvaluationsLocal
+                                .filter((evaluation) => isEvaluationSelected(evaluation))
+                                .map(evaluation => {
+                                    return (
+                                        <TableRow key={evaluation.id}>
+                                            <TableCell>{evaluation.id}</TableCell>
+                                            <TableCell>{evaluation.commment}</TableCell>
+                                            <TableCell>{evaluation.date}</TableCell>
+                                            <TableCell>
+                                            {dataStudents.find(student => student.id === evaluation.idStudent)?.name} {" "}
+                                            {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName1} {" "}
+                                            {dataStudents.find(student => student.id === evaluation.idStudent)?.lastName2} {" "}
+                                            </TableCell>
 
 
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(evaluation)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(evaluation)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleEditData(evaluation)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                    <IconButton onClick={() => handleEditData(evaluation)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(evaluation.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleDeleteData(evaluation.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                        </Table>
+        
                     </Card>
                 </Box>
                         

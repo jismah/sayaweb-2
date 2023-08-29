@@ -1,11 +1,13 @@
 import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
-import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Card, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
+import { TableContainer, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
 import { FaceSmileIcon } from '@heroicons/react/24/solid';
 import { User } from '@supabase/supabase-js';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Color, Badge, Title, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
 
 import { Student } from '../../Students/Students/Students';
@@ -54,6 +56,11 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
   const [familyHeaders, setFamilyHeaders] = useState<Parent[]>([]);
 
   const toast = useToast();
+
+  const [selectedNames, setSelectedNames] = useState<string[]>([]);
+  const isParentSelected = (parent: Parent) =>
+  selectedNames.includes(parent.name) || selectedNames.length === 0;
+
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -275,7 +282,6 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
       <>
           <Box px={3} py={3}>
           <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-            <Heading as='h3' size='xl' id='Parents' >Padres</Heading>
             <Box display={enableEditing ? 'block' : 'none'}>
               <ButtonGroup>
                   <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'} display={familyMode ? 'block' : 'none'}>
@@ -343,49 +349,43 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
                         {showMode && (
                           loading ? (
                             <Box pt={4}>
-                              <Card variant={'outline'}>
-                                  <CardBody>
-                                      <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                          <Spinner color='teal' size='xl' thickness='3px' />
-                                      </Box>
-                                  </CardBody>
+                              <Card>
+                                  <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                      <Spinner color='teal' size='xl' thickness='3px' />
+                                  </Box>
                               </Card>
                             </Box>
                           ) : (
                             <Box pt={4}>
                               <FormLabel>Cabeceras de la familia</FormLabel>
-                              <Card variant={'outline'}>
-                                <CardBody p={0}>
-                                  <TableContainer>
-                                    <Table variant='striped'>
-                                      <Thead>
-                                          <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Cedula</Th>
-                                            <Th>Telefono</Th>
-                                            <Th>Email</Th>
-                                            <Th>Ocupación</Th>
-                                          </Tr>
-                                      </Thead>
-                                      <Tbody>
-                                          {familyHeaders.map((parent: Parent) => {
-                                              return (
-                                                <Tr key={parent.id}>
-                                                  <Td>{parent.id}</Td>
-                                                  <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                  <Td>{parent.identityCard}</Td>
-                                                  <Td>{parent.telephone}</Td>
-                                                  <Td>{parent.email}</Td>
-                                                  <Td>{parent.occupation}</Td>
-                                                </Tr>
-                                              )
-                                          })
-                                          }
-                                      </Tbody>
-                                    </Table>
-                                  </TableContainer>
-                                </CardBody>
+                              <Card >
+                                <Table>
+                                  <TableHead>
+                                      <TableRow>
+                                        <TableHeaderCell>ID</TableHeaderCell>
+                                        <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                                        <TableHeaderCell>Cedula</TableHeaderCell>
+                                        <TableHeaderCell>Telefono</TableHeaderCell>
+                                        <TableHeaderCell>Email</TableHeaderCell>
+                                        <TableHeaderCell>Ocupación</TableHeaderCell>
+                                      </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                      {familyHeaders.map((parent: Parent) => {
+                                          return (
+                                            <TableRow key={parent.id}>
+                                              <TableHeaderCell>{parent.id}</TableHeaderCell>
+                                              <TableHeaderCell>{parent.name} {parent.lastName1} {parent.lastName2}</TableHeaderCell>
+                                              <TableHeaderCell>{parent.identityCard}</TableHeaderCell>
+                                              <TableHeaderCell>{parent.telephone}</TableHeaderCell>
+                                              <TableHeaderCell>{parent.email}</TableHeaderCell>
+                                              <TableHeaderCell>{parent.occupation}</TableHeaderCell>
+                                            </TableRow>
+                                          )
+                                      })
+                                      }
+                                  </TableBody>
+                                </Table>
                               </Card>
                             </Box>
                           )
@@ -396,47 +396,41 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
                         {showMode && (
                           loading ? (
                             <Box pt={4}>
-                              <Card variant={'outline'}>
-                                  <CardBody>
-                                      <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                          <Spinner color='teal' size='xl' thickness='3px' />
-                                      </Box>
-                                  </CardBody>
+                              <Card>
+                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                </Box>
                               </Card>
                             </Box>
                           ) : (
                             <Box pt={4}>
                               <FormLabel>Hijos</FormLabel>
-                              <Card variant={'outline'}>
-                                <CardBody p={0}>
-                                  <TableContainer>
-                                    <Table variant='striped'>
-                                      <Thead>
-                                          <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Nombre Completo</Th>
-                                            <Th>Telefono</Th>
-                                            <Th>Dirección</Th>
-                                            <Th>Fecha de nacimiento</Th>
-                                          </Tr>
-                                      </Thead>
-                                      <Tbody>
-                                          {familyChildrens.map((student: Student) => {
-                                              return (
-                                                <Tr key={student.id}>
-                                                  <Td>{student.id}</Td>
-                                                  <Td>{student.name} {student.lastName1} {student.lastName2}</Td>
-                                                  <Td>{student.housePhone}</Td>
-                                                  <Td>{student.address}</Td>
-                                                  <Td>{student.dateBirth}</Td>
-                                                </Tr>
-                                              )
-                                          })
-                                          }
-                                      </Tbody>
-                                    </Table>
-                                  </TableContainer>
-                                </CardBody>
+                              <Card>
+                                <Table>
+                                  <TableHead>
+                                      <TableRow>
+                                        <TableHeaderCell>ID</TableHeaderCell>
+                                        <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                                        <TableHeaderCell>Telefono</TableHeaderCell>
+                                        <TableHeaderCell>Dirección</TableHeaderCell>
+                                        <TableHeaderCell>Fecha de nacimiento</TableHeaderCell>
+                                      </TableRow>
+                                  </TableHead>
+                                  <Tbody>
+                                      {familyChildrens.map((student: Student) => {
+                                          return (
+                                            <TableRow key={student.id}>
+                                              <TableCell>{student.id}</TableCell>
+                                              <TableCell>{student.name} {student.lastName1} {student.lastName2}</TableCell>
+                                              <TableCell>{student.housePhone}</TableCell>
+                                              <TableCell>{student.address}</TableCell>
+                                              <TableCell>{student.dateBirth}</TableCell>
+                                            </TableRow>
+                                          )
+                                      })
+                                      }
+                                  </Tbody>
+                                </Table>
                               </Card>
                             </Box>
                           )
@@ -463,59 +457,77 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
 
             {loading ?
               <Box pt={4}>
-                <Card variant={'outline'}>
-                    <CardBody>
-                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                            <Spinner color='teal' size='xl' thickness='3px' />
-                        </Box>
-                    </CardBody>
+                <Card >
+                  <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                      <Spinner color='teal' size='xl' thickness='3px' />
+                  </Box>
                 </Card>
               </Box>
               : <Box pt={4}>
-                  <Card variant={'outline'}>
-                      <CardBody p={0}>
-                          <TableContainer>
-                              <Table variant='striped'>
-                                  <Thead>
-                                      <Tr>
-                                      <Th>ID</Th>
-                                      <Th>Nombre Completo</Th>
-                                      <Th>Cedula</Th>
-                                      <Th>Telefono</Th>
-                                      <Th>Email</Th>
-                                      <Th>Ocupación</Th>
-                                      <Th>Acciones</Th>
-                                      </Tr>
-                                  </Thead>
-                                  <Tbody>
-                                      {dataParents.map(parent => {
-                                          return (
-                                              <Tr key={parent.id}>
-                                                <Td>{parent.id}</Td>
-                                                <Td>{parent.name} {parent.lastName1} {parent.lastName2}</Td>
-                                                <Td>{parent.identityCard}</Td>
-                                                <Td>{parent.telephone}</Td>
-                                                <Td>{parent.email}</Td>
-                                                <Td>{parent.occupation}</Td>
-                                                <Td>
-                                                    <ButtonGroup variant='ghost' spacing='1'>
-                                                        <IconButton onClick={() => handleShowData(parent)}
-                                                        colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                  <Card>
+                    <Flex justifyContent={'space-between'} alignItems={'center'}>
+                      <Flex justifyContent="start" className="space-x-2">
+                        <Heading size='md' id='Parents'>Padres</Heading>
+                        <Badge color="gray">{dataParents.length}</Badge>
+                      </Flex>
+                      <Box>
+                        <MultiSelect
+                          onValueChange={setSelectedNames}
+                          placeholder="Buscar..."
+                          className="max-w-lg"
+                        >
+                          {dataParents.map((parents) => (
+                            <MultiSelectItem key={parents.id} value={parents.name}>
+                              {parents.name} {parents.lastName1} {parents.lastName2}
+                            </MultiSelectItem>
+                          ))}
+                        </MultiSelect>
+                      </Box>
+                    </Flex>
+                    <Text className="mt-2">Lista de Padres Registrados</Text>
+                     
+                    <Table className='mt-6'>
+                        <TableHead>
+                            <TableRow>
+                            <TableHeaderCell>ID</TableHeaderCell>
+                            <TableHeaderCell>Nombre Completo</TableHeaderCell>
+                            <TableHeaderCell>Cedula</TableHeaderCell>
+                            <TableHeaderCell>Telefono</TableHeaderCell>
+                            <TableHeaderCell>Email</TableHeaderCell>
+                            <TableHeaderCell>Ocupación</TableHeaderCell>
+                            <TableHeaderCell>Acciones</TableHeaderCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {dataParents
+                            .filter((parent) => isParentSelected(parent))
+                            .map(parent => {
+                                return (
+                                    <TableRow key={parent.id}>
+                                      <TableCell>{parent.id}</TableCell>
+                                      <TableCell>{parent.name} {parent.lastName1} {parent.lastName2}</TableCell>
+                                      <TableCell>{parent.identityCard}</TableCell>
+                                      <TableCell>{parent.telephone}</TableCell>
+                                      <TableCell>{parent.email}</TableCell>
+                                      <TableCell>{parent.occupation}</TableCell>
+                                      <TableCell>
+                                          <ButtonGroup variant='ghost' spacing='1'>
+                                              <IconButton onClick={() => handleShowData(parent)}
+                                              colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                        <IconButton onClick={() => handleEditData(parent)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
+                                              <IconButton onClick={() => handleEditData(parent)} colorScheme='green' icon={<EditIcon />} aria-label='Edit' display={enableEditing ? 'block' : 'none'}></IconButton>
 
-                                                        <IconButton onClick={() => handleDeleteData(parent.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
-                                                    </ButtonGroup>
-                                                </Td>
-                                              </Tr>
-                                          )
-                                      })
-                                      }
-                                  </Tbody>
+                                              <IconButton onClick={() => handleDeleteData(parent.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete' display={(familyMode && enableEditing) ? 'block' : 'none'}></IconButton>
+                                          </ButtonGroup>
+                                      </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                            }
+                        </TableBody>
 
-                              </Table>
-                          </TableContainer>
-                      </CardBody>
+                    </Table>
+
                   </Card>
               </Box>
                       

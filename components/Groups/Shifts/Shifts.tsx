@@ -3,13 +3,15 @@ import { WeekDay } from "../WeekDays/WeekDays";
 
 import { Staff } from "../../StaffAdministrator/Staff/Staff";
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select } from "@chakra-ui/react";
 //MultiSelect
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
+import { DateTime } from "luxon";
 
 export interface Shift{
     id: string;
@@ -52,6 +54,12 @@ export default function Shifts(){
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isShiftSelected = (shift: Shift) =>
+    selectedNames.includes(shift.id) || selectedNames.length === 0;
+    
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -281,7 +289,6 @@ export default function Shifts(){
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Tandas</Heading>
                     <Box>
                         <ButtonGroup>
                             <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -325,12 +332,10 @@ export default function Shifts(){
                                     
                                     {loading ? (
                                         <Box pt={4}>
-                                            <Card variant={'outline'}>
-                                                <CardBody>
-                                                    <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                        <Spinner color='teal' size='xl' thickness='3px' />
-                                                    </Box>
-                                                </CardBody>
+                                            <Card>
+                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                                </Box>
                                             </Card>
                                         </Box>
                                     ) : (
@@ -394,66 +399,93 @@ export default function Shifts(){
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
-                            <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                <Spinner color='teal' size='xl' thickness='3px' />
-                            </Box>
-                        </CardBody>
+                    <Card>
+                        <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                            <Spinner color='teal' size='xl' thickness='3px' />
+                        </Box>
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Horario</Th>
-                                            <Th>Día de la semana</Th>
-                                            <Th>Empleado</Th>
-                                            <Th>Año académico</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataShifts.map(shift => {
-                                            return (
-                                                <Tr key={shift.id}>
-                                                    <Td>{shift.id}</Td>
-                                                    <Td>{shift.initialHour} - {shift.finishHour}</Td>
-                                                    <Td>
-                                                        {dataWeekDays.find(day => day.id === shift.idWeekDay)?.name} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.name} {" "}
-                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName1} {" "}
-                                                        {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName2} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        {dataAcademicYears.find(year => year.id === shift.idAcademicYear)?.startTime} {" "}
-                                                        -
-                                                        {dataAcademicYears.find(year => year.id === shift.idAcademicYear)?.startTime} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(shift)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Tandas</Heading>
+                                <Badge color="gray">{dataShifts.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataShifts.map((shift) => (
+                                    <MultiSelectItem key={shift.id} value={shift.id}>
+                                        {shift.initialHour} - {shift.finishHour}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Tandas Registrados</Text>
 
-                                                            <IconButton onClick={() => handleEditData(shift)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Horario</TableHeaderCell>
+                                    <TableHeaderCell>Día de la semana</TableHeaderCell>
+                                    <TableHeaderCell>Empleado</TableHeaderCell>
+                                    <TableHeaderCell>Año académico</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataShifts
+                                .filter((shift) => isShiftSelected(shift))
+                                .map(shift => {
+                                    return (
+                                        <TableRow key={shift.id}>
+                                            <TableCell>{shift.id}</TableCell>
+                                            <TableCell>{shift.initialHour} - {shift.finishHour}</TableCell>
+                                            <TableCell>
+                                                {dataWeekDays.find(day => day.id === shift.idWeekDay)?.name} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                {dataStaffs.find(staff => staff.id === shift.idStaff)?.name} {" "}
+                                                {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName1} {" "}
+                                                {dataStaffs.find(staff => staff.id === shift.idStaff)?.lastName2} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                            {dataAcademicYears.map(year => (
+                                                <div key={year.id}>
+                                                    {DateTime.fromISO(year.startTime)
+                                                        .setLocale('es')
+                                                        .toFormat('MMMM dd, yyyy')
+                                                        .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                                    {" - "}
+                                                    {DateTime.fromISO(year.endTime)
+                                                        .setLocale('es')
+                                                        .toFormat('MMMM dd, yyyy')
+                                                        .replace(/^\w/, firstChar => firstChar.toUpperCase())}
+                                                </div>
+                                            ))}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(shift)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            <IconButton onClick={() => handleDeleteData(shift.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                    <IconButton onClick={() => handleEditData(shift)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                                                    <IconButton onClick={() => handleDeleteData(shift.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
+
+                        </Table>
                     </Card>
                 </Box>
                         

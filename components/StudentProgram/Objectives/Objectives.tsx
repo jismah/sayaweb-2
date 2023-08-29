@@ -4,13 +4,15 @@ import { Evaluation } from "../Evaluations/Evaluations";
 
 
 import { useEffect, useState } from "react";
-import { Box, Button, ButtonGroup, Card, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, CardBody, Flex, FormControl, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Spinner, Stack, TableContainer, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 
 //Select
 import { Select } from "@chakra-ui/react";
 //MultiSelect
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Program } from "../Programs/Programs";
+
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
   
 export interface Objective{
@@ -50,6 +52,10 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+
+    const [selectedNames, setSelectedNames] = useState<string[]>([]);
+    const isObjectiveSelected = (objective: Objective) =>
+    selectedNames.includes(objective.title) || selectedNames.length === 0;
 
     // PAGINATION
     const pageSize = 10; // Cantidad de elementos por página
@@ -272,7 +278,6 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
         <>
             <Box px={3} py={3}>
                 <Flex justifyContent={'space-between'} alignItems={'center'} mt={'40px'}>
-                    <Heading as='h3' size='xl' id='Parents' >Objetivos</Heading>
                     <Box>
                         <ButtonGroup>
                             {!programMode && <Button onClick={handleOpenCreateModal} size='sm' leftIcon={<AddIcon />} variant={'outline'} color={'teal'}>
@@ -314,12 +319,12 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
                                     {loading ? (
                                         <Box pt={4}>
-                                            <Card variant={'outline'}>
-                                                <CardBody>
-                                                    <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                                                        <Spinner color='teal' size='xl' thickness='3px' />
-                                                    </Box>
-                                                </CardBody>
+                                            <Card >
+           
+                                                <Box height={'10vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                                                    <Spinner color='teal' size='xl' thickness='3px' />
+                                                </Box>
+                                 
                                             </Card>
                                         </Box>
                                     ): (
@@ -380,66 +385,86 @@ export default function Objectives({dataObjectives, programMode} : {dataObjectiv
 
                 {loading ?
                 <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody>
+                    <Card >
+
                             <Box height={'80vh'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                                 <Spinner color='teal' size='xl' thickness='3px' />
                             </Box>
-                        </CardBody>
+   
                     </Card>
                 </Box>
                 : <Box pt={4}>
-                    <Card variant={'outline'}>
-                        <CardBody p={0}>
-                            <TableContainer>
-                                <Table variant='striped'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Título</Th>
-                                            <Th>Nota</Th>
-                                            <Th>Evaluación</Th>
-                                            <Th>Programa</Th>
-                                            <Td>Acciones</Td>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {dataObjectivesLocal.map(objective => {
-                                            return (
-                                                <Tr key={objective.id}>
-                                                    <Td>{objective.id}</Td>
-                                                    <Td>{objective.title}</Td>
-                                                    <Td>{objective.mark}</Td>
-                                                    <Td>
-                                                        {dataEvaluations.find(evaluation => evaluation.id === objective.idEvaluation)?.commment} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        {dataPrograms.find(program => program.id === objective.idProgram)?.description} {" "}
-                                                    </Td>
-                                                    <Td>
-                                                        <ButtonGroup variant='ghost' spacing='1'>
-                                                            <IconButton onClick={() => handleShowData(objective)}
-                                                            colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
+                    <Card >
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Flex justifyContent="start" className="space-x-2">
+                                <Heading size='md' id='tutores'>Objetivos</Heading>
+                                <Badge color="gray">{dataObjectivesLocal.length}</Badge>
+                                </Flex>
+                                <Box>
+                                <MultiSelect
+                                    onValueChange={setSelectedNames}
+                                    placeholder="Buscar..."
+                                    className="max-w-lg"
+                                >
+                                    {dataObjectivesLocal.map((objective) => (
+                                    <MultiSelectItem key={objective.id} value={objective.title}>
+                                        {objective.title}
+                                    </MultiSelectItem>
+                                    ))}
+                                </MultiSelect>
+                                </Box>
+                            </Flex>
+                        <Text className="mt-2">Lista de Objetivos Registrados</Text>
+                        
+                        <Table className='mt-6'>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>ID</TableHeaderCell>
+                                    <TableHeaderCell>Título</TableHeaderCell>
+                                    <TableHeaderCell>Nota</TableHeaderCell>
+                                    <TableHeaderCell>Evaluación</TableHeaderCell>
+                                    <TableHeaderCell>Programa</TableHeaderCell>
+                                    <TableHeaderCell>Acciones</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {dataObjectivesLocal
+                                .filter((objective) => isObjectiveSelected(objective))
+                                .map(objective => {
+                                    return (
+                                        <TableRow key={objective.id}>
+                                            <TableCell>{objective.id}</TableCell>
+                                            <TableCell>{objective.title}</TableCell>
+                                            <TableCell>{objective.mark}</TableCell>
+                                            <TableCell>
+                                                {dataEvaluations.find(evaluation => evaluation.id === objective.idEvaluation)?.commment} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                {dataPrograms.find(program => program.id === objective.idProgram)?.description} {" "}
+                                            </TableCell>
+                                            <TableCell>
+                                                <ButtonGroup variant='ghost' spacing='1'>
+                                                    <IconButton onClick={() => handleShowData(objective)}
+                                                    colorScheme='blue' icon={<ViewIcon />} aria-label='Show'></IconButton>
 
-                                                            {!programMode && (
-                                                                <Box>
-                                                                    <IconButton onClick={() => handleEditData(objective)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
+                                                    {!programMode && (
+                                                        <Box>
+                                                            <IconButton onClick={() => handleEditData(objective)} colorScheme='green' icon={<EditIcon />} aria-label='Edit'></IconButton>
 
-                                                                    <IconButton onClick={() => handleDeleteData(objective.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
-                                                                </Box>
-                                                            )}
-                                                            
-                                                        </ButtonGroup>
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })
-                                        }
-                                    </Tbody>
+                                                            <IconButton onClick={() => handleDeleteData(objective.id)} icon={<DeleteIcon />} colorScheme='red' aria-label='Delete'></IconButton>
+                                                        </Box>
+                                                    )}
+                                                    
+                                                </ButtonGroup>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                                }
+                            </TableBody>
 
-                                </Table>
-                            </TableContainer>
-                        </CardBody>
+                        </Table>
+
                     </Card>
                 </Box>
                         

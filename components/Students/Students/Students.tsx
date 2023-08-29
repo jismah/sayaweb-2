@@ -506,7 +506,7 @@ export default function Students({ familyStudents, dataFamily, familyMode, progr
                       if (student.status === "REJECTED") {
                         StatusAux = "Rechazado";
                       } else if (student.status === "ENROLLED") {
-                        StatusAux = "Inscripto";
+                        StatusAux = "Inscrito";
                       } else if (student.status === "WAITLISTED") {
                         StatusAux = "En Lista de Espera";
                       } else if (student.status === "ACCEPTED_NOT_ENROLLED") {
