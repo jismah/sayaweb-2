@@ -72,6 +72,9 @@ export default function Tutors(){
             });
             const json = await res.json();
             console.log(json);
+
+            setDataTutor(initialTutor);
+            setSelectedStudentId("");
         
             setDataTutors(json.response); // ACTUALIZAR EL ESTADO
             setTotalRecords(json.total); // Establecer el total de registros

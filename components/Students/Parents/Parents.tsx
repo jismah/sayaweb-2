@@ -1,13 +1,9 @@
-import { AddIcon, DeleteIcon, CheckIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
-import { TableContainer, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot, Box, Button, Flex, Center, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, CardBody, Stack, NumberIncrementStepperProps, SimpleGrid } from '@chakra-ui/react';
-import { FaceSmileIcon } from '@heroicons/react/24/solid';
-import { User } from '@supabase/supabase-js';
+import { AddIcon, DeleteIcon, ViewIcon, EditIcon} from '@chakra-ui/icons';
+import { Box, Button, Flex, Spinner, ButtonGroup, IconButton, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useDisclosure, useToast, Heading, Stack, SimpleGrid } from '@chakra-ui/react';
 // import { Props } from '@supabase/auth-ui-react/dist/components/Auth/UserContext';
-import { NextPage } from 'next';
-import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 
-import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Color, Badge, Title, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
+import { Card, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Table, Badge, Text, MultiSelect, MultiSelectItem } from '@tremor/react';
 
 
 import { Student } from '../../Students/Students/Students';
@@ -192,7 +188,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
 
   // DELETE DATA
   const handleDeleteData = async (id: string) => {
-    const res = await fetch(`/api/parents/${id}`, {
+    const res = await fetch(`https://sayaserver.onrender.com/api/parents/${id}`, {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json",

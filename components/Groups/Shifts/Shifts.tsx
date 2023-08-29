@@ -133,6 +133,11 @@ export default function Shifts(){
             const json = await res.json();
             console.log(json);
 
+            setDataShift(initialShiftData);
+            setSelectedStaffId("");
+            setSelectedWeekDayId("");
+            setSelectedAcademicYearId("");
+
             toast({
                     title: 'Registro Creado!',
                     description: "Se creo el registro correctamente.",

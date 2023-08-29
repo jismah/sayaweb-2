@@ -160,6 +160,8 @@ export default function Groups(){
             
             const jsonGroupsBulk = await resGroupsBulk.json();
             console.log(jsonGroupsBulk);
+
+            setDataGroup(initialGroupData);
     
             toast({
                 title: 'Registro Creado!',
