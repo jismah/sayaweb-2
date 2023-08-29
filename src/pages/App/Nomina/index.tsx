@@ -8,8 +8,11 @@ import ListNominaByStaff from '../../../../components/Nomina/ListNominaByStaff';
 import CreateNomina from '../../../../components/Nomina/CreateNomina';
 import CreateDetailNomina from '../../../../components/Nomina/CreateDetailNomina';
 import NominaDoc from '../../../../components/Nomina/NominaDoc';
+import { useUser } from '@supabase/auth-helpers-react';
+import router from 'next/router';
 
 const Nominas: NextPage = () => {
+    const user = useUser();
     
     const [SearchId, setSearchId] = useState('');
     const [SearchYear, setSearchYear] = useState('');
@@ -157,6 +160,13 @@ const Nominas: NextPage = () => {
     const closeDoc = () => {
         setIsDocOpen(false);
     };
+
+    // Startup
+    useEffect(() => {
+        if (!user) {
+            router.push('/Auth/Login');
+        }
+    }, []);
 
     return (
         <>
