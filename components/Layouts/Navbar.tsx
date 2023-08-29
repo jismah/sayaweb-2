@@ -2,7 +2,7 @@ import React from "react";
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack, useToast } from "@chakra-ui/react";
+import { Flex, useColorModeValue, Heading, useBreakpointValue, Button, Stack, Menu, MenuButton, Avatar, MenuList, MenuItem, Box, useColorMode, HStack, useToast, MenuGroup } from "@chakra-ui/react";
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import Image from 'next/image'
 
@@ -115,8 +115,10 @@ const Navbar: React.FC = () => {
                                     />
                                 </MenuButton>
                                 <MenuList alignItems={'center'}>
-                                    <MenuItem>Configuración</MenuItem>
-                                    <MenuItem onClick={() => handleSignOut()}>Cerrar Sesión</MenuItem>
+                                    <MenuGroup title={user?.email}>
+                                        <MenuItem>Configuración</MenuItem>
+                                        <MenuItem onClick={() => handleSignOut()}>Cerrar Sesión</MenuItem>
+                                    </MenuGroup>
                                 </MenuList>
                             </Menu>
                         </Stack>
