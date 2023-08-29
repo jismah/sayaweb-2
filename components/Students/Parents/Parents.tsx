@@ -416,7 +416,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
                                         <TableHeaderCell>Fecha de nacimiento</TableHeaderCell>
                                       </TableRow>
                                   </TableHead>
-                                  <Tbody>
+                                  <TableBody>
                                       {familyChildrens.map((student: Student) => {
                                           return (
                                             <TableRow key={student.id}>
@@ -429,7 +429,7 @@ export default function Parents({familyParents, dataFamily, familyMode, enableEd
                                           )
                                       })
                                       }
-                                  </Tbody>
+                                  </TableBody>
                                 </Table>
                               </Card>
                             </Box>
